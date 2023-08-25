@@ -10,32 +10,33 @@ on:
     #branches: [ main ]
 
 jobs:
-  test:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      packages: write
+# No need for this as build command itself already runs tests.
+#  test:
+#    runs-on: ubuntu-22.04
+#    permissions:
+#      contents: read
+#      packages: write
+#
+#    defaults:
+#      run:
+#        working-directory: ./wingit
+#
+#    steps:
+#    - uses: actions/checkout@v3
+#    - name: Set up JDK 17
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '17'
+#        distribution: 'temurin'
+#        cache: maven
+#
+#    - name: Test with Maven
+#      run: |
+#            mvn -B clean test -P dev
 
-    defaults:
-      run:
-        working-directory: ./wingit
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-
-    - name: Test with Maven
-      run: |
-            mvn -B test -P dev 
 
 
-
-  build:
+  build-and-test:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
