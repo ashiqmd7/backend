@@ -17,6 +17,10 @@ jobs:
       contents: read
       packages: write
 
+    defaults:
+      run:
+        working-directory: ./wingit
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -31,7 +35,7 @@ jobs:
 
     - name: Build with Maven
       working-directory: ./wingit
-      run:
+      run: |
             mvn -B package -P prod --file pom.xml
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
