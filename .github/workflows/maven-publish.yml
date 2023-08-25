@@ -34,7 +34,6 @@ jobs:
         #settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
-      working-directory: ./wingit
       run: |
             mvn -B package -P prod --file pom.xml
             mkdir artifacts && cp target/*.jar artifacts
@@ -44,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: github-actions-artifact
-        path: artifacts
+        path: ./wingit/artifacts
 
     # TODO: Deployment step to AWS.
 
