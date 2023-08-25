@@ -31,7 +31,7 @@ jobs:
 
     - name: Build with Maven
       run:
-            mvn -B package -P prod --file pom.xml
+            mvn -B package -P prod
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
 
