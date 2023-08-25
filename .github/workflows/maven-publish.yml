@@ -30,8 +30,8 @@ jobs:
         #settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
+      working-directory: ./wingit
       run:
-            cd wingit
             mvn -B package -P prod --file pom.xml
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
