@@ -60,9 +60,14 @@ jobs:
             mvn -B package -P dev --file pom.xml
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
-
+    - name: Create Timestamp for Version Info
+      id: time
+      uses: nanzm/get-time-action@v1.1
+      with:
+        format: 'YYYY-MM-DD-HH-mm-ss'
     - name: Save artifact
       uses: actions/upload-artifact@v3
       with:
-        name: github-actions-artifact
+        name: "Artifact-DEV-${{steps.time.outputs.time}}"
         path: ./wingit/artifacts
+        retention-days: 5
