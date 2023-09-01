@@ -1,7 +1,7 @@
 # This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
 
-name: Maven Build and Deploy
+name: Production Build and Deploy
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
     #branches: [ main ]
 
 jobs:
-  build-only:
+  build-and-deploy:
 
     runs-on: ubuntu-22.04
     permissions:
@@ -34,12 +34,12 @@ jobs:
         
     - name: Build with Maven
       run: |
-            mvn -B package -P prod --file pom.xml -DskipTest
+            mvn -B package -P prod --file pom.xml -Dmaven.test.skip
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
     - name: Create Timestamp for Version Info
       id: time
-      uses: nanzm/get-time-action@v1.1
+      uses: nanzm/get-time-action@v2.0
       with:
         format: 'YYYY-MM-DD-HH-mm-ss'
     - name: Save artifact
@@ -55,11 +55,10 @@ jobs:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         application_name: wingit
-        environment_name: Wingit-env-prod
+        environment_name: wingit-env-prod
         version_label: wingit-${{steps.time.outputs.time}}
         region: ap-southeast-1
-        # Need to wildcard this jar file name in future. Or change it when we change version number.
-        deployment_package: ./wingit/artifacts/wingit-0.0.1-SNAPSHOT.jar
+        deployment_package: ./wingit/artifacts/wingit-prod.jar
 
 
     
