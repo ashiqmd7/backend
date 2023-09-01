@@ -1,13 +1,13 @@
 package com.G2T5203.wingit.entities;
 
 public class Seat_Listing {
-    private Route_Listing route_listing;
+    private RouteListing route_listing;
     private String SEAT_ID;
     private String occupant_name;
     private String USER_ID;
     private String BOOKING_ID;
 
-    public Seat_Listing(Route_Listing route_listing, String SEAT_ID, String occupant_name, String USER_ID, String BOOKING_ID) {
+    public Seat_Listing(RouteListing route_listing, String SEAT_ID, String occupant_name, String USER_ID, String BOOKING_ID) {
         this.route_listing = route_listing;
         this.SEAT_ID = SEAT_ID;
         this.occupant_name = occupant_name;
@@ -15,11 +15,11 @@ public class Seat_Listing {
         this.BOOKING_ID = BOOKING_ID;
     }
 
-    public Route_Listing getRoute_listing() {
+    public RouteListing getRoute_listing() {
         return route_listing;
     }
 
-    public void setRoute_listing(Route_Listing route_listing) {
+    public void setRoute_listing(RouteListing route_listing) {
         this.route_listing = route_listing;
     }
 

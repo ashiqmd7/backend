@@ -1,57 +1,67 @@
 package com.G2T5203.wingit.entities;
 
+import jakarta.persistence.*;
+
+@Entity
+@IdClass(SeatId.class)
 public class Seat {
-    private String PLANE_ID;
-    private String SEAT_ID;
-    private String Class;
-    private double price_factor;
+    @Id
+    private String planeID;
+    @Id
+    private int seatNumber;
+    private String seatClass;
+    private double priceFactor;
 
-    public Seat(String PLANE_ID, String SEAT_ID, String aClass, double price_factor) {
-        this.PLANE_ID = PLANE_ID;
-        this.SEAT_ID = SEAT_ID;
-        this.Class = aClass;
-        this.price_factor = price_factor;
+    public Seat(String planeID, int seatNumber, String seatClass, double priceFactor) {
+        this.planeID = planeID;
+        this.seatNumber = seatNumber;
+        this.seatClass = seatClass;
+        this.priceFactor = priceFactor;
     }
 
-    public String getPLANE_ID() {
-        return PLANE_ID;
+    public Seat() {
+
     }
 
-    public void setPLANE_ID(String PLANE_ID) {
-        this.PLANE_ID = PLANE_ID;
+    public String getPlaneID() {
+        return planeID;
     }
 
-    public String getSEAT_ID() {
-        return SEAT_ID;
+    public void setPlaneID(String planeID) {
+        this.planeID = planeID;
     }
 
-    public void setSEAT_ID(String SEAT_ID) {
-        this.SEAT_ID = SEAT_ID;
+    public int getSeatNumber() {
+        return seatNumber;
     }
 
-    public String getAClass() {
-        return Class;
+    public void setSeatNumber(int seatNumber) {
+        this.seatNumber = seatNumber;
     }
 
-    public void setClass(String aClass) {
-        Class = aClass;
+    public String getSeatClass() {
+        return seatClass;
     }
 
-    public double getPrice_factor() {
-        return price_factor;
+    public void setSeatClass(String seatClass) {
+        this.seatClass = seatClass;
     }
 
-    public void setPrice_factor(double price_factor) {
-        this.price_factor = price_factor;
+    public double getPriceFactor() {
+        return priceFactor;
+    }
+
+    public void setPriceFactor(double priceFactor) {
+        this.priceFactor = priceFactor;
     }
 
     @Override
     public String toString() {
         return "Seat{" +
-                "PLANE_ID='" + PLANE_ID + '\'' +
-                ", SEAT_ID='" + SEAT_ID + '\'' +
-                ", Class='" + Class + '\'' +
-                ", price_factor=" + price_factor +
+                "planeID='" + planeID + '\'' +
+                ", seatNumber=" + seatNumber +
+                ", seatClass='" + seatClass + '\'' +
+                ", priceFactor=" + priceFactor +
                 '}';
     }
 }

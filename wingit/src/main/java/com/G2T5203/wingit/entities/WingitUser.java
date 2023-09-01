@@ -1,9 +1,16 @@
 package com.G2T5203.wingit.entities;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Date;
 
+@Entity
 public class WingitUser {
-    private String UserID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String userID;
     private String password;
     private String firstName;
     private String lastName;
@@ -12,8 +19,9 @@ public class WingitUser {
     private String phone;
     private String salutation;
 
-    public WingitUser(String UserID, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
-        this.UserID = UserID;
+
+    public WingitUser(String userID, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+        this.userID = userID;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,12 +31,16 @@ public class WingitUser {
         this.salutation = salutation;
     }
 
-    public String getUserID() {
-        return UserID;
+    public WingitUser() {
+
     }
 
-    public void setUserID(String UserID) {
-        this.UserID = UserID;
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getPassword() {
@@ -90,7 +102,7 @@ public class WingitUser {
     @Override
     public String toString() {
         return "WingitUser{" +
-                "UserID='" + UserID + '\'' +
+                "userID='" + userID + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
