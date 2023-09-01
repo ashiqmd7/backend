@@ -2,33 +2,33 @@ package com.G2T5203.wingit.entities;
 
 import java.util.Date;
 
-public class User {
-    private String USER_ID;
+public class WingitUser {
+    private String UserID;
     private String password;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
     private Date dob;
     private String email;
-    private int phone;
+    private String phone;
     private String salutation;
 
-    public User(String USER_ID, String password, String first_name, String last_name, Date dob, String email, int phone, String salutation) {
-        this.USER_ID = USER_ID;
+    public WingitUser(String UserID, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+        this.UserID = UserID;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.dob = dob;
         this.email = email;
         this.phone = phone;
         this.salutation = salutation;
     }
 
-    public String getUSER_ID() {
-        return USER_ID;
+    public String getUserID() {
+        return UserID;
     }
 
-    public void setUSER_ID(String USER_ID) {
-        this.USER_ID = USER_ID;
+    public void setUserID(String UserID) {
+        this.UserID = UserID;
     }
 
     public String getPassword() {
@@ -39,20 +39,20 @@ public class User {
         this.password = password;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Date getDob() {
@@ -71,11 +71,11 @@ public class User {
         this.email = email;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
@@ -89,14 +89,14 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "USER_ID='" + USER_ID + '\'' +
+        return "WingitUser{" +
+                "UserID='" + UserID + '\'' +
                 ", password='" + password + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", dob=" + dob +
                 ", email='" + email + '\'' +
-                ", phone=" + phone +
+                ", phone='" + phone + '\'' +
                 ", salutation='" + salutation + '\'' +
                 '}';
     }

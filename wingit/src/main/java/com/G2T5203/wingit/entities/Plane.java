@@ -1,22 +1,22 @@
 package com.G2T5203.wingit.entities;
 
 public class Plane {
-    private String PLANE_ID;
+    private String PlaneID;
     private int capacity;
     private String model;
 
-    public Plane(String PLANE_ID, int capacity, String model) {
-        this.PLANE_ID = PLANE_ID;
+    public Plane(String PlaneID, int capacity, String model) {
+        this.PlaneID = PlaneID;
         this.capacity = capacity;
         this.model = model;
     }
 
-    public String getPLANE_ID() {
-        return PLANE_ID;
+    public String getPlaneID() {
+        return PlaneID;
     }
 
-    public void setPLANE_ID(String PLANE_ID) {
-        this.PLANE_ID = PLANE_ID;
+    public void setPlaneID(String PlaneID) {
+        this.PlaneID = PlaneID;
     }
 
     public int getCapacity() {
@@ -38,7 +38,7 @@ public class Plane {
     @Override
     public String toString() {
         return "Plane{" +
-                "PLANE_ID='" + PLANE_ID + '\'' +
+                "PlaneID='" + PlaneID + '\'' +
                 ", capacity=" + capacity +
                 ", model='" + model + '\'' +
                 '}';
