@@ -1,7 +1,7 @@
 # This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
 
-name: Maven Build and Deploy
+name: Production Build and Deploy
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
     #branches: [ main ]
 
 jobs:
-  build-only:
+  build-and-deploy:
 
     runs-on: ubuntu-22.04
     permissions:
@@ -29,26 +29,36 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-        # Below I don't think we are using it. Was from template.
-        #server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        #settings-path: ${{ github.workspace }} # location for the settings.xml file
-
+        
+        
+        
     - name: Build with Maven
       run: |
-            mvn -B package -P prod --file pom.xml -DskipTest
+            mvn -B package -P prod --file pom.xml -Dmaven.test.skip
             mkdir artifacts && cp target/*.jar artifacts
             cd artifacts && ls
-
+    - name: Create Timestamp for Version Info
+      id: time
+      uses: nanzm/get-time-action@v2.0
+      with:
+        format: 'YYYY-MM-DD-HH-mm-ss'
     - name: Save artifact
       uses: actions/upload-artifact@v3
       with:
-        name: github-actions-artifact
+        name: "Artifact-${{steps.time.outputs.time}}"
         path: ./wingit/artifacts
+        retention-days: 5
 
-    # TODO: Deployment step to AWS.
+    - name: Beanstalk Deploy for JAR
+      uses: einaregilsson/beanstalk-deploy@v21
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: wingit
+        environment_name: wingit-env-prod
+        version_label: wingit-${{steps.time.outputs.time}}
+        region: ap-southeast-1
+        deployment_package: ./wingit/artifacts/wingit-prod.jar
 
-    # Below is also from the template though our deployment will be for AWS to be set up later.
-    #- name: Publish to GitHub Packages Apache Maven
-      #run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-      #env:
-        #GITHUB_TOKEN: ${{ github.token }}
+
+    
