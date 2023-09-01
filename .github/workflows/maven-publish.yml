@@ -39,7 +39,7 @@ jobs:
             cd artifacts && ls
     - name: Create Timestamp for Version Info
       id: time
-      uses: nanzm/get-time-action@v1.1
+      uses: nanzm/get-time-action@v2.0
       with:
         format: 'YYYY-MM-DD-HH-mm-ss'
     - name: Save artifact
