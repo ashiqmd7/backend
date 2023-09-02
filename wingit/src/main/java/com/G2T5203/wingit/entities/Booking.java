@@ -2,14 +2,14 @@ package com.G2T5203.wingit.entities;
 
 import java.util.Date;
 
-public class Hold_Booking {
+public class Booking {
     private String HOLD_ID;
     private String USER_ID;
     private Date start_datetime;
     private int party_size;
     private RouteListing route_listing;
 
-    public Hold_Booking(String HOLD_ID, String USER_ID, Date start_datetime, int party_size, RouteListing route_listing) {
+    public Booking(String HOLD_ID, String USER_ID, Date start_datetime, int party_size, RouteListing route_listing) {
         this.HOLD_ID = HOLD_ID;
         this.USER_ID = USER_ID;
         this.start_datetime = start_datetime;

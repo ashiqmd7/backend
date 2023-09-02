@@ -13,6 +13,7 @@ public class RouteListing {
     private String planeID;
     @Id
     private String routeID;
+    @Id
     private Date departureDatetime;
     private double basePrice;
 
