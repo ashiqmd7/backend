@@ -1,12 +1,18 @@
 package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.logging.Level;
 
 @RestController
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService service;
 
     public UserController(UserService service) {
@@ -27,10 +33,11 @@ public class UserController {
 
     // POST to add a new user
     // TODO: Need set the path properly.
-    @PostMapping
-    public WingitUser addUser(@RequestBody WingitUser newUser) {
-        // TODO: Implement code to add a new user to the repository
-        return null; // Example for JPA: userRepository.save(newUser)
+    @PostMapping(path = "/users/new")
+    public ResponseEntity<String> createUser(@RequestBody WingitUser newUser) {
+        logger.debug("RequestBody JSON: " + newUser.toString());
+        HttpStatus resultingStatus = service.createUser(newUser);
+        return ResponseEntity.status(resultingStatus).build();
     }
 
     // DELETE a specific user by userID
@@ -40,7 +47,7 @@ public class UserController {
     }
 
     // PUT to update a specific user by userID
-    @PutMapping("/users/update{userID}")
+    @PutMapping("/users/update/{userID}")
     public WingitUser updateUser(@PathVariable String userID, @RequestBody WingitUser updatedUser) {
         // TODO: Implement code to update an existing user in the repository
         return null; // Example for JPA: userRepository.save(updatedUser)

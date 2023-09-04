@@ -1,5 +1,5 @@
 create table WINGIT_USER (
-    USER_ID bigint not null,
+    USER_ID bigint auto_increment not null,
     PASSWORD varchar(255) not null,
     FIRST_NAME varchar(255) not null,
     LAST_NAME varchar(255) not null,
