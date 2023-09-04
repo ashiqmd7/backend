@@ -48,9 +48,12 @@ public class UserController {
 
     // PUT to update a specific user by userID
     @PutMapping("/users/update/{userID}")
-    public WingitUser updateUser(@PathVariable String userID, @RequestBody WingitUser updatedUser) {
-        // TODO: Implement code to update an existing user in the repository
-        return null; // Example for JPA: userRepository.save(updatedUser)
+    public ResponseEntity<String> updateUser(@PathVariable Integer userID, @RequestBody WingitUser updatedUser) {
+        updatedUser.setUserId(userID);
+        HttpStatus resultingStatus;
+        resultingStatus = service.updateUser(updatedUser);
+
+        return ResponseEntity.status(resultingStatus).build();
     }
 
 

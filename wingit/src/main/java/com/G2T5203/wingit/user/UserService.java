@@ -55,4 +55,23 @@ public class UserService {
 
         return HttpStatus.OK;
     }
+
+    @Transactional
+    public HttpStatus updateUser(WingitUser updatedUser) {
+        try {
+            boolean userExists = getById(updatedUser.getUserId()) != null;
+            if (userExists) {
+                repo.save(updatedUser);
+            } else {
+                logger.error("User " + updatedUser.getUserId() + " does not exist!");
+                return HttpStatus.BAD_REQUEST;
+            }
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Failed to add new User: DataIntegrityViolationException\n" + updatedUser.toString());
+            logger.debug("Error details: " + e.getLocalizedMessage());
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        return HttpStatus.OK;
+    }
 }
