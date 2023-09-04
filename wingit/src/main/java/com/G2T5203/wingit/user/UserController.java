@@ -32,7 +32,6 @@ public class UserController {
     }
 
     // POST to add a new user
-    // TODO: Need set the path properly.
     @PostMapping(path = "/users/new")
     public ResponseEntity<String> createUser(@RequestBody WingitUser newUser) {
         logger.debug("RequestBody JSON: " + newUser.toString());
@@ -42,8 +41,9 @@ public class UserController {
 
     // DELETE a specific user by userID
     @DeleteMapping(path = "/users/delete/{userID}")
-    public void deleteUser(@PathVariable String userID) {
-        // TODO: To be implemented
+    public ResponseEntity<String> deleteUser(@PathVariable Integer userID) {
+        HttpStatus resultingStatus = service.deleteUserById(userID);
+        return ResponseEntity.status(resultingStatus).build();
     }
 
     // PUT to update a specific user by userID
