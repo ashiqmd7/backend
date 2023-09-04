@@ -7,22 +7,22 @@ import java.util.List;
 @RestController
 public class UserController {
 
-    private final UserRepository repo;
+    private final UserService service;
 
-    public UserController(UserRepository repo) {
-        this.repo = repo;
+    public UserController(UserService service) {
+        this.service = service;
     }
 
     // GET all users
     @GetMapping(path = "/users")
     public List<WingitUser> getAllUsers() {
-        return repo.findAll();
+        return service.getAllUsers();
     }
 
     // GET a specific user by userID
     @GetMapping(path = "/users/{userID}")
     public WingitUser getUser(@PathVariable Integer userID) {
-        return repo.findById(userID).orElse(null);
+        return service.getById(userID);
     }
 
     // POST to add a new user
