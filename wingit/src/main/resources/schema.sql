@@ -1,13 +1,13 @@
-create table WingitUser (
-                            userID bigint not null,
-                            password varchar(255) not null,
-                            firstName varchar(255) not null,
-                            lastName varchar(255) not null,
-                            dob date not null,
-                            email varchar(255) not null,
-                            phone bigint not null,
-                            salutation varchar(255) not null,
-                            primary key (userID)
+create table WINGIT_USER (
+    USERID bigint not null,
+    PASSWORD varchar(255) not null,
+    FIRST_NAME varchar(255) not null,
+    LAST_NAME varchar(255) not null,
+    DOB date not null,
+    EMAIL varchar(255) not null,
+    PHONE varchar(20) not null,
+    SALUTATION varchar(255) not null,
+    primary key (userID)
 );
 
 create table Plane (
@@ -54,7 +54,7 @@ create table HoldBooking (
                              planeID bigint not null,
                              routeID bigint not null,
                              primary key (holdID, userID),
-                             foreign key (userID) references WingitUser(userID),
+                             foreign key (userID) references WINGIT_USER(userID),
                              foreign key (routeID) references Route(routeID)
 );
 

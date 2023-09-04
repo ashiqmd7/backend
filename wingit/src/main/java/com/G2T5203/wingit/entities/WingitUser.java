@@ -10,7 +10,7 @@ import java.util.Date;
 public class WingitUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String userID;
+    private Integer userID;
     private String password;
     private String firstName;
     private String lastName;
@@ -20,7 +20,7 @@ public class WingitUser {
     private String salutation;
 
 
-    public WingitUser(String userID, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+    public WingitUser(Integer userID, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
         this.userID = userID;
         this.password = password;
         this.firstName = firstName;
@@ -35,11 +35,11 @@ public class WingitUser {
 
     }
 
-    public String getUserID() {
+    public Integer getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(Integer userID) {
         this.userID = userID;
     }
 
