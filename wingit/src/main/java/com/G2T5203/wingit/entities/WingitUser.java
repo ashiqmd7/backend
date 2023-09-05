@@ -1,9 +1,7 @@
 package com.G2T5203.wingit.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity
@@ -15,6 +13,7 @@ public class WingitUser {
     private String firstName;
     private String lastName;
     private Date dob;
+    @Column(unique = true)
     private String email;
     private String phone;
     private String salutation;

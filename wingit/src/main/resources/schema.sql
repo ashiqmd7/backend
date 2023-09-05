@@ -4,7 +4,7 @@ create table WINGIT_USER (
     FIRST_NAME varchar(255) not null,
     LAST_NAME varchar(255) not null,
     DOB date not null,
-    EMAIL varchar(255) not null,
+    EMAIL varchar(255) UNIQUE not null,
     PHONE varchar(20) not null,
     SALUTATION varchar(255) not null,
     primary key (USER_ID)
