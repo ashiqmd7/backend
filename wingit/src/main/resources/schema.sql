@@ -10,11 +10,11 @@ create table WINGIT_USER (
     primary key (USER_ID)
 );
 
-create table Plane (
-                       planeID bigint not null,
-                       capacity bigint not null,
-                       model varchar(255) not null,
-                       primary key (planeID)
+create table PLANE (
+                       PLANE_ID varchar(6) not null,
+                       CAPACITY bigint not null,
+                       MODEL varchar(255) not null,
+                       primary key (PLANE_ID)
 );
 
 

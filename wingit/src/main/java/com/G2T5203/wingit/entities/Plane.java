@@ -9,12 +9,12 @@ import jakarta.persistence.Id;
 public class Plane {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String planeID;
+    private String planeId;
     private int capacity;
     private String model;
 
-    public Plane(String planeID, int capacity, String model) {
-        this.planeID = planeID;
+    public Plane(String planeId, int capacity, String model) {
+        this.planeId = planeId;
         this.capacity = capacity;
         this.model = model;
     }
@@ -22,12 +22,12 @@ public class Plane {
     public Plane() {
     }
 
-    public String getPlaneID() {
-        return planeID;
+    public String getPlaneId() {
+        return planeId;
     }
 
-    public void setPlaneID(String planeID) {
-        this.planeID = planeID;
+    public void setPlaneId(String planeID) {
+        this.planeId = planeID;
     }
 
     public int getCapacity() {
@@ -49,7 +49,7 @@ public class Plane {
     @Override
     public String toString() {
         return "Plane{" +
-                "planeID='" + planeID + '\'' +
+                "planeID='" + planeId + '\'' +
                 ", capacity=" + capacity +
                 ", model='" + model + '\'' +
                 '}';
