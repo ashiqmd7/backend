@@ -11,13 +11,13 @@ import java.time.Duration;
 public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String routeID;
+    private String routeId;
     private String departureDest;
     private String arrivalDest;
     private Duration flightDuration;
 
-    public Route(String routeID, String departureDest, String arrivalDest, Duration flightDuration) {
-        this.routeID = routeID;
+    public Route(String routeId, String departureDest, String arrivalDest, Duration flightDuration) {
+        this.routeId = routeId;
         this.departureDest = departureDest;
         this.arrivalDest = arrivalDest;
         this.flightDuration = flightDuration;
@@ -27,12 +27,12 @@ public class Route {
 
     }
 
-    public String getRouteID() {
-        return routeID;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public void setRouteID(String routeID) {
-        this.routeID = routeID;
+    public void setRouteId(String routeID) {
+        this.routeId = routeID;
     }
 
     public String getDepartureDest() {
@@ -62,7 +62,7 @@ public class Route {
     @Override
     public String toString() {
         return "Route{" +
-                "routeID='" + routeID + '\'' +
+                "routeID='" + routeId + '\'' +
                 ", departureDest='" + departureDest + '\'' +
                 ", arrivalDest='" + arrivalDest + '\'' +
                 ", flightDuration=" + flightDuration +

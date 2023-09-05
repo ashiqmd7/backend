@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class RouteListingID implements Serializable {
-    private String planeID;
-    private String routeID;
+    private String planeId;
+    private String routeId;
     private Date departureDatetime;
 
-    public RouteListingID(String planeID, String routeID, Date departureDatetime) {
-        this.planeID = planeID;
-        this.routeID = routeID;
+    public RouteListingID(String planeId, String routeId, Date departureDatetime) {
+        this.planeId = planeId;
+        this.routeId = routeId;
         this.departureDatetime = departureDatetime;
     }
 }

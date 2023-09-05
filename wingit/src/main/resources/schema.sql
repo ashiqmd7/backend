@@ -11,68 +11,62 @@ create table WINGIT_USER (
 );
 
 create table PLANE (
-                       PLANE_ID varchar(6) not null,
-                       CAPACITY bigint not null,
-                       MODEL varchar(255) not null,
-                       primary key (PLANE_ID)
+    PLANE_ID varchar(6) not null,
+    CAPACITY bigint not null,
+    MODEL varchar(255) not null,
+    primary key (PLANE_ID)
 );
 
 
-create table Seat (
-                      planeID bigint not null,
-                      seatNumber bigint not null,
-                      seatClass varchar(255) not null,
-                      priceFactor double not null,
-                      primary key (planeID, seatNumber),
-                      foreign key (planeID) references Plane(planeID)
+create table SEAT (
+    PLANE_ID varchar(6) not null,
+    SEAT_NUMBER bigint not null,
+    SEAT_CLASS varchar(255) not null,
+    PRICE_FACTOR double not null,
+    primary key (PLANE_ID, SEAT_NUMBER),
+    foreign key (PLANE_ID) references PLANE(PLANE_ID)
 );
 
-create table Route (
-                       routeID bigint not null,
-                       departureDest varchar(255) not null,
-                       arrivalDest varchar(255) not null,
-                       flightDuration double not null,
-                       primary key (routeID)
+create table ROUTE (
+    ROUTE_ID varchar(6) not null,
+    DEPARTURE_DEST varchar(255) not null,
+    ARRIVAL_DEST varchar(255) not null,
+    FLIGHT_DURATION double not null,
+    primary key (ROUTE_ID)
 );
 
-create table RouteListing (
-                              planeID bigint not null,
-                              routeID bigint not null,
-                              departureDatetime datetime not null,
-                              basePrice double not null,
-                              primary key (planeID, routeID),
-                              foreign key (planeID) references Plane(planeID),
-                              foreign key (routeID) references Route(routeID)
+create table ROUTE_LISTING (
+    PLANE_ID varchar(6) not null,
+    ROUTE_ID varchar(6) not null,
+    DEPARTURE_DATETIME datetime not null,
+    BASE_PRICE double not null,
+    primary key (PLANE_ID, ROUTE_ID),
+    foreign key (PLANE_ID) references Plane(PLANE_ID),
+    foreign key (ROUTE_ID) references Route(ROUTE_ID)
 );
 
-create table HoldBooking (
-                             holdID bigint not null,
-                             userID bigint not null,
-                             startDatetime datetime not null,
-                             partySize bigint not null,
-                             routeListingID bigint not null,
-                             planeID bigint not null,
-                             routeID bigint not null,
-                             primary key (holdID, userID),
-                             foreign key (userID) references WINGIT_USER(USER_ID),
-                             foreign key (routeID) references Route(routeID)
+create table BOOKING (
+     holdID bigint not null,
+     userID bigint not null,
+     startDatetime datetime not null,
+     partySize bigint not null,
+     routeListingID bigint not null,
+     planeID bigint not null,
+     routeID bigint not null,
+     primary key (holdID, userID),
+     foreign key (userID) references WINGIT_USER(USER_ID),
+     foreign key (routeID) references Route(ROUTE_ID)
 );
 
-create table SeatListing (
-                             SeatListingID bigint not null,
-                             planeID bigint not null,
-                             routeID bigint not null,
-                             seatNumber bigint not null,
-                             occupantName varchar(255),
-                             userID bigint,
-                             bookingID bigint,
-                             primary key (planeID, routeID, planeID, seatNumber),
-                             foreign key (planeID, routeID) references RouteListing(planeID, routeID),
-                             foreign key (planeID, seatNumber) references Seat(planeID, seatNumber)
-);
-
-create table TripBooking (
-                             bookingID bigint not null,
-                             chargedPrice double not null,
-                             primary key (bookingID)
+create table SEAT_LISTING (
+     SeatListingID bigint not null,
+     planeID bigint not null,
+     routeID bigint not null,
+     seatNumber bigint not null,
+     occupantName varchar(255),
+     userID bigint,
+     bookingID bigint,
+     primary key (planeID, routeID, planeID, seatNumber),
+     foreign key (planeID, routeID) references ROUTE_LISTING(PLANE_ID, ROUTE_ID),
+     foreign key (planeID, seatNumber) references SEAT(PLANE_ID, SEAT_NUMBER)
 );

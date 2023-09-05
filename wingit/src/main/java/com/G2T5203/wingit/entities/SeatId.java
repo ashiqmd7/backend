@@ -3,11 +3,11 @@ package com.G2T5203.wingit.entities;
 import java.io.Serializable;
 
 public class SeatId implements Serializable {
-    private String planeID;
+    private String planeId;
     private int seatNumber;
 
-    public SeatId(String planeID, int seatNumber) {
-        this.planeID = planeID;
+    public SeatId(String planeId, int seatNumber) {
+        this.planeId = planeId;
         this.seatNumber = seatNumber;
     }
 

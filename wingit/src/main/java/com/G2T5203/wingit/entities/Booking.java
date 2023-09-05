@@ -3,68 +3,101 @@ package com.G2T5203.wingit.entities;
 import java.util.Date;
 
 public class Booking {
-    private String HOLD_ID;
-    private String USER_ID;
-    private Date start_datetime;
-    private int party_size;
-    private RouteListing route_listing;
+    private String holdId;
+    private String userId;
+    private String planeId;
+    private String routeId;
+    private Date startBookingDatetime;
+    private int partySize;
+    private double chargedPrice;
+    private boolean isPaid;
 
-    public Booking(String HOLD_ID, String USER_ID, Date start_datetime, int party_size, RouteListing route_listing) {
-        this.HOLD_ID = HOLD_ID;
-        this.USER_ID = USER_ID;
-        this.start_datetime = start_datetime;
-        this.party_size = party_size;
-        this.route_listing = route_listing;
+    public Booking(String holdId, String userId, String planeId, String routeId, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
+        this.holdId = holdId;
+        this.userId = userId;
+        this.planeId = planeId;
+        this.routeId = routeId;
+        this.startBookingDatetime = startBookingDatetime;
+        this.partySize = partySize;
+        this.chargedPrice = chargedPrice;
+        this.isPaid = isPaid;
     }
 
-    public String getHOLD_ID() {
-        return HOLD_ID;
+    public String getHoldId() {
+        return holdId;
     }
 
-    public void setHOLD_ID(String HOLD_ID) {
-        this.HOLD_ID = HOLD_ID;
+    public void setHoldId(String holdId) {
+        this.holdId = holdId;
     }
 
-    public String getUSER_ID() {
-        return USER_ID;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUSER_ID(String USER_ID) {
-        this.USER_ID = USER_ID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public Date getStart_datetime() {
-        return start_datetime;
+    public String getPlaneId() {
+        return planeId;
     }
 
-    public void setStart_datetime(Date start_datetime) {
-        this.start_datetime = start_datetime;
+    public void setPlaneId(String planeId) {
+        this.planeId = planeId;
     }
 
-    public int getParty_size() {
-        return party_size;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public void setParty_size(int party_size) {
-        this.party_size = party_size;
+    public void setRouteId(String routeId) {
+        this.routeId = routeId;
     }
 
-    public RouteListing getRoute_listing() {
-        return route_listing;
+    public Date getStartBookingDatetime() {
+        return startBookingDatetime;
     }
 
-    public void setRoute_listing(RouteListing route_listing) {
-        this.route_listing = route_listing;
+    public void setStartBookingDatetime(Date startBookingDatetime) {
+        this.startBookingDatetime = startBookingDatetime;
+    }
+
+    public int getPartySize() {
+        return partySize;
+    }
+
+    public void setPartySize(int partySize) {
+        this.partySize = partySize;
+    }
+
+    public double getChargedPrice() {
+        return chargedPrice;
+    }
+
+    public void setChargedPrice(double chargedPrice) {
+        this.chargedPrice = chargedPrice;
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(boolean paid) {
+        isPaid = paid;
     }
 
     @Override
     public String toString() {
-        return "Hold_Booking{" +
-                "HOLD_ID='" + HOLD_ID + '\'' +
-                ", USER_ID='" + USER_ID + '\'' +
-                ", start_datetime=" + start_datetime +
-                ", party_size=" + party_size +
-                ", route_listing=" + route_listing +
+        return "Booking{" +
+                "holdId='" + holdId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", planeId='" + planeId + '\'' +
+                ", routeId='" + routeId + '\'' +
+                ", startBookingDatetime=" + startBookingDatetime +
+                ", partySize=" + partySize +
+                ", chargedPrice=" + chargedPrice +
+                ", isPaid=" + isPaid +
                 '}';
     }
 }

@@ -6,14 +6,14 @@ import jakarta.persistence.*;
 @IdClass(SeatId.class)
 public class Seat {
     @Id
-    private String planeID;
+    private String planeId;
     @Id
     private int seatNumber;
     private String seatClass;
     private double priceFactor;
 
-    public Seat(String planeID, int seatNumber, String seatClass, double priceFactor) {
-        this.planeID = planeID;
+    public Seat(String planeId, int seatNumber, String seatClass, double priceFactor) {
+        this.planeId = planeId;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
         this.priceFactor = priceFactor;
@@ -23,12 +23,12 @@ public class Seat {
 
     }
 
-    public String getPlaneID() {
-        return planeID;
+    public String getPlaneId() {
+        return planeId;
     }
 
-    public void setPlaneID(String planeID) {
-        this.planeID = planeID;
+    public void setPlaneId(String planeID) {
+        this.planeId = planeID;
     }
 
     public int getSeatNumber() {
@@ -58,7 +58,7 @@ public class Seat {
     @Override
     public String toString() {
         return "Seat{" +
-                "planeID='" + planeID + '\'' +
+                "planeID='" + planeId + '\'' +
                 ", seatNumber=" + seatNumber +
                 ", seatClass='" + seatClass + '\'' +
                 ", priceFactor=" + priceFactor +

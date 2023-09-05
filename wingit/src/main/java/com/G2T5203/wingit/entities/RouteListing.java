@@ -10,16 +10,16 @@ import java.util.Date;
 @IdClass(RouteListingID.class)
 public class RouteListing {
     @Id
-    private String planeID;
+    private String planeId;
     @Id
-    private String routeID;
+    private String routeId;
     @Id
     private Date departureDatetime;
     private double basePrice;
 
-    public RouteListing(String planeID, String routeID, Date departureDatetime, double basePrice) {
-        this.planeID = planeID;
-        this.routeID = routeID;
+    public RouteListing(String planeId, String routeId, Date departureDatetime, double basePrice) {
+        this.planeId = planeId;
+        this.routeId = routeId;
         this.departureDatetime = departureDatetime;
         this.basePrice = basePrice;
     }
@@ -28,20 +28,20 @@ public class RouteListing {
 
     }
 
-    public String getPlaneID() {
-        return planeID;
+    public String getPlaneId() {
+        return planeId;
     }
 
-    public void setPlaneID(String planeID) {
-        this.planeID = planeID;
+    public void setPlaneId(String planeID) {
+        this.planeId = planeID;
     }
 
-    public String getRouteID() {
-        return routeID;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public void setRouteID(String routeID) {
-        this.routeID = routeID;
+    public void setRouteId(String routeID) {
+        this.routeId = routeID;
     }
 
     public Date getDepartureDatetime() {
@@ -63,8 +63,8 @@ public class RouteListing {
     @Override
     public String toString() {
         return "RouteListing{" +
-                "planeID='" + planeID + '\'' +
-                ", routeID='" + routeID + '\'' +
+                "planeID='" + planeId + '\'' +
+                ", routeID='" + routeId + '\'' +
                 ", departureDatetime=" + departureDatetime +
                 ", basePrice=" + basePrice +
                 '}';
