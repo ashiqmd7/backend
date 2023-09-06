@@ -20,12 +20,12 @@ public class WingitApplication {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
 						.allowedMethods("*")
-						.allowedOrigins(
-								"http://localhost:3000",
-								"http://wingit.world",
-								"https://wingit.world",
-								"http://46.17.172.31",
-								"https://46.17.172.31"
+						.allowedOrigins("*"
+//								"http://localhost:3000",
+//								"http://wingit.world",
+//								"https://wingit.world",
+//								"http://46.17.172.31",
+//								"https://46.17.172.31"
 						) ;
 			}
 		};
