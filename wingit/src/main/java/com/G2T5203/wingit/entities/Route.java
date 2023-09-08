@@ -1,11 +1,9 @@
 package com.G2T5203.wingit.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.Duration;
+import java.util.List;
 
 @Entity
 public class Route {
@@ -15,6 +13,8 @@ public class Route {
     private String departureDest;
     private String arrivalDest;
     private Duration flightDuration;
+    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
+    private List<RouteListing> routeListings;
 
     public Route(String routeId, String departureDest, String arrivalDest, Duration flightDuration) {
         this.routeId = routeId;
@@ -31,8 +31,8 @@ public class Route {
         return routeId;
     }
 
-    public void setRouteId(String routeID) {
-        this.routeId = routeID;
+    public void setRouteId(String routeId) {
+        this.routeId = routeId;
     }
 
     public String getDepartureDest() {
@@ -59,10 +59,18 @@ public class Route {
         this.flightDuration = flightDuration;
     }
 
+    public List<RouteListing> getRouteListings() {
+        return routeListings;
+    }
+
+    public void setRouteListings(List<RouteListing> routeListings) {
+        this.routeListings = routeListings;
+    }
+
     @Override
     public String toString() {
         return "Route{" +
-                "routeID='" + routeId + '\'' +
+                "routeId='" + routeId + '\'' +
                 ", departureDest='" + departureDest + '\'' +
                 ", arrivalDest='" + arrivalDest + '\'' +
                 ", flightDuration=" + flightDuration +

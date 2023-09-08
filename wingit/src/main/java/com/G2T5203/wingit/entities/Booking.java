@@ -1,58 +1,84 @@
 package com.G2T5203.wingit.entities;
 
-import java.util.Date;
+import jakarta.persistence.*;
 
+import java.util.Date;
+import java.util.List;
+
+@Entity
 public class Booking {
-    private String holdId;
-    private String userId;
-    private String planeId;
-    private String routeId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String bookingId;
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private WingitUser wingitUser;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "outboundPlaneId", referencedColumnName = "planeId"),
+            @JoinColumn(name = "outboundRouteId", referencedColumnName = "routeId"),
+            @JoinColumn(name = "outboundDepartureDatetime", referencedColumnName = "departureDatetime")
+    })
+    private RouteListing outboundRouteListing;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "inboundPlaneId", referencedColumnName = "planeId"),
+            @JoinColumn(name = "inboundRouteId", referencedColumnName = "routeId"),
+            @JoinColumn(name = "inboundDepartureDatetime", referencedColumnName = "departureDatetime")
+    })
+    private RouteListing inboundRouteListing;
     private Date startBookingDatetime;
     private int partySize;
     private double chargedPrice;
     private boolean isPaid;
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    private List<SeatListing> seatListing;
 
-    public Booking(String holdId, String userId, String planeId, String routeId, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
-        this.holdId = holdId;
-        this.userId = userId;
-        this.planeId = planeId;
-        this.routeId = routeId;
+    public Booking(String bookingId, WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
+        this.bookingId = bookingId;
+        this.wingitUser = wingitUser;
+        this.outboundRouteListing = outboundRouteListing;
+        this.inboundRouteListing = inboundRouteListing;
         this.startBookingDatetime = startBookingDatetime;
         this.partySize = partySize;
         this.chargedPrice = chargedPrice;
         this.isPaid = isPaid;
     }
 
-    public String getHoldId() {
-        return holdId;
+    public Booking() {
+
     }
 
-    public void setHoldId(String holdId) {
-        this.holdId = holdId;
+    public String getBookingId() {
+        return bookingId;
     }
 
-    public String getUserId() {
-        return userId;
+    public void setBookingId(String bookingId) {
+        this.bookingId = bookingId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public WingitUser getWingitUser() {
+        return wingitUser;
     }
 
-    public String getPlaneId() {
-        return planeId;
+    public void setWingitUser(WingitUser wingitUser) {
+        this.wingitUser = wingitUser;
     }
 
-    public void setPlaneId(String planeId) {
-        this.planeId = planeId;
+    public RouteListing getOutboundRouteListing() {
+        return outboundRouteListing;
     }
 
-    public String getRouteId() {
-        return routeId;
+    public void setOutboundRouteListing(RouteListing outboundRouteListing) {
+        this.outboundRouteListing = outboundRouteListing;
     }
 
-    public void setRouteId(String routeId) {
-        this.routeId = routeId;
+    public RouteListing getInboundRouteListing() {
+        return inboundRouteListing;
+    }
+
+    public void setInboundRouteListing(RouteListing inboundRouteListing) {
+        this.inboundRouteListing = inboundRouteListing;
     }
 
     public Date getStartBookingDatetime() {
@@ -87,13 +113,21 @@ public class Booking {
         isPaid = paid;
     }
 
+    public List<SeatListing> getSeatListing() {
+        return seatListing;
+    }
+
+    public void setSeatListing(List<SeatListing> seatListing) {
+        this.seatListing = seatListing;
+    }
+
     @Override
     public String toString() {
         return "Booking{" +
-                "holdId='" + holdId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", planeId='" + planeId + '\'' +
-                ", routeId='" + routeId + '\'' +
+                "bookingId='" + bookingId + '\'' +
+                ", wingitUser=" + wingitUser +
+                ", outboundRouteListing=" + outboundRouteListing +
+                ", inboundRouteListing=" + inboundRouteListing +
                 ", startBookingDatetime=" + startBookingDatetime +
                 ", partySize=" + partySize +
                 ", chargedPrice=" + chargedPrice +

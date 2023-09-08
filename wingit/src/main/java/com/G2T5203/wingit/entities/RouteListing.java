@@ -1,25 +1,34 @@
 package com.G2T5203.wingit.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
-@IdClass(RouteListingID.class)
+@IdClass(RouteListingPk.class)
 public class RouteListing {
     @Id
-    private String planeId;
+    @ManyToOne
+    @JoinColumn(name = "planeId")
+    private Plane plane;
     @Id
-    private String routeId;
+    @ManyToOne
+    @JoinColumn(name = "routeId")
+    private Route route;
     @Id
     private Date departureDatetime;
     private double basePrice;
+    @OneToMany(mappedBy = "outboundRouteListing", cascade = CascadeType.ALL)
+    private List<Booking> outboundBooking;
+    @OneToMany(mappedBy = "inboundRouteListing", cascade = CascadeType.ALL)
+    private List<Booking> inboundBooking;
+    @OneToMany(mappedBy = "routeListing", cascade = CascadeType.ALL)
+    private List<SeatListing> seatListing;
 
-    public RouteListing(String planeId, String routeId, Date departureDatetime, double basePrice) {
-        this.planeId = planeId;
-        this.routeId = routeId;
+    public RouteListing(Plane plane, Route route, Date departureDatetime, double basePrice) {
+        this.plane = plane;
+        this.route = route;
         this.departureDatetime = departureDatetime;
         this.basePrice = basePrice;
     }
@@ -28,20 +37,20 @@ public class RouteListing {
 
     }
 
-    public String getPlaneId() {
-        return planeId;
+    public Plane getPlane() {
+        return plane;
     }
 
-    public void setPlaneId(String planeID) {
-        this.planeId = planeID;
+    public void setPlane(Plane plane) {
+        this.plane = plane;
     }
 
-    public String getRouteId() {
-        return routeId;
+    public Route getRoute() {
+        return route;
     }
 
-    public void setRouteId(String routeID) {
-        this.routeId = routeID;
+    public void setRoute(Route route) {
+        this.route = route;
     }
 
     public Date getDepartureDatetime() {
@@ -60,11 +69,35 @@ public class RouteListing {
         this.basePrice = basePrice;
     }
 
+    public List<Booking> getOutboundBooking() {
+        return outboundBooking;
+    }
+
+    public void setOutboundBooking(List<Booking> outboundBooking) {
+        this.outboundBooking = outboundBooking;
+    }
+
+    public List<Booking> getInboundBooking() {
+        return inboundBooking;
+    }
+
+    public void setInboundBooking(List<Booking> inboundBooking) {
+        this.inboundBooking = inboundBooking;
+    }
+
+    public List<SeatListing> getSeatListing() {
+        return seatListing;
+    }
+
+    public void setSeatListing(List<SeatListing> seatListing) {
+        this.seatListing = seatListing;
+    }
+
     @Override
     public String toString() {
         return "RouteListing{" +
-                "planeID='" + planeId + '\'' +
-                ", routeID='" + routeId + '\'' +
+                "plane=" + plane +
+                ", route=" + route +
                 ", departureDatetime=" + departureDatetime +
                 ", basePrice=" + basePrice +
                 '}';

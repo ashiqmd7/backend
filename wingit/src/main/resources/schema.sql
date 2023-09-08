@@ -40,33 +40,42 @@ create table ROUTE_LISTING (
     ROUTE_ID varchar(6) not null,
     DEPARTURE_DATETIME datetime not null,
     BASE_PRICE double not null,
-    primary key (PLANE_ID, ROUTE_ID),
+    primary key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME),
     foreign key (PLANE_ID) references Plane(PLANE_ID),
     foreign key (ROUTE_ID) references Route(ROUTE_ID)
 );
 
 create table BOOKING (
-     holdID bigint not null,
-     userID bigint not null,
-     startDatetime datetime not null,
-     partySize bigint not null,
-     routeListingID bigint not null,
-     planeID bigint not null,
-     routeID bigint not null,
-     primary key (holdID, userID),
-     foreign key (userID) references WINGIT_USER(USER_ID),
-     foreign key (routeID) references Route(ROUTE_ID)
+     BOOKING_ID varchar(6) not null,
+     USER_ID bigint not null,
+
+     OUTBOUND_PLANE_ID varchar(6) not null,
+     OUTBOUND_ROUTE_ID varchar(6) not null,
+     OUTBOUND_DEPARTURE_DATETIME datetime not null,
+
+     INBOUND_PLANE_ID varchar(6) not null,
+     INBOUND_ROUTE_ID varchar(6) not null,
+     INBOUND_DEPARTURE_DATETIME datetime not null,
+
+     START_BOOKING_DATETIME datetime not null,
+     PARTY_SIZE bigint not null,
+     CHARGED_PRICE double not null,
+     primary key (BOOKING_ID),
+     foreign key (USER_ID) references WINGIT_USER(USER_ID),
+     foreign key (OUTBOUND_PLANE_ID, OUTBOUND_ROUTE_ID, OUTBOUND_DEPARTURE_DATETIME) references ROUTE_LISTING(PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME),
+     foreign key (INBOUND_PLANE_ID, INBOUND_ROUTE_ID, INBOUND_DEPARTURE_DATETIME) references ROUTE_LISTING(PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME)
 );
 
 create table SEAT_LISTING (
-     SeatListingID bigint not null,
-     planeID bigint not null,
-     routeID bigint not null,
-     seatNumber bigint not null,
-     occupantName varchar(255),
-     userID bigint,
-     bookingID bigint,
-     primary key (planeID, routeID, planeID, seatNumber),
-     foreign key (planeID, routeID) references ROUTE_LISTING(PLANE_ID, ROUTE_ID),
-     foreign key (planeID, seatNumber) references SEAT(PLANE_ID, SEAT_NUMBER)
+     PLANE_ID varchar(6) not null,
+     ROUTE_ID varchar(6) not null,
+     DEPARTURE_DATETIME datetime not null,
+
+     SEAT_NUMBER bigint not null,
+     BOOKING_ID varchar(6) not null,
+     OCCUPANT_NAME varchar(255),
+     primary key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME, SEAT_NUMBER),
+     foreign key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME) references ROUTE_LISTING(PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME),
+     foreign key (PLANE_ID, SEAT_NUMBER) references SEAT(PLANE_ID, SEAT_NUMBER),
+     foreign key (BOOKING_ID) references BOOKING(BOOKING_ID)
 );

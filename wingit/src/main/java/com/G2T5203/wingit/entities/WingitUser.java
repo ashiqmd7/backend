@@ -3,6 +3,7 @@ package com.G2T5203.wingit.entities;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class WingitUser {
@@ -17,6 +18,8 @@ public class WingitUser {
     private String email;
     private String phone;
     private String salutation;
+    @OneToMany(mappedBy = "wingitUser", cascade = CascadeType.ALL)
+    private List<Booking> bookings;
 
 
     public WingitUser(Integer userId, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {

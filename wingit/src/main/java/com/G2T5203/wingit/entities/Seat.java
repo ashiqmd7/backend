@@ -2,18 +2,24 @@ package com.G2T5203.wingit.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
-@IdClass(SeatId.class)
+@IdClass(SeatPk.class)
 public class Seat {
     @Id
-    private String planeId;
+    @ManyToOne
+    @JoinColumn(name = "planeId")
+    private Plane plane;
     @Id
     private int seatNumber;
     private String seatClass;
     private double priceFactor;
+    @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL)
+    private List<SeatListing> seatListing;
 
-    public Seat(String planeId, int seatNumber, String seatClass, double priceFactor) {
-        this.planeId = planeId;
+    public Seat(Plane plane, int seatNumber, String seatClass, double priceFactor) {
+        this.plane = plane;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
         this.priceFactor = priceFactor;
@@ -23,12 +29,12 @@ public class Seat {
 
     }
 
-    public String getPlaneId() {
-        return planeId;
+    public Plane getPlane() {
+        return plane;
     }
 
-    public void setPlaneId(String planeID) {
-        this.planeId = planeID;
+    public void setPlane(Plane plane) {
+        this.plane = plane;
     }
 
     public int getSeatNumber() {
@@ -55,10 +61,18 @@ public class Seat {
         this.priceFactor = priceFactor;
     }
 
+    public List<SeatListing> getSeatListing() {
+        return seatListing;
+    }
+
+    public void setSeatListing(List<SeatListing> seatListing) {
+        this.seatListing = seatListing;
+    }
+
     @Override
     public String toString() {
         return "Seat{" +
-                "planeID='" + planeId + '\'' +
+                "plane=" + plane +
                 ", seatNumber=" + seatNumber +
                 ", seatClass='" + seatClass + '\'' +
                 ", priceFactor=" + priceFactor +
