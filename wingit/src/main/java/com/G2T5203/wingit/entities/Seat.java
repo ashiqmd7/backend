@@ -2,18 +2,24 @@ package com.G2T5203.wingit.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
-@IdClass(SeatId.class)
+@IdClass(SeatPk.class)
 public class Seat {
     @Id
-    private String planeID;
+    @ManyToOne
+    @JoinColumn(name = "planeId")
+    private Plane plane;
     @Id
-    private int seatNumber;
+    private String seatNumber;
     private String seatClass;
     private double priceFactor;
+    @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL)
+    private List<SeatListing> seatListing;
 
-    public Seat(String planeID, int seatNumber, String seatClass, double priceFactor) {
-        this.planeID = planeID;
+    public Seat(Plane plane, String seatNumber, String seatClass, double priceFactor) {
+        this.plane = plane;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
         this.priceFactor = priceFactor;
@@ -23,19 +29,19 @@ public class Seat {
 
     }
 
-    public String getPlaneID() {
-        return planeID;
+    public Plane getPlane() {
+        return plane;
     }
 
-    public void setPlaneID(String planeID) {
-        this.planeID = planeID;
+    public void setPlane(Plane plane) {
+        this.plane = plane;
     }
 
-    public int getSeatNumber() {
+    public String getSeatNumber() {
         return seatNumber;
     }
 
-    public void setSeatNumber(int seatNumber) {
+    public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
     }
 
@@ -55,10 +61,18 @@ public class Seat {
         this.priceFactor = priceFactor;
     }
 
+    public List<SeatListing> getSeatListing() {
+        return seatListing;
+    }
+
+    public void setSeatListing(List<SeatListing> seatListing) {
+        this.seatListing = seatListing;
+    }
+
     @Override
     public String toString() {
         return "Seat{" +
-                "planeID='" + planeID + '\'' +
+                "plane=" + plane +
                 ", seatNumber=" + seatNumber +
                 ", seatClass='" + seatClass + '\'' +
                 ", priceFactor=" + priceFactor +

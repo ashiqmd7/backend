@@ -1,23 +1,23 @@
 package com.G2T5203.wingit.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.Duration;
+import java.util.List;
 
 @Entity
 public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String routeID;
+    private Integer routeId;
     private String departureDest;
     private String arrivalDest;
     private Duration flightDuration;
+    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
+    private List<RouteListing> routeListings;
 
-    public Route(String routeID, String departureDest, String arrivalDest, Duration flightDuration) {
-        this.routeID = routeID;
+    public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
+        this.routeId = routeId;
         this.departureDest = departureDest;
         this.arrivalDest = arrivalDest;
         this.flightDuration = flightDuration;
@@ -27,12 +27,12 @@ public class Route {
 
     }
 
-    public String getRouteID() {
-        return routeID;
+    public Integer getRouteId() {
+        return routeId;
     }
 
-    public void setRouteID(String routeID) {
-        this.routeID = routeID;
+    public void setRouteId(Integer routeId) {
+        this.routeId = routeId;
     }
 
     public String getDepartureDest() {
@@ -59,10 +59,18 @@ public class Route {
         this.flightDuration = flightDuration;
     }
 
+    public List<RouteListing> getRouteListings() {
+        return routeListings;
+    }
+
+    public void setRouteListings(List<RouteListing> routeListings) {
+        this.routeListings = routeListings;
+    }
+
     @Override
     public String toString() {
         return "Route{" +
-                "routeID='" + routeID + '\'' +
+                "routeId='" + routeId + '\'' +
                 ", departureDest='" + departureDest + '\'' +
                 ", arrivalDest='" + arrivalDest + '\'' +
                 ", flightDuration=" + flightDuration +

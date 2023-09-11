@@ -1,70 +1,136 @@
 package com.G2T5203.wingit.entities;
 
+import jakarta.persistence.*;
+
 import java.util.Date;
+import java.util.List;
 
+@Entity
 public class Booking {
-    private String HOLD_ID;
-    private String USER_ID;
-    private Date start_datetime;
-    private int party_size;
-    private RouteListing route_listing;
+    @Id
+    private String bookingId;
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private WingitUser wingitUser;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "outboundPlaneId", referencedColumnName = "planeId"),
+            @JoinColumn(name = "outboundRouteId", referencedColumnName = "routeId"),
+            @JoinColumn(name = "outboundDepartureDatetime", referencedColumnName = "departureDatetime")
+    })
+    private RouteListing outboundRouteListing;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "inboundPlaneId", referencedColumnName = "planeId"),
+            @JoinColumn(name = "inboundRouteId", referencedColumnName = "routeId"),
+            @JoinColumn(name = "inboundDepartureDatetime", referencedColumnName = "departureDatetime")
+    })
+    private RouteListing inboundRouteListing;
+    private Date startBookingDatetime;
+    private int partySize;
+    private double chargedPrice;
+    private boolean isPaid;
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    private List<SeatListing> seatListing;
 
-    public Booking(String HOLD_ID, String USER_ID, Date start_datetime, int party_size, RouteListing route_listing) {
-        this.HOLD_ID = HOLD_ID;
-        this.USER_ID = USER_ID;
-        this.start_datetime = start_datetime;
-        this.party_size = party_size;
-        this.route_listing = route_listing;
+    public Booking(String bookingId, WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
+        this.bookingId = bookingId;
+        this.wingitUser = wingitUser;
+        this.outboundRouteListing = outboundRouteListing;
+        this.inboundRouteListing = inboundRouteListing;
+        this.startBookingDatetime = startBookingDatetime;
+        this.partySize = partySize;
+        this.chargedPrice = chargedPrice;
+        this.isPaid = isPaid;
     }
 
-    public String getHOLD_ID() {
-        return HOLD_ID;
+    public Booking() {
+
     }
 
-    public void setHOLD_ID(String HOLD_ID) {
-        this.HOLD_ID = HOLD_ID;
+    public String getBookingId() {
+        return bookingId;
     }
 
-    public String getUSER_ID() {
-        return USER_ID;
+    public void setBookingId(String bookingId) {
+        this.bookingId = bookingId;
     }
 
-    public void setUSER_ID(String USER_ID) {
-        this.USER_ID = USER_ID;
+    public WingitUser getWingitUser() {
+        return wingitUser;
     }
 
-    public Date getStart_datetime() {
-        return start_datetime;
+    public void setWingitUser(WingitUser wingitUser) {
+        this.wingitUser = wingitUser;
     }
 
-    public void setStart_datetime(Date start_datetime) {
-        this.start_datetime = start_datetime;
+    public RouteListing getOutboundRouteListing() {
+        return outboundRouteListing;
     }
 
-    public int getParty_size() {
-        return party_size;
+    public void setOutboundRouteListing(RouteListing outboundRouteListing) {
+        this.outboundRouteListing = outboundRouteListing;
     }
 
-    public void setParty_size(int party_size) {
-        this.party_size = party_size;
+    public RouteListing getInboundRouteListing() {
+        return inboundRouteListing;
     }
 
-    public RouteListing getRoute_listing() {
-        return route_listing;
+    public void setInboundRouteListing(RouteListing inboundRouteListing) {
+        this.inboundRouteListing = inboundRouteListing;
     }
 
-    public void setRoute_listing(RouteListing route_listing) {
-        this.route_listing = route_listing;
+    public Date getStartBookingDatetime() {
+        return startBookingDatetime;
+    }
+
+    public void setStartBookingDatetime(Date startBookingDatetime) {
+        this.startBookingDatetime = startBookingDatetime;
+    }
+
+    public int getPartySize() {
+        return partySize;
+    }
+
+    public void setPartySize(int partySize) {
+        this.partySize = partySize;
+    }
+
+    public double getChargedPrice() {
+        return chargedPrice;
+    }
+
+    public void setChargedPrice(double chargedPrice) {
+        this.chargedPrice = chargedPrice;
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(boolean paid) {
+        isPaid = paid;
+    }
+
+    public List<SeatListing> getSeatListing() {
+        return seatListing;
+    }
+
+    public void setSeatListing(List<SeatListing> seatListing) {
+        this.seatListing = seatListing;
     }
 
     @Override
     public String toString() {
-        return "Hold_Booking{" +
-                "HOLD_ID='" + HOLD_ID + '\'' +
-                ", USER_ID='" + USER_ID + '\'' +
-                ", start_datetime=" + start_datetime +
-                ", party_size=" + party_size +
-                ", route_listing=" + route_listing +
+        return "Booking{" +
+                "bookingId='" + bookingId + '\'' +
+                ", wingitUser=" + wingitUser +
+                ", outboundRouteListing=" + outboundRouteListing +
+                ", inboundRouteListing=" + inboundRouteListing +
+                ", startBookingDatetime=" + startBookingDatetime +
+                ", partySize=" + partySize +
+                ", chargedPrice=" + chargedPrice +
+                ", isPaid=" + isPaid +
                 '}';
     }
 }
