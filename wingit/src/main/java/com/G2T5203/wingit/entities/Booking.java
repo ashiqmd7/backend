@@ -8,7 +8,6 @@ import java.util.List;
 @Entity
 public class Booking {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String bookingId;
     @ManyToOne
     @JoinColumn(name = "userId")

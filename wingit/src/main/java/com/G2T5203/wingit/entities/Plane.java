@@ -7,7 +7,6 @@ import java.util.List;
 @Entity
 public class Plane {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String planeId;
     private int capacity;
     private String model;

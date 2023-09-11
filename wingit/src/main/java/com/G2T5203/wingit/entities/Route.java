@@ -9,14 +9,14 @@ import java.util.List;
 public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String routeId;
+    private Integer routeId;
     private String departureDest;
     private String arrivalDest;
     private Duration flightDuration;
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
     private List<RouteListing> routeListings;
 
-    public Route(String routeId, String departureDest, String arrivalDest, Duration flightDuration) {
+    public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
         this.routeId = routeId;
         this.departureDest = departureDest;
         this.arrivalDest = arrivalDest;
@@ -27,11 +27,11 @@ public class Route {
 
     }
 
-    public String getRouteId() {
+    public Integer getRouteId() {
         return routeId;
     }
 
-    public void setRouteId(String routeId) {
+    public void setRouteId(Integer routeId) {
         this.routeId = routeId;
     }
 

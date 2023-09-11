@@ -28,7 +28,7 @@ create table SEAT (
 );
 
 create table ROUTE (
-    ROUTE_ID varchar(6) not null,
+    ROUTE_ID bigint auto_increment not null,
     DEPARTURE_DEST varchar(255) not null,
     ARRIVAL_DEST varchar(255) not null,
     FLIGHT_DURATION double not null,
@@ -37,7 +37,7 @@ create table ROUTE (
 
 create table ROUTE_LISTING (
     PLANE_ID varchar(6) not null,
-    ROUTE_ID varchar(6) not null,
+    ROUTE_ID bigint not null,
     DEPARTURE_DATETIME datetime not null,
     BASE_PRICE double not null,
     primary key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME),
@@ -50,11 +50,11 @@ create table BOOKING (
      USER_ID bigint not null,
 
      OUTBOUND_PLANE_ID varchar(6) not null,
-     OUTBOUND_ROUTE_ID varchar(6) not null,
+     OUTBOUND_ROUTE_ID bigint not null,
      OUTBOUND_DEPARTURE_DATETIME datetime not null,
 
      INBOUND_PLANE_ID varchar(6) not null,
-     INBOUND_ROUTE_ID varchar(6) not null,
+     INBOUND_ROUTE_ID bigint not null,
      INBOUND_DEPARTURE_DATETIME datetime not null,
 
      START_BOOKING_DATETIME datetime not null,
@@ -68,7 +68,7 @@ create table BOOKING (
 
 create table SEAT_LISTING (
      PLANE_ID varchar(6) not null,
-     ROUTE_ID varchar(6) not null,
+     ROUTE_ID bigint not null,
      DEPARTURE_DATETIME datetime not null,
 
      SEAT_NUMBER bigint not null,
