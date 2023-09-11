@@ -53,9 +53,9 @@ create table BOOKING (
      OUTBOUND_ROUTE_ID bigint not null,
      OUTBOUND_DEPARTURE_DATETIME datetime not null,
 
-     INBOUND_PLANE_ID varchar(6) not null,
-     INBOUND_ROUTE_ID bigint not null,
-     INBOUND_DEPARTURE_DATETIME datetime not null,
+     INBOUND_PLANE_ID varchar(6),
+     INBOUND_ROUTE_ID bigint,
+     INBOUND_DEPARTURE_DATETIME datetime,
 
      START_BOOKING_DATETIME datetime not null,
      PARTY_SIZE bigint not null,
@@ -72,7 +72,7 @@ create table SEAT_LISTING (
      DEPARTURE_DATETIME datetime not null,
 
      SEAT_NUMBER varchar(3) not null,
-     BOOKING_ID varchar(6) not null,
+     BOOKING_ID varchar(6),
      OCCUPANT_NAME varchar(255),
      primary key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME, SEAT_NUMBER),
      foreign key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME) references ROUTE_LISTING(PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME),
