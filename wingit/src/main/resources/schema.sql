@@ -20,7 +20,7 @@ create table PLANE (
 
 create table SEAT (
     PLANE_ID varchar(6) not null,
-    SEAT_NUMBER bigint not null,
+    SEAT_NUMBER varchar(3) not null,
     SEAT_CLASS varchar(255) not null,
     PRICE_FACTOR double not null,
     primary key (PLANE_ID, SEAT_NUMBER),
@@ -71,7 +71,7 @@ create table SEAT_LISTING (
      ROUTE_ID bigint not null,
      DEPARTURE_DATETIME datetime not null,
 
-     SEAT_NUMBER bigint not null,
+     SEAT_NUMBER varchar(3) not null,
      BOOKING_ID varchar(6) not null,
      OCCUPANT_NAME varchar(255),
      primary key (PLANE_ID, ROUTE_ID, DEPARTURE_DATETIME, SEAT_NUMBER),

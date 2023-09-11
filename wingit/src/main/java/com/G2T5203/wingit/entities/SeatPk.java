@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class SeatPk implements Serializable {
     private Plane plane;
-    private int seatNumber;
+    private String seatNumber;
 
-    public SeatPk(Plane plane, int seatNumber) {
+    public SeatPk(Plane plane, String seatNumber) {
         this.plane = plane;
         this.seatNumber = seatNumber;
     }

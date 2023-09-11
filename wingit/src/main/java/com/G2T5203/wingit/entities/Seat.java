@@ -12,13 +12,13 @@ public class Seat {
     @JoinColumn(name = "planeId")
     private Plane plane;
     @Id
-    private int seatNumber;
+    private String seatNumber;
     private String seatClass;
     private double priceFactor;
     @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL)
     private List<SeatListing> seatListing;
 
-    public Seat(Plane plane, int seatNumber, String seatClass, double priceFactor) {
+    public Seat(Plane plane, String seatNumber, String seatClass, double priceFactor) {
         this.plane = plane;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
@@ -37,11 +37,11 @@ public class Seat {
         this.plane = plane;
     }
 
-    public int getSeatNumber() {
+    public String getSeatNumber() {
         return seatNumber;
     }
 
-    public void setSeatNumber(int seatNumber) {
+    public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
     }
 
