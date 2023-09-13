@@ -34,6 +34,7 @@ public class UserService {
         try {
             repo.save(newUser);
         } catch (DataIntegrityViolationException e) {
+            // TODO: Convert these systems to custom Exceptions based. Refer to class activity BookExceptions.
             logger.error("Failed to add new User: DataIntegrityViolationException\n" + newUser.toString());
             logger.debug("Error details: " + e.getLocalizedMessage());
             return HttpStatus.BAD_REQUEST;

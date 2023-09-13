@@ -1,11 +1,13 @@
 package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -28,12 +30,14 @@ public class UserController {
     // GET a specific user by userID
     @GetMapping(path = "/users/{userID}")
     public WingitUser getUser(@PathVariable Integer userID) {
-        return service.getById(userID);
+        WingitUser user = service.getById(userID);
+        if (user == null) throw new UserNotFoundException(userID);
+        return user;
     }
 
     // POST to add a new user
     @PostMapping(path = "/users/new")
-    public ResponseEntity<String> createUser(@RequestBody WingitUser newUser) {
+    public ResponseEntity<String> createUser(@Valid @RequestBody WingitUser newUser) {
         logger.debug("RequestBody JSON: " + newUser.toString());
         HttpStatus resultingStatus;
         try {
@@ -55,7 +59,7 @@ public class UserController {
 
     // PUT to update a specific user by userID
     @PutMapping("/users/update/{userID}")
-    public ResponseEntity<String> updateUser(@PathVariable Integer userID, @RequestBody WingitUser updatedUser) {
+    public ResponseEntity<String> updateUser(@PathVariable Integer userID, @Valid @RequestBody WingitUser updatedUser) {
         updatedUser.setUserId(userID);
         HttpStatus resultingStatus;
         resultingStatus = service.updateUser(updatedUser);
