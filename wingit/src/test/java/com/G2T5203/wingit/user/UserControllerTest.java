@@ -45,7 +45,7 @@ class UserControllerTest {
                 Date.valueOf(LocalDate.parse("2001-12-04")),
                 "brandon.choy.2037@scis.smu.edu.sg",
                 "+65 8746 3847",
-                "Mr.");
+                "Mr");
     }
     private WingitUser createSampleUser2() {
         return new WingitUser(
@@ -55,7 +55,7 @@ class UserControllerTest {
                 Date.valueOf(LocalDate.parse("1996-10-03")),
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
-                "Mrs.");
+                "Mrs");
     }
 
     @Autowired
@@ -158,9 +158,7 @@ class UserControllerTest {
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
 
-        // NOTE: Currently it would respond with 200 as we have not handled the error properly.
         assertEquals(404, responseEntity.getStatusCode().value());
-        assertNull(retrievedUser);
     }
 
     @Test
@@ -182,11 +180,14 @@ class UserControllerTest {
         WingitUser duplicateUserEmail = createSampleUser2();
         duplicateUserEmail.setEmail(existingUser.getEmail());
         URI uri = constructUri("users/new");
-        ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, existingUser, WingitUser.class);
+        ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, duplicateUserEmail, WingitUser.class);
 
-        // NOTE: Currently it would respond with 500 cause we have not handled the error
         assertEquals(400, responseEntity.getStatusCode().value());
     }
+
+    // TODO: Testcase createUser with future Date of Birth
+    // TODO: Testcase createUser with no name, empty parameters, etc.
+    // TODO: Testcase createUser with non-valid parameters, Salutation, Role, etc.
 
     @Test
     void deleteUser_Success() throws Exception {

@@ -1,22 +1,29 @@
 package com.G2T5203.wingit.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
 public class WingitUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // TODO: Validation annotations to include messages.
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
+    @NotEmpty
     private String password;
+    @NotEmpty
     private String firstName;
+    @NotEmpty
     private String lastName;
+    @NotNull @Past
     private Date dob;
-    @Column(unique = true)
+    @Column(unique = true) @Email @NotEmpty
     private String email;
+    @NotEmpty
     private String phone;
+    @NotEmpty @Pattern(regexp = "Mr|Mrs|Miss|Mdm|Master")
     private String salutation;
     @OneToMany(mappedBy = "wingitUser", cascade = CascadeType.ALL)
     private List<Booking> bookings;
