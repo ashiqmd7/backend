@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
@@ -157,12 +159,34 @@ class UserControllerTest {
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
 
+        // NOTE: Currently it would respond with 200 as we have not handled the error properly.
         assertEquals(404, responseEntity.getStatusCode().value());
         assertNull(retrievedUser);
     }
 
     @Test
-    void createUser() {
+    void createUser_Success() throws Exception {
+        WingitUser sampleUser = createSampleUser1();
+        URI uri = constructUri("users/new");
+        ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, sampleUser, WingitUser.class);
+
+        assertEquals(201, responseEntity.getStatusCode().value());
+        WingitUser postedUser = userRepository.findByEmail(sampleUser.getEmail());
+        assertNotNull(postedUser);
+    }
+
+    @Test
+    void createUser_ExistingEmail_Failure() throws Exception {
+        WingitUser existingUser = createSampleUser1();
+        userRepository.save(existingUser);
+
+        WingitUser duplicateUserEmail = createSampleUser2();
+        duplicateUserEmail.setEmail(existingUser.getEmail());
+        URI uri = constructUri("users/new");
+        ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, existingUser, WingitUser.class);
+
+        // NOTE: Currently it would respond with 500 cause we have not handled the error
+        assertEquals(400, responseEntity.getStatusCode().value());
     }
 
     @Test
@@ -171,6 +195,21 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUser() {
+    void updateUser_Success() throws Exception {
+        WingitUser sampleUser = createSampleUser1();
+        Integer sampleUserId = userRepository.save(sampleUser).getUserId();
+        WingitUser updatedUser = createSampleUser1();
+        updatedUser.setFirstName("Updated");
+        updatedUser.setLastName("User");
+        // TODO: Exhaustive test all the other update fields
+
+        URI uri = constructUri("users/update/" + sampleUserId);
+        HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(updatedUser);
+        ResponseEntity<Void> responseEntity = testRestTemplate.exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
+        assertEquals(200, responseEntity.getStatusCode().value());
+
+        WingitUser retrievedUser = userRepository.findById(sampleUserId).get();
+        assertEquals("Updated", retrievedUser.getFirstName());
+        assertEquals("User", retrievedUser.getLastName());
     }
 }
