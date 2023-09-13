@@ -30,9 +30,10 @@ public class PlaneController {
 
     // GET a specific plane by planeId
     @GetMapping("/planes/{planeId}")
-    public ResponseEntity<Plane> getPlane(@PathVariable String planeId) {
+    public Plane getPlane(@PathVariable String planeId) {
         Plane plane = service.getById(planeId);
-        return ResponseEntity.ok(plane);
+        if (plane == null) throw new PlaneNotFoundException(planeId);
+        return plane;
     }
 
     // POST to add a new plane
