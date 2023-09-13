@@ -33,6 +33,16 @@ public class WingitUser {
         this.salutation = salutation;
     }
 
+    public WingitUser(String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dob = dob;
+        this.email = email;
+        this.phone = phone;
+        this.salutation = salutation;
+    }
+
     public WingitUser() {
 
     }
