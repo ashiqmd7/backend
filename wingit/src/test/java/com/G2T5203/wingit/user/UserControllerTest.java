@@ -21,6 +21,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -190,9 +191,19 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUser() {
-        // TODO: Can't be written as delete is currently not working.
+    void deleteUser_Success() throws Exception {
+        WingitUser userToBeDeleted = createSampleUser1();
+        Integer userId = userRepository.save(userToBeDeleted).getUserId();
+
+        URI uri = constructUri("users/delete/" + userId);
+        ResponseEntity<Void> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
+        assertEquals(200, responseEntity.getStatusCode().value());
+
+        Optional<WingitUser> retrievedUser = userRepository.findById(userId);
+        assertFalse(retrievedUser.isPresent());
     }
+
+    // TODO: Delete User fails test case (not found).
 
     @Test
     void updateUser_Success() throws Exception {
@@ -212,4 +223,6 @@ class UserControllerTest {
         assertEquals("Updated", retrievedUser.getFirstName());
         assertEquals("User", retrievedUser.getLastName());
     }
+
+    // TODO: Update User fail test case (not found).
 }
