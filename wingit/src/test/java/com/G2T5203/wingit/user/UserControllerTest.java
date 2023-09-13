@@ -71,9 +71,7 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() {
-        // Commenting out for now cause there are issues...
-        // TODO: Fix the problem where we can't run delete all.
-        // userRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
