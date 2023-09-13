@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
     @LocalServerPort
     private int port;
-    private final String baseUrl = "http://localhost:";
+
     private URI constructUri(String path) throws URISyntaxException {
+        String baseUrl = "http://localhost:";
         return new URI(baseUrl + port + "/" + path);
     }
     // Helper functions
-    private String startingUrl() { return baseUrl + port + "/"; }
     private WingitUser createSampleUser1() {
         return new WingitUser(
                 "goodpassword",
@@ -80,7 +80,7 @@ class UserControllerTest {
         ResponseEntity<WingitUser[]> responseEntity = testRestTemplate.getForEntity(uri, WingitUser[].class);
 
         assertEquals(200, responseEntity.getStatusCode().value());
-        assertEquals(0, Objects.requireNonNull(responseEntity.getBody()).length);
+        assertEquals(0, responseEntity.getBody().length);
     }
 
     @Test
