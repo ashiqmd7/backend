@@ -19,7 +19,22 @@ public class SeatPk implements Serializable {
         this.seatNumber = seatNumber;
     }
 
-    public SeatPk() {
+    public SeatPk() {}
+
+    public Plane getPlane() {
+        return plane;
+    }
+
+    public void setPlane(Plane plane) {
+        this.plane = plane;
+    }
+
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(String seatNumber) {
+        this.seatNumber = seatNumber;
     }
 
     @Override

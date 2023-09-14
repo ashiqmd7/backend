@@ -25,7 +25,30 @@ public class RouteListingPk implements Serializable {
         this.departureDatetime = departureDatetime;
     }
 
-    public RouteListingPk() {
+    public RouteListingPk() {}
+
+    public Plane getPlane() {
+        return plane;
+    }
+
+    public void setPlane(Plane plane) {
+        this.plane = plane;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
+    }
+
+    public Date getDepartureDatetime() {
+        return departureDatetime;
+    }
+
+    public void setDepartureDatetime(Date departureDatetime) {
+        this.departureDatetime = departureDatetime;
     }
 
     @Override

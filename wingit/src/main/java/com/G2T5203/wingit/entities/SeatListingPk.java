@@ -25,9 +25,7 @@ public class SeatListingPk implements Serializable {
         this.seat = seat;
     }
 
-    public SeatListingPk() {
-
-    }
+    public SeatListingPk() {}
 
     public RouteListing getRouteListing() {
         return routeListing;
