@@ -5,7 +5,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class RouteListingController {
@@ -24,6 +28,20 @@ public class RouteListingController {
     @GetMapping(path = "/routeListings/departAndArrive/{departureDest}/{arrivalDest}")
     public List<RouteListingSimpleJson> getAllRouteListingsByDepartAndArrive(@PathVariable String departureDest, @PathVariable String arrivalDest) {
         return service.getAllRouteListingsWithDepartureDestAndArrivalDestination(departureDest, arrivalDest);
+    }
+
+    @GetMapping(path = "/routeListings/fullSearch/{departureDest}/{arrivalDest}/{year}/{month}/{day}")
+    public List<RouteListingSimpleJson> getAllRoutesMatchingFullSearch(
+            @PathVariable String departureDest,
+            @PathVariable String arrivalDest,
+            @PathVariable Integer year,
+            @PathVariable Integer month,
+            @PathVariable Integer day) {
+        // TODO: Figure out how to filter by matching DATE component only for the sql side.
+        // For now we will just do in on Spring Boot side.
+        LocalDate matchingDate = LocalDate.of(year, month, day);
+        // TODO: Figure out why the returned JSON is having it's time component squashed!
+        return service.getAllRouteListingsMatchingFullSearch(departureDest, arrivalDest, matchingDate);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
