@@ -16,13 +16,13 @@ public class RouteListingController {
     @GetMapping(path = "/routeListings")
     public List<RouteListing> getAllRouteListings() { return service.getAllRouteListings(); }
 
-//    @ResponseStatus(HttpStatus.CREATED)
-//    @PostMapping(path = "/routeListings/new")
-//    public RouteListing createRouteListing(@Valid @RequestBody RouteListing newRouteListing) {
-//        try {
-//            return service.createRouteListing(newRouteListing);
-//        } catch (Exception e) {
-//            throw new RouteListingBadRequestException(e);
-//        }
-//    }
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "/routeListings/new")
+    public RouteListing createRouteListing(@Valid @RequestBody RouteListing newRouteListing) {
+        try {
+            return service.createRouteListing(newRouteListing);
+        } catch (Exception e) {
+            throw new RouteListingBadRequestException(e);
+        }
+    }
 }
