@@ -14,13 +14,13 @@ public class SeatController {
     public SeatController(SeatService service) { this.service = service; }
 
     @GetMapping(path = "/seats")
-    public List<Seat> getAllSeats() { return service.getAllSeats(); }
+    public List<SeatSimpleJson> getAllSeats() { return service.getAllSeats(); }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/seats/new")
-    public Seat createSeat(@Valid @RequestBody Seat newSeat) {
+    public Seat createSeat(@Valid @RequestBody SeatSimpleJson newSeatSimpleJson) {
         try {
-            return service.createSeat(newSeat);
+            return service.createSeat(newSeatSimpleJson);
         } catch (Exception e) {
             throw new SeatBadRequestException(e);
         }
