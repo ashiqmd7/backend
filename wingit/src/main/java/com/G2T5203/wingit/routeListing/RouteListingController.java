@@ -14,13 +14,13 @@ public class RouteListingController {
     public RouteListingController(RouteListingService service) { this.service = service; }
 
     @GetMapping(path = "/routeListings")
-    public List<RouteListing> getAllRouteListings() { return service.getAllRouteListings(); }
+    public List<RouteListingSimpleJson> getAllRouteListings() { return service.getAllRouteListings(); }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/routeListings/new")
-    public RouteListing createRouteListing(@Valid @RequestBody RouteListing newRouteListing) {
+    public RouteListing createRouteListing(@Valid @RequestBody RouteListingSimpleJson newRouteListingSimpleJson) {
         try {
-            return service.createRouteListing(newRouteListing);
+            return service.createRouteListing(newRouteListingSimpleJson);
         } catch (Exception e) {
             throw new RouteListingBadRequestException(e);
         }

@@ -8,4 +8,8 @@ public class SeatBadRequestException extends RuntimeException {
     public SeatBadRequestException(Exception e) {
         super("BAD REQUEST: " + e.getLocalizedMessage());
     }
+
+    public SeatBadRequestException(String msg) {
+        super("BAD REQUEST: " + msg);
+    }
 }

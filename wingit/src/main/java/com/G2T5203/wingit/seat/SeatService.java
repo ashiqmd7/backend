@@ -36,7 +36,7 @@ public class SeatService {
 
         SeatPk seatPk = new SeatPk(retrievedPlane.get(), newSeatSimpleJson.getSeatNumber());
         boolean alreadyExists = repo.existsById(seatPk);
-        if (alreadyExists) throw new SeatBadRequestException(new Exception("Seat already exists."));
+        if (alreadyExists) throw new SeatBadRequestException("Seat already exists.");
 
         Seat newSeat = new Seat(
                 seatPk,
