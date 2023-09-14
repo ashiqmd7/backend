@@ -1,5 +1,6 @@
 package com.G2T5203.wingit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -20,10 +21,13 @@ public class RouteListing {
     private Date departureDatetime;
     private double basePrice;
     @OneToMany(mappedBy = "outboundRouteListing", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Booking> outboundBooking;
     @OneToMany(mappedBy = "inboundRouteListing", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Booking> inboundBooking;
     @OneToMany(mappedBy = "routeListing", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SeatListing> seatListing;
 
     public RouteListing(Plane plane, Route route, Date departureDatetime, double basePrice) {

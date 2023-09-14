@@ -1,5 +1,6 @@
 package com.G2T5203.wingit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -11,8 +12,10 @@ public class Plane {
     private int capacity;
     private String model;
     @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Seat> seats;
     @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RouteListing> routeListings;
 
     public Plane(String planeId, int capacity, String model) {

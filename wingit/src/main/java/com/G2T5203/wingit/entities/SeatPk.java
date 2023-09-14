@@ -6,6 +6,10 @@ public class SeatPk implements Serializable {
     private Plane plane;
     private String seatNumber;
 
+    public SeatPk() {
+
+    }
+
     public SeatPk(Plane plane, String seatNumber) {
         this.plane = plane;
         this.seatNumber = seatNumber;

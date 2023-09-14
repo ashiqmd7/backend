@@ -11,6 +11,10 @@ public class SeatListingPk implements Serializable {
         this.seat = seat;
     }
 
+    public SeatListingPk() {
+
+    }
+
     public RouteListing getRouteListing() {
         return routeListing;
     }

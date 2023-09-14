@@ -1,5 +1,6 @@
 package com.G2T5203.wingit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,6 +20,7 @@ public class Route {
     @DurationMin(hours = 1)
     private Duration flightDuration;
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RouteListing> routeListings;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
