@@ -11,4 +11,6 @@ public class SeatPk implements Serializable {
         this.seatNumber = seatNumber;
     }
 
+    public SeatPk() {
+    }
 }
