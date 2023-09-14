@@ -4,6 +4,7 @@ import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -13,8 +14,6 @@ import java.util.List;
 
 @RestController
 public class UserController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService service;
 
     public UserController(UserService service) {
@@ -36,36 +35,38 @@ public class UserController {
     }
 
     // POST to add a new user
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/users/new")
-    public ResponseEntity<String> createUser(@Valid @RequestBody WingitUser newUser) {
-        logger.debug("RequestBody JSON: " + newUser.toString());
-        HttpStatus resultingStatus;
+    public WingitUser createUser(@Valid @RequestBody WingitUser newUser) {
         try {
-            resultingStatus = service.createUser(newUser);
-        } catch (UnexpectedRollbackException e) {
-            logger.error("Failed to add new User: UnexpectedRollbackException\n" + newUser.toString());
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            resultingStatus = HttpStatus.BAD_REQUEST;
+            return service.createUser(newUser);
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
         }
-        return ResponseEntity.status(resultingStatus).build();
     }
 
     // DELETE a specific user by userID
-    @DeleteMapping(path = "/users/delete/{userID}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer userID) {
-        HttpStatus resultingStatus = service.deleteUserById(userID);
-        return ResponseEntity.status(resultingStatus).build();
+    @DeleteMapping(path = "/users/delete/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        try {
+            service.deleteUserById(userId);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
     }
 
     // PUT to update a specific user by userID
-    @PutMapping("/users/update/{userID}")
-    public ResponseEntity<String> updateUser(@PathVariable Integer userID, @Valid @RequestBody WingitUser updatedUser) {
-        updatedUser.setUserId(userID);
-        HttpStatus resultingStatus;
-        resultingStatus = service.updateUser(updatedUser);
-
-        return ResponseEntity.status(resultingStatus).build();
+    @PutMapping("/users/update/{userId}")
+    public WingitUser updateUser(@PathVariable Integer userId, @Valid @RequestBody WingitUser updatedUser) {
+        updatedUser.setUserId(userId);
+        try {
+            return service.updateUser(updatedUser);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
     }
-
-
 }

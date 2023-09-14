@@ -33,19 +33,24 @@ public class RouteController {
         return route;
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/routes/new")
     public Route createRoute(@Valid @RequestBody Route newRoute) {
-        Logger.getAnonymousLogger().log(Level.INFO, "QQQ: " + newRoute);
-        Route savedRoute = service.createRoute(newRoute);
-        return savedRoute;
+        try {
+            return service.createRoute(newRoute);
+        } catch (Exception e) {
+            throw new RouteBadRequestException(e);
+        }
     }
 
     @DeleteMapping(path = "/routes/delete/{routeId}")
     public void deleteRoute(@PathVariable Integer routeId) {
         try {
             service.deleteRoute(routeId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new RouteNotFoundException(routeId);
+        } catch (RouteNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RouteBadRequestException(e);
         }
     }
 

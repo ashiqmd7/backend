@@ -202,7 +202,12 @@ class UserControllerTest {
         assertFalse(retrievedUser.isPresent());
     }
 
-    // TODO: Delete User fails test case (not found).
+    @Test
+    void deleteUser_NotFound_Failure() throws Exception {
+        URI uri = constructUri("users/delete/1");
+        ResponseEntity<Void> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
+        assertEquals(404, responseEntity.getStatusCode().value());
+    }
 
     @Test
     void updateUser_Success() throws Exception {

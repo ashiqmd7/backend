@@ -2,8 +2,6 @@ package com.G2T5203.wingit.route;
 
 import com.G2T5203.wingit.entities.Route;
 import jakarta.transaction.Transactional;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +23,16 @@ public class RouteService {
     }
 
     @Transactional
-    public Route createRoute(Route newRoute) {
-        return repo.save(newRoute);
-    }
+    public Route createRoute(Route newRoute) { return repo.save(newRoute); }
 
     @Transactional
-    public void deleteRoute(Integer id) { repo.deleteById(id); }
+    public void deleteRoute(Integer routeId) {
+        if (repo.existsById(routeId)) {
+            repo.deleteById(routeId);
+        } else {
+            throw new RouteNotFoundException(routeId);
+        }
+    }
 
     @Transactional
     public Route updateRoute(Route updatedRoute) {
