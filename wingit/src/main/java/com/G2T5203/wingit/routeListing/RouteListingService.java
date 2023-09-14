@@ -35,6 +35,20 @@ public class RouteListingService {
                 .collect(Collectors.toList());
     }
 
+    public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDest(String departureDest) {
+        List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDest(departureDest);
+        return routeListings.stream()
+                .map(RouteListingSimpleJson::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDestAndArrivalDestination(String departureDest, String arrivalDest) {
+        List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(departureDest, arrivalDest);
+        return routeListings.stream()
+                .map(RouteListingSimpleJson::new)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public RouteListing createRouteListing(RouteListingSimpleJson simpleJson) {
         Optional<Route> retrievedRoute = routeRepo.findById(simpleJson.getRouteId());
