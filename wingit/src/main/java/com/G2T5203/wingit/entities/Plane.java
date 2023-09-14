@@ -11,12 +11,12 @@ public class Plane {
     private String planeId;
     private int capacity;
     private String model;
-    @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Seat> seats;
-    @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<RouteListing> routeListings;
+//    @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    private List<Seat> seats;
+//    @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    private List<RouteListing> routeListings;
 
     public Plane(String planeId, int capacity, String model) {
         this.planeId = planeId;
@@ -52,21 +52,21 @@ public class Plane {
         this.model = model;
     }
 
-    public List<Seat> getSeats() {
-        return seats;
-    }
-
-    public void setSeats(List<Seat> seats) {
-        this.seats = seats;
-    }
-
-    public List<RouteListing> getRouteListings() {
-        return routeListings;
-    }
-
-    public void setRouteListings(List<RouteListing> routeListings) {
-        this.routeListings = routeListings;
-    }
+//    public List<Seat> getSeats() {
+//        return seats;
+//    }
+//
+//    public void setSeats(List<Seat> seats) {
+//        this.seats = seats;
+//    }
+//
+//    public List<RouteListing> getRouteListings() {
+//        return routeListings;
+//    }
+//
+//    public void setRouteListings(List<RouteListing> routeListings) {
+//        this.routeListings = routeListings;
+//    }
 
     @Override
     public String toString() {

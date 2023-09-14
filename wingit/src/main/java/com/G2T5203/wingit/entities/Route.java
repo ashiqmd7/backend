@@ -19,9 +19,9 @@ public class Route {
     private String arrivalDest;
     @DurationMin(hours = 1)
     private Duration flightDuration;
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<RouteListing> routeListings;
+//    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    private List<RouteListing> routeListings;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
         this.routeId = routeId;
@@ -71,13 +71,13 @@ public class Route {
         this.flightDuration = flightDuration;
     }
 
-    public List<RouteListing> getRouteListings() {
-        return routeListings;
-    }
-
-    public void setRouteListings(List<RouteListing> routeListings) {
-        this.routeListings = routeListings;
-    }
+//    public List<RouteListing> getRouteListings() {
+//        return routeListings;
+//    }
+//
+//    public void setRouteListings(List<RouteListing> routeListings) {
+//        this.routeListings = routeListings;
+//    }
 
     @Override
     public String toString() {
