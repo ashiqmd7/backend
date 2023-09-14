@@ -23,7 +23,9 @@ public class UserService {
     }
 
     @Transactional
-    public WingitUser createUser(WingitUser newUser) { return repo.save(newUser); }
+    public WingitUser createUser(WingitUser newUser) {
+        return repo.save(newUser);
+    }
 
     @Transactional
     public void deleteUserById(Integer userId) {

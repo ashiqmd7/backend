@@ -1,13 +1,10 @@
 package com.G2T5203.wingit.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.time.DurationMin;
 
 import java.time.Duration;
-import java.util.List;
 
 @Entity
 public class Route {
@@ -19,9 +16,6 @@ public class Route {
     private String arrivalDest;
     @DurationMin(hours = 1)
     private Duration flightDuration;
-//    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<RouteListing> routeListings;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
         this.routeId = routeId;
@@ -70,14 +64,6 @@ public class Route {
     public void setFlightDuration(Duration flightDuration) {
         this.flightDuration = flightDuration;
     }
-
-//    public List<RouteListing> getRouteListings() {
-//        return routeListings;
-//    }
-//
-//    public void setRouteListings(List<RouteListing> routeListings) {
-//        this.routeListings = routeListings;
-//    }
 
     @Override
     public String toString() {

@@ -3,7 +3,6 @@ package com.G2T5203.wingit.entities;
 import jakarta.persistence.*;
 
 @Entity
-//@IdClass(SeatListingPk.class)
 public class SeatListing {
     @EmbeddedId
     private SeatListingPk seatListingPk;

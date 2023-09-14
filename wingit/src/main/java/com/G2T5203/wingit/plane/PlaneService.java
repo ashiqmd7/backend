@@ -13,8 +13,6 @@ import java.util.List;
 
 @Service
 public class PlaneService {
-    private static final Logger logger = LoggerFactory.getLogger(PlaneService.class);
-
     private final PlaneRepository repo;
 
     public PlaneService(PlaneRepository repo) {
@@ -30,49 +28,24 @@ public class PlaneService {
     }
 
     @Transactional
-    public HttpStatus createPlane(Plane newPlane) {
-        try {
-            repo.save(newPlane);
-        } catch (DataIntegrityViolationException e) {
-            logger.error("Failed to add new Plane: DataIntegrityViolationException\n" + newPlane.toString());
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        return HttpStatus.CREATED;
+    public Plane createPlane(Plane newPlane) {
+        return repo.save(newPlane);
     }
 
     @Transactional
-    public HttpStatus deletePlaneById(String planeId) {
-        try {
+    public void deletePlaneById(String planeId) {
+        if (repo.existsById(planeId)) {
             repo.deleteById(planeId);
-        } catch (EmptyResultDataAccessException e) {
-            logger.error("Failed to delete plane by Id: EmptyResultDataAccessException\n" +
-                    "PlaneId that was attempted to be deleted: " + planeId);
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            return HttpStatus.BAD_REQUEST;
+        } else {
+            throw new PlaneNotFoundException(planeId);
         }
-
-        return HttpStatus.OK;
     }
 
     @Transactional
-    public HttpStatus updatePlane(Plane updatedPlane) {
-        try {
-            boolean planeExists = getById(updatedPlane.getPlaneId()) != null;
-            if (planeExists) {
-                repo.save(updatedPlane);
-            } else {
-                logger.error("Plane " + updatedPlane.getPlaneId() + " does not exist!");
-                return HttpStatus.BAD_REQUEST;
-            }
-        } catch (DataIntegrityViolationException e) {
-            logger.error("Failed to update Plane: DataIntegrityViolationException\n" + updatedPlane.toString());
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        return HttpStatus.OK;
+    public Plane updatePlane(Plane updatedPlane) {
+        boolean planeExists = repo.existsById(updatedPlane.getPlaneId());
+        if (!planeExists) throw new PlaneNotFoundException(updatedPlane.getPlaneId());
+        return repo.save(updatedPlane);
     }
 }
 

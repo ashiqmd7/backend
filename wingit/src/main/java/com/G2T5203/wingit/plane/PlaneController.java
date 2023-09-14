@@ -13,9 +13,6 @@ import java.util.List;
 
 @RestController
 public class PlaneController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     private final PlaneService service;
 
     public PlaneController(PlaneService service) {
@@ -37,35 +34,39 @@ public class PlaneController {
     }
 
     // POST to add a new plane
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/planes/new")
-    public ResponseEntity<Plane> createPlane(@RequestBody Plane newPlane) {
-        logger.debug("RequestBody JSON: " + newPlane.toString());
-        HttpStatus resultingStatus;
+    public Plane createPlane(@RequestBody Plane newPlane) {
         try {
-            resultingStatus = service.createPlane(newPlane);
-        } catch (UnexpectedRollbackException e) {
-            logger.error("Failed to add new User: UnexpectedRollbackException\n" + newPlane.toString());
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            resultingStatus = HttpStatus.BAD_REQUEST;
+            return service.createPlane(newPlane);
+        } catch (Exception e) {
+            throw new PlaneBadRequestException(e);
         }
-        return ResponseEntity.status(resultingStatus).build();
     }
 
     // DELETE a specific plane by planeId
     @DeleteMapping("/planes/delete/{planeId}")
-    public ResponseEntity<Void> deletePlane(@PathVariable String planeId) {
-        HttpStatus resultingStatus = service.deletePlaneById(planeId);
-        return ResponseEntity.status(resultingStatus).build();
+    public void deletePlane(@PathVariable String planeId) {
+        try {
+            service.deletePlaneById(planeId);
+        } catch (PlaneNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new PlaneBadRequestException(e);
+        }
     }
 
     // PUT to update a specific plane by planeId
     @PutMapping("/planes/update/{planeId}")
-    public ResponseEntity<Plane> updatePlane(@PathVariable String planeId, @RequestBody Plane updatedPlane) {
+    public Plane updatePlane(@PathVariable String planeId, @RequestBody Plane updatedPlane) {
         updatedPlane.setPlaneId(planeId);
-        HttpStatus resultingStatus;
-        resultingStatus = service.updatePlane(updatedPlane);
-
-        return ResponseEntity.status(resultingStatus).build();
+        try {
+            return service.updatePlane(updatedPlane);
+        } catch (PlaneNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new PlaneBadRequestException(e);
+        }
     }
 }
 
