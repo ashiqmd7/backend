@@ -1,7 +1,9 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.entities.Route;
 import com.G2T5203.wingit.entities.WingitUser;
+import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.user.UserRepository;
 import org.slf4j.Logger;
@@ -37,6 +39,18 @@ public class DatabaseInitializer {
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs")));
+
+
+        // Initialise Planes
+        PlaneRepository planeRepository = context.getBean(PlaneRepository.class);
+        Log("[Add Plane]: " + planeRepository.save(new Plane(
+                "SQ123",
+                100,
+                "B777")));
+        Log("[Add Plane]: " + planeRepository.save(new Plane(
+                "SQ888",
+                200,
+                "A350")));
 
 
         // Initialise Routes
