@@ -8,4 +8,7 @@ public class RouteListingBadRequestException extends RuntimeException {
     public RouteListingBadRequestException(Exception e) {
         super("BAD REQUEST: " + e.getLocalizedMessage());
     }
+    public RouteListingBadRequestException(String msg) {
+        super("BAD REQUEST: " + msg);
+    }
 }
