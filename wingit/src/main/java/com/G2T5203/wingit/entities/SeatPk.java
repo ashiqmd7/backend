@@ -1,8 +1,16 @@
 package com.G2T5203.wingit.entities;
 
-import java.io.Serializable;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
+import java.io.Serializable;
+import java.util.Objects;
+
+@Embeddable
 public class SeatPk implements Serializable {
+    @ManyToOne
+    @JoinColumn(name = "planeId")
     private Plane plane;
     private String seatNumber;
 
@@ -11,4 +19,34 @@ public class SeatPk implements Serializable {
         this.seatNumber = seatNumber;
     }
 
+    public SeatPk() {}
+
+    public Plane getPlane() {
+        return plane;
+    }
+
+    public void setPlane(Plane plane) {
+        this.plane = plane;
+    }
+
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(String seatNumber) {
+        this.seatNumber = seatNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SeatPk seatPk = (SeatPk) o;
+        return Objects.equals(plane, seatPk.plane) && Objects.equals(seatNumber, seatPk.seatNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(plane, seatNumber);
+    }
 }

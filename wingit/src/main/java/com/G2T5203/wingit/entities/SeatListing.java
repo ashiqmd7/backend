@@ -3,53 +3,29 @@ package com.G2T5203.wingit.entities;
 import jakarta.persistence.*;
 
 @Entity
-@IdClass(SeatListingPk.class)
 public class SeatListing {
-    @Id
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "planeId", referencedColumnName = "planeId"),
-            @JoinColumn(name = "routeId", referencedColumnName = "routeId"),
-            @JoinColumn(name = "departureDatetime", referencedColumnName = "departureDatetime")
-    })
-    private RouteListing routeListing;
-    @Id
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "planeId", referencedColumnName = "planeId"),
-            @JoinColumn(name = "seatNumber", referencedColumnName = "seatNumber"),
-    })
-    private Seat seat;
+    @EmbeddedId
+    private SeatListingPk seatListingPk;
     @ManyToOne
     @JoinColumn(name = "bookingId")
     private Booking booking;
     private String occupantName;
 
-    public SeatListing(RouteListing routeListing, Seat seat, Booking booking, String occupantName) {
-        this.routeListing = routeListing;
-        this.seat = seat;
+    public SeatListing(SeatListingPk seatListingPk, Booking booking, String occupantName) {
+        this.seatListingPk = seatListingPk;
         this.booking = booking;
         this.occupantName = occupantName;
     }
 
     public SeatListing() {
-
     }
 
-    public RouteListing getRouteListing() {
-        return routeListing;
+    public SeatListingPk getSeatListingPk() {
+        return seatListingPk;
     }
 
-    public void setRouteListing(RouteListing routeListing) {
-        this.routeListing = routeListing;
-    }
-
-    public Seat getSeat() {
-        return seat;
-    }
-
-    public void setSeat(Seat seat) {
-        this.seat = seat;
+    public void setSeatListingPk(SeatListingPk seatListingPk) {
+        this.seatListingPk = seatListingPk;
     }
 
     public Booking getBooking() {
@@ -71,8 +47,7 @@ public class SeatListing {
     @Override
     public String toString() {
         return "SeatListing{" +
-                "routeListing=" + routeListing +
-                ", seat=" + seat +
+                "seatListingPk=" + seatListingPk +
                 ", booking=" + booking +
                 ", occupantName='" + occupantName + '\'' +
                 '}';

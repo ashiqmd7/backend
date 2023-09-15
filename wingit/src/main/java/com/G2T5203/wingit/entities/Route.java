@@ -1,20 +1,21 @@
 package com.G2T5203.wingit.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.time.DurationMin;
 
 import java.time.Duration;
-import java.util.List;
 
 @Entity
 public class Route {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer routeId;
+    @NotEmpty
     private String departureDest;
+    @NotEmpty
     private String arrivalDest;
+    @DurationMin(hours = 1)
     private Duration flightDuration;
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL)
-    private List<RouteListing> routeListings;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
         this.routeId = routeId;
@@ -23,8 +24,13 @@ public class Route {
         this.flightDuration = flightDuration;
     }
 
-    public Route() {
+    public Route(String departureDest, String arrivalDest, Duration flightDuration) {
+        this.departureDest = departureDest;
+        this.arrivalDest = arrivalDest;
+        this.flightDuration = flightDuration;
+    }
 
+    public Route() {
     }
 
     public Integer getRouteId() {
@@ -57,14 +63,6 @@ public class Route {
 
     public void setFlightDuration(Duration flightDuration) {
         this.flightDuration = flightDuration;
-    }
-
-    public List<RouteListing> getRouteListings() {
-        return routeListings;
-    }
-
-    public void setRouteListings(List<RouteListing> routeListings) {
-        this.routeListings = routeListings;
     }
 
     @Override

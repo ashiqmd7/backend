@@ -1,18 +1,13 @@
 package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 public class UserController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService service;
 
     public UserController(UserService service) {
@@ -25,43 +20,55 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    // GET a specific user by userID
-    @GetMapping(path = "/users/{userID}")
-    public WingitUser getUser(@PathVariable Integer userID) {
-        return service.getById(userID);
+    // GET a specific user by username
+    @GetMapping(path = "/users/{username}")
+    public WingitUser getUser(@PathVariable String username) {
+        WingitUser user = service.getById(username);
+        if (user == null) throw new UserNotFoundException(username);
+        return user;
     }
 
     // POST to add a new user
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/users/new")
-    public ResponseEntity<String> createUser(@RequestBody WingitUser newUser) {
-        logger.debug("RequestBody JSON: " + newUser.toString());
-        HttpStatus resultingStatus;
+    public WingitUser createUser(@Valid @RequestBody WingitUser newUser) {
         try {
-            resultingStatus = service.createUser(newUser);
-        } catch (UnexpectedRollbackException e) {
-            logger.error("Failed to add new User: UnexpectedRollbackException\n" + newUser.toString());
-            logger.debug("Error details: " + e.getLocalizedMessage());
-            resultingStatus = HttpStatus.BAD_REQUEST;
+            if (newUser.getAuthorityRole() == null) {
+                newUser.setAuthorityRole("ROLE_USER");
+            }
+            return service.createUser(newUser);
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
         }
-        return ResponseEntity.status(resultingStatus).build();
     }
 
-    // DELETE a specific user by userID
-    @DeleteMapping(path = "/users/delete/{userID}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer userID) {
-        HttpStatus resultingStatus = service.deleteUserById(userID);
-        return ResponseEntity.status(resultingStatus).build();
+    // DELETE a specific user by username
+    @DeleteMapping(path = "/users/delete/{username}")
+    public void deleteUser(@PathVariable String username) {
+        try {
+            service.deleteUserById(username);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
     }
 
-    // PUT to update a specific user by userID
-    @PutMapping("/users/update/{userID}")
-    public ResponseEntity<String> updateUser(@PathVariable Integer userID, @RequestBody WingitUser updatedUser) {
-        updatedUser.setUserId(userID);
-        HttpStatus resultingStatus;
-        resultingStatus = service.updateUser(updatedUser);
+    // PUT to update a specific user by username
+    @PutMapping("/users/update/{username}")
+    public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
+        boolean usernamesMatch = username.equals(updatedUser.getUsername());
+        if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismtach.");
 
-        return ResponseEntity.status(resultingStatus).build();
+        if (updatedUser.getAuthorityRole() == null) {
+            updatedUser.setAuthorityRole("ROLE_USER");
+        }
+        try {
+            return service.updateUser(updatedUser);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
     }
-
-
 }
