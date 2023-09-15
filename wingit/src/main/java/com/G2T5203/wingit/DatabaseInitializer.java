@@ -30,6 +30,7 @@ public class DatabaseInitializer {
         List<WingitUser> wingitUserList = new ArrayList<>();
         // TODO: Consider changing Wingit.DoB to LocalDate
         wingitUserList.add(userRepository.save(new WingitUser(
+                "bradonDaddy",
                 "goodpassword",
                 "Brandon",
                 "Choy",
@@ -38,6 +39,7 @@ public class DatabaseInitializer {
                 "+65 8746 3847",
                 "Mr")));
         wingitUserList.add(userRepository.save(new WingitUser(
+                "DaddyChoy",
                 "password",
                 "Jared",
                 "Hong",

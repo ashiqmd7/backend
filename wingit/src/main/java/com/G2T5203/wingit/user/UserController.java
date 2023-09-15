@@ -2,13 +2,7 @@ package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -26,11 +20,11 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    // GET a specific user by userID
-    @GetMapping(path = "/users/{userID}")
-    public WingitUser getUser(@PathVariable Integer userID) {
-        WingitUser user = service.getById(userID);
-        if (user == null) throw new UserNotFoundException(userID);
+    // GET a specific user by username
+    @GetMapping(path = "/users/{username}")
+    public WingitUser getUser(@PathVariable String username) {
+        WingitUser user = service.getById(username);
+        if (user == null) throw new UserNotFoundException(username);
         return user;
     }
 
@@ -45,11 +39,11 @@ public class UserController {
         }
     }
 
-    // DELETE a specific user by userID
-    @DeleteMapping(path = "/users/delete/{userId}")
-    public void deleteUser(@PathVariable Integer userId) {
+    // DELETE a specific user by username
+    @DeleteMapping(path = "/users/delete/{username}")
+    public void deleteUser(@PathVariable String username) {
         try {
-            service.deleteUserById(userId);
+            service.deleteUserById(username);
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -57,10 +51,10 @@ public class UserController {
         }
     }
 
-    // PUT to update a specific user by userID
-    @PutMapping("/users/update/{userId}")
-    public WingitUser updateUser(@PathVariable Integer userId, @Valid @RequestBody WingitUser updatedUser) {
-        updatedUser.setUserId(userId);
+    // PUT to update a specific user by username
+    @PutMapping("/users/update/{username}")
+    public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
+        updatedUser.setUsername(username);
         try {
             return service.updateUser(updatedUser);
         } catch (UserNotFoundException e) {

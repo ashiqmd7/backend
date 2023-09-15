@@ -10,8 +10,8 @@ import java.util.List;
 @Entity
 public class WingitUser {
     // TODO: Validation annotations to include messages.
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    @Id
+    private String username;
     @NotEmpty
     private String password;
     @NotEmpty
@@ -31,8 +31,8 @@ public class WingitUser {
     private List<Booking> bookings;
 
 
-    public WingitUser(Integer userId, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
-        this.userId = userId;
+    public WingitUser(String username, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+        this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -41,27 +41,14 @@ public class WingitUser {
         this.phone = phone;
         this.salutation = salutation;
     }
+    public WingitUser() {}
 
-    public WingitUser(String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dob = dob;
-        this.email = email;
-        this.phone = phone;
-        this.salutation = salutation;
+    public String getUsername() {
+        return username;
     }
 
-    public WingitUser() {
-
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -123,7 +110,7 @@ public class WingitUser {
     @Override
     public String toString() {
         return "WingitUser{" +
-                "userID='" + userId + '\'' +
+                "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

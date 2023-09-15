@@ -11,7 +11,7 @@ public class Booking {
     @Id
     private String bookingId;
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "username")
     private WingitUser wingitUser;
     @ManyToOne
     @JoinColumns({

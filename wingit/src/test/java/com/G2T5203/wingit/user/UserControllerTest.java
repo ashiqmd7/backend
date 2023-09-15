@@ -1,9 +1,6 @@
 package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
-import com.mysql.cj.log.Log;
-import org.apache.coyote.Response;
-import org.glassfish.jaxb.runtime.v2.runtime.reflect.opt.Const;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,6 +32,7 @@ class UserControllerTest {
     // Helper functions
     private WingitUser createSampleUser1() {
         return new WingitUser(
+                "brandonDaddy",
                 "goodpassword",
                 "Brandon",
                 "Choy",
@@ -49,6 +43,7 @@ class UserControllerTest {
     }
     private WingitUser createSampleUser2() {
         return new WingitUser(
+                "DaddyChoy",
                 "password",
                 "Jared",
                 "Hong",
@@ -89,9 +84,9 @@ class UserControllerTest {
                 createSampleUser1(),
                 createSampleUser2()
         };
-        Integer[] userIds = {
-                userRepository.save(sampleUsers[0]).getUserId(),
-                userRepository.save(sampleUsers[1]).getUserId()
+        String[] username = {
+                userRepository.save(sampleUsers[0]).getUsername(),
+                userRepository.save(sampleUsers[1]).getUsername()
         };
 
 
@@ -104,11 +99,11 @@ class UserControllerTest {
         assertEquals(2, retrievedUsers.length);
 
         for (int i = 0; i < retrievedUsers.length; i++) {
-            Integer id = userIds[i];
+            String id = username[i];
             WingitUser sampleControl = sampleUsers[i];
             WingitUser retrievedUser = retrievedUsers[i];
 
-            assertEquals(id, retrievedUser.getUserId());
+            assertEquals(id, retrievedUser.getUsername());
             assertEquals(sampleControl.getPassword(), retrievedUser.getPassword());
             assertEquals(sampleControl.getFirstName(), retrievedUser.getFirstName());
             assertEquals(sampleControl.getLastName(), retrievedUser.getLastName());
@@ -126,13 +121,13 @@ class UserControllerTest {
                 createSampleUser1(),
                 createSampleUser2()
         };
-        Integer[] userIds = {
-                userRepository.save(sampleUsers[0]).getUserId(),
-                userRepository.save(sampleUsers[1]).getUserId()
+        String[] username = {
+                userRepository.save(sampleUsers[0]).getUsername(),
+                userRepository.save(sampleUsers[1]).getUsername()
         };
         final int sampleIndexUsedForTesting = 1;
 
-        URI uri = constructUri("users/" + userIds[sampleIndexUsedForTesting]);
+        URI uri = constructUri("users/" + username[sampleIndexUsedForTesting]);
         ResponseEntity<WingitUser> responseEntity = testRestTemplate.getForEntity(uri, WingitUser.class);
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
@@ -141,7 +136,7 @@ class UserControllerTest {
         assertNotNull(retrievedUser);
         WingitUser sampleControl = sampleUsers[sampleIndexUsedForTesting];
 
-        assertEquals(userIds[sampleIndexUsedForTesting], retrievedUser.getUserId());
+        assertEquals(username[sampleIndexUsedForTesting], retrievedUser.getUsername());
         assertEquals(sampleControl.getPassword(), retrievedUser.getPassword());
         assertEquals(sampleControl.getFirstName(), retrievedUser.getFirstName());
         assertEquals(sampleControl.getLastName(), retrievedUser.getLastName());
@@ -183,6 +178,21 @@ class UserControllerTest {
         ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, duplicateUserEmail, WingitUser.class);
 
         assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is also "Email already used for existing account."
+    }
+
+    @Test
+    void createUser_ExistingUsername_Failure() throws Exception {
+        WingitUser existingUser = createSampleUser1();
+        userRepository.save(existingUser);
+
+        WingitUser duplicateUsename = createSampleUser2();
+        duplicateUsename.setUsername(existingUser.getUsername());
+        URI uri = constructUri("users/new");
+        ResponseEntity<WingitUser> responseEntity = testRestTemplate.postForEntity(uri, duplicateUsename, WingitUser.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is also "Username already exists."
     }
 
     // TODO: Testcase createUser with future Date of Birth
@@ -192,13 +202,13 @@ class UserControllerTest {
     @Test
     void deleteUser_Success() throws Exception {
         WingitUser userToBeDeleted = createSampleUser1();
-        Integer userId = userRepository.save(userToBeDeleted).getUserId();
+        String username = userRepository.save(userToBeDeleted).getUsername();
 
-        URI uri = constructUri("users/delete/" + userId);
+        URI uri = constructUri("users/delete/" + username);
         ResponseEntity<Void> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
-        Optional<WingitUser> retrievedUser = userRepository.findById(userId);
+        Optional<WingitUser> retrievedUser = userRepository.findById(username);
         assertFalse(retrievedUser.isPresent());
     }
 
@@ -212,18 +222,18 @@ class UserControllerTest {
     @Test
     void updateUser_Success() throws Exception {
         WingitUser sampleUser = createSampleUser1();
-        Integer sampleUserId = userRepository.save(sampleUser).getUserId();
+        String sampleUsername = userRepository.save(sampleUser).getUsername();
         WingitUser updatedUser = createSampleUser1();
         updatedUser.setFirstName("Updated");
         updatedUser.setLastName("User");
         // TODO: Exhaustive test all the other update fields
 
-        URI uri = constructUri("users/update/" + sampleUserId);
+        URI uri = constructUri("users/update/" + sampleUsername);
         HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(updatedUser);
         ResponseEntity<Void> responseEntity = testRestTemplate.exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
-        WingitUser retrievedUser = userRepository.findById(sampleUserId).get();
+        WingitUser retrievedUser = userRepository.findById(sampleUsername).get();
         assertEquals("Updated", retrievedUser.getFirstName());
         assertEquals("User", retrievedUser.getLastName());
     }
