@@ -32,6 +32,7 @@ public class DatabaseInitializer {
         wingitUserList.add(userRepository.save(new WingitUser(
                 "bradonDaddy",
                 "goodpassword",
+                "ROLE_USER",
                 "Brandon",
                 "Choy",
                 DateUtils.handledParseDate("2001-12-04"),
@@ -41,12 +42,23 @@ public class DatabaseInitializer {
         wingitUserList.add(userRepository.save(new WingitUser(
                 "DaddyChoy",
                 "password",
+                "ROLE_USER",
                 "Jared",
                 "Hong",
                 DateUtils.handledParseDate("1996-10-03"),
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs")));
+        wingitUserList.add(userRepository.save(new WingitUser(
+                "admin",
+                "pass",
+                "ROLE_ADMIN",
+                "admin",
+                "admin",
+                java.sql.Date.valueOf(LocalDate.parse("2000-01-01")),
+                "admin@admin.com",
+                "+65 6475 3846",
+                "Master")));
         for (WingitUser wingitUser : wingitUserList) {
             Log("[Add WingitUser]: " + wingitUser);
         }

@@ -14,6 +14,8 @@ public class WingitUser {
     private String username;
     @NotEmpty
     private String password;
+    @NotEmpty @Pattern(regexp = "ROLE_USER|ROLE_ADMIN")
+    private String authorityRole;
     @NotEmpty
     private String firstName;
     @NotEmpty
@@ -31,9 +33,10 @@ public class WingitUser {
     private List<Booking> bookings;
 
 
-    public WingitUser(String username, String password, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+    public WingitUser(String username, String password, String authorityRole, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
         this.username = username;
         this.password = password;
+        this.authorityRole = authorityRole;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dob = dob;
@@ -58,6 +61,10 @@ public class WingitUser {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getAuthorityRole() { return authorityRole; }
+
+    public void setAuthorityRole(String authorityRole) { this.authorityRole = authorityRole; }
 
     public String getFirstName() {
         return firstName;
@@ -112,6 +119,7 @@ public class WingitUser {
         return "WingitUser{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", authorityRole='" + authorityRole + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dob=" + dob +

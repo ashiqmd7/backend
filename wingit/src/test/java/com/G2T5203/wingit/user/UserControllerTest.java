@@ -34,6 +34,7 @@ class UserControllerTest {
         return new WingitUser(
                 "brandonDaddy",
                 "goodpassword",
+                "ROLE_USER",
                 "Brandon",
                 "Choy",
                 Date.valueOf(LocalDate.parse("2001-12-04")),
@@ -45,12 +46,25 @@ class UserControllerTest {
         return new WingitUser(
                 "DaddyChoy",
                 "password",
+                "ROLE_USER",
                 "Jared",
                 "Hong",
                 Date.valueOf(LocalDate.parse("1996-10-03")),
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs");
+    }
+    private WingitUser createAdminUser() {
+        return new WingitUser(
+                "admin",
+                "pass",
+                "ROLE_ADMIN",
+                "admin",
+                "admin",
+                Date.valueOf(LocalDate.parse("2000-01-01")),
+                "admin@admin.com",
+                "+65 6475 3846",
+                "Master");
     }
 
     @Autowired
