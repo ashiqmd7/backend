@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -21,7 +21,7 @@ public class WingitUser {
     @NotEmpty
     private String lastName;
     @NotNull @Past
-    private Date dob;
+    private LocalDate dob;
     @Column(unique = true) @Email @NotEmpty
     private String email;
     @NotEmpty
@@ -33,7 +33,7 @@ public class WingitUser {
     private List<Booking> bookings;
 
 
-    public WingitUser(String username, String password, String authorityRole, String firstName, String lastName, Date dob, String email, String phone, String salutation) {
+    public WingitUser(String username, String password, String authorityRole, String firstName, String lastName, LocalDate dob, String email, String phone, String salutation) {
         this.username = username;
         this.password = password;
         this.authorityRole = authorityRole;
@@ -82,11 +82,11 @@ public class WingitUser {
         this.lastName = lastName;
     }
 
-    public Date getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 

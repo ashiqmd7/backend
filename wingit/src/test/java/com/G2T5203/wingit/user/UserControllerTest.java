@@ -37,7 +37,7 @@ class UserControllerTest {
                 "ROLE_USER",
                 "Brandon",
                 "Choy",
-                Date.valueOf(LocalDate.parse("2001-12-04")),
+                LocalDate.parse("2001-12-04"),
                 "brandon.choy.2037@scis.smu.edu.sg",
                 "+65 8746 3847",
                 "Mr");
@@ -49,7 +49,7 @@ class UserControllerTest {
                 "ROLE_USER",
                 "Jared",
                 "Hong",
-                Date.valueOf(LocalDate.parse("1996-10-03")),
+                LocalDate.parse("1996-10-03"),
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs");
@@ -61,7 +61,7 @@ class UserControllerTest {
                 "ROLE_ADMIN",
                 "admin",
                 "admin",
-                Date.valueOf(LocalDate.parse("2000-01-01")),
+                LocalDate.parse("2000-01-01"),
                 "admin@admin.com",
                 "+65 6475 3846",
                 "Master");
