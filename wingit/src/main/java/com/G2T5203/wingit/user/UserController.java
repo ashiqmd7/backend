@@ -33,6 +33,9 @@ public class UserController {
     @PostMapping(path = "/users/new")
     public WingitUser createUser(@Valid @RequestBody WingitUser newUser) {
         try {
+            if (newUser.getAuthorityRole() == null) {
+                newUser.setAuthorityRole("ROLE_USER");
+            }
             return service.createUser(newUser);
         } catch (Exception e) {
             throw new UserBadRequestException(e);
@@ -54,7 +57,12 @@ public class UserController {
     // PUT to update a specific user by username
     @PutMapping("/users/update/{username}")
     public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
-        updatedUser.setUsername(username);
+        boolean usernamesMatch = username.equals(updatedUser.getUsername());
+        if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismtach.");
+
+        if (updatedUser.getAuthorityRole() == null) {
+            updatedUser.setAuthorityRole("ROLE_USER");
+        }
         try {
             return service.updateUser(updatedUser);
         } catch (UserNotFoundException e) {

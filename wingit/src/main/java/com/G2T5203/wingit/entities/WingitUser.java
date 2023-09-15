@@ -15,7 +15,7 @@ public class WingitUser {
     @NotEmpty
     private String password;
     @NotEmpty @Pattern(regexp = "ROLE_USER|ROLE_ADMIN")
-    private String authorityRole;
+    private String authorityRole = "ROLE_USER"; // defaults to user.
     @NotEmpty
     private String firstName;
     @NotEmpty
