@@ -3,8 +3,11 @@ package com.G2T5203.wingit.user;
 import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -26,6 +29,13 @@ public class UserController {
         WingitUser user = service.getById(username);
         if (user == null) throw new UserNotFoundException(username);
         return user;
+    }
+
+    @GetMapping(path = "/users/authTest/{var}")
+    public ResponseEntity<Object> getAuthTest(@PathVariable String var) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("pathInput", var);
+        return new ResponseEntity<>(body, null, HttpStatus.OK);
     }
 
     // POST to add a new user

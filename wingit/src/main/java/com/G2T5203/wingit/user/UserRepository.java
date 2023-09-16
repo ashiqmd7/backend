@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserRepository extends JpaRepository<WingitUser, String> {
     WingitUser findByEmail(String email);
     boolean existsByEmail(String email);
+    boolean existsByUsernameAndPassword(String username, String password);
 }

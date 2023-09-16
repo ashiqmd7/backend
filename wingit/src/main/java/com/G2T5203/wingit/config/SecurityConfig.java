@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -67,6 +68,8 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasRole("USER")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/users/new")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).hasRole("USER")
                             .anyRequest().hasAuthority("SCOPE_READ");
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,11 +79,13 @@ public class SecurityConfig {
                 .build();
     }
 
+
     @Bean
     public UserDetailsService userDetailsService() {
+        // TODO: Needs to link up with out WingitUser database. So that our roles and password and useranmes work.
         return new InMemoryUserDetailsManager(
                 User.withUsername("sample")
-                        .password("{noop}password")
+                        .password("{noop}password") // {noop} is to indicate that it's plain text.
                         .authorities("READ","ROLE_USER")
                         .build());
     }

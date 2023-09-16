@@ -44,4 +44,8 @@ public class UserService {
         if (!userExists) throw new UserNotFoundException(updatedUser.getUsername());
         return repo.save(updatedUser);
     }
+
+    public Boolean verifyUserCredentials(String username, String password) {
+        return repo.existsByUsernameAndPassword(username, password);
+    }
 }
