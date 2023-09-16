@@ -6,6 +6,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -26,6 +27,7 @@ public class SecurityConfig {
 //                    auth.requestMatchers("/api/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .httpBasic(withDefaults())
                 .build();
@@ -44,17 +46,18 @@ public class SecurityConfig {
                 .build();
     }
 
-    // /permitAll() /private = login with a formLogin
+//     /permitAll() /private = login with a formLogin
     @Bean
     @Order(3)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/").permitAll();
-//                    auth.requestMatchers("/error").permitAll();
+                    auth.requestMatchers(new AntPathRequestMatcher("/")).permitAll();
+                    auth.requestMatchers(new AntPathRequestMatcher("/error")).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(withDefaults())
                 .build();
+
     }
 }
