@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,24 +36,15 @@ public class SecurityConfig {
     @Value("${jwt.key}")
     private String jwtKey;
 
-    // /api/** authenticated / httpBasic
     @Bean
-    @Order(1)
-    SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .securityMatcher("/users/**")
-                .authorizeHttpRequests(auth -> {
-//                    auth.requestMatchers("/api/**").authenticated();
-                    auth.anyRequest().authenticated();
-                })
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                .httpBasic(withDefaults())
-                .build();
+    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
+        var authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        return new ProviderManager(authProvider);
     }
 
     @Bean
-    @Order(2)
+    @Order(1)
     SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(AntPathRequestMatcher.antMatcher("/h2-console/**"))
@@ -62,34 +56,22 @@ public class SecurityConfig {
                 .build();
     }
 
-//     /permitAll() /private = login with a formLogin
     @Bean
-    @Order(3)
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> {
-//                    auth.requestMatchers(new AntPathRequestMatcher("/")).permitAll();
-//                    auth.requestMatchers(new AntPathRequestMatcher("/error")).permitAll();
-//                    auth.anyRequest().authenticated();
-//                })
-//                .formLogin(withDefaults())
-//                .build();
-//    }
-
-    // with oauth
+    @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasRole("USER")
-                        .anyRequest().hasAuthority("SCOPE_READ")
-                )
+                .authorizeHttpRequests(auth -> {
+                    auth
+                            // new AntPathRequestMatcher() allows you to set additional properties on 'AntPathRequestMatcher' instance during instantiation
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasRole("USER")
+                            .anyRequest().hasAuthority("SCOPE_READ");
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-//                .oauth2ResourceServer((rs) ->
-//                        rs.jwt((jwt) ->jwt.decoder(jwtDecoder()))
-//                )
+                .formLogin(withDefaults())
                 .httpBasic(withDefaults())
                 .build();
     }
