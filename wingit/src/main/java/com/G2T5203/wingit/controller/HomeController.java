@@ -10,6 +10,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Principal principal) {
+        // principal prints out the username of the currently authenticated user
         return "Hello, " + principal.getName();
     }
 
