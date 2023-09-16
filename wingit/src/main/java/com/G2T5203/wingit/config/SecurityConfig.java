@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -37,12 +38,6 @@ public class SecurityConfig {
     @Value("${jwt.key}")
     private String jwtKey;
 
-    @Bean
-    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
-        var authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        return new ProviderManager(authProvider);
-    }
 
     @Bean
     @Order(1)
@@ -67,9 +62,21 @@ public class SecurityConfig {
                             // new AntPathRequestMatcher() allows you to set additional properties on 'AntPathRequestMatcher' instance during instantiation
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
-                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasRole("USER")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasAnyRole("USER", "ADMIN")
+
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/users/new")).permitAll()
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).hasRole("USER")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/planes/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seats/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routeListings/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seatListings/new")).hasRole("ADMIN")
+
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/bookings")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/*")).permitAll()
+
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
                             .anyRequest().hasAuthority("SCOPE_READ");
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -80,15 +87,6 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        // TODO: Needs to link up with out WingitUser database. So that our roles and password and useranmes work.
-        return new InMemoryUserDetailsManager(
-                User.withUsername("sample")
-                        .password("{noop}password") // {noop} is to indicate that it's plain text.
-                        .authorities("READ","ROLE_USER")
-                        .build());
-    }
 
     @Bean
     JwtEncoder jwtEncoder() {
@@ -103,4 +101,39 @@ public class SecurityConfig {
     }
 
 
+
+//    @Bean
+//    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
+//        var authProvider = new DaoAuthenticationProvider();
+//        authProvider.setUserDetailsService(userDetailsService);
+//        return new ProviderManager(authProvider);
+//    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return new InMemoryUserDetailsManager(
+//                User.withUsername("sample")
+//                        .password("{noop}password") // {noop} is to indicate that it's plain text.
+//                        .authorities("READ","ROLE_USER")
+//                        .build());
+//    }
+    // TODO: Need to clean this up with what's above. Below is taken from the class activity code.
+    // Might be good enough to just keep and delete the rest above. But leaving it to QJ to clean up since he knows best
+    private UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(encoder());
+
+        return authProvider;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder encoder() { return new BCryptPasswordEncoder(); }
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,14 +25,17 @@ import java.util.List;
 public class DatabaseInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
     private static void Log(String msg) { logger.debug(msg); }
+
     public static void init(ApplicationContext context) {
+        // Get encoder
+        BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
+
         // Initialise WingitUsers
         UserRepository userRepository = context.getBean(UserRepository.class);
         List<WingitUser> wingitUserList = new ArrayList<>();
-        // TODO: Consider changing Wingit.DoB to LocalDate
         wingitUserList.add(userRepository.save(new WingitUser(
                 "bradonDaddy",
-                "goodpassword",
+                encoder.encode("goodpassword"),
                 "ROLE_USER",
                 "Brandon",
                 "Choy",
@@ -41,7 +45,7 @@ public class DatabaseInitializer {
                 "Mr")));
         wingitUserList.add(userRepository.save(new WingitUser(
                 "DaddyChoy",
-                "password",
+                encoder.encode("password"),
                 "ROLE_USER",
                 "Jared",
                 "Hong",
@@ -51,7 +55,7 @@ public class DatabaseInitializer {
                 "Mrs")));
         wingitUserList.add(userRepository.save(new WingitUser(
                 "admin",
-                "pass",
+                encoder.encode("pass"),
                 "ROLE_ADMIN",
                 "admin",
                 "admin",

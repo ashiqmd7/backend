@@ -4,6 +4,7 @@ import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +13,10 @@ import java.util.*;
 @RestController
 public class UserController {
     private final UserService service;
-
-    public UserController(UserService service) {
+    private final BCryptPasswordEncoder encoder;
+    public UserController(UserService service, BCryptPasswordEncoder encoder) {
         this.service = service;
+        this.encoder = encoder;
     }
 
     // GET all users
@@ -46,6 +48,7 @@ public class UserController {
             if (newUser.getAuthorityRole() == null) {
                 newUser.setAuthorityRole("ROLE_USER");
             }
+            newUser.setPassword(encoder.encode(newUser.getPassword()));
             return service.createUser(newUser);
         } catch (Exception e) {
             throw new UserBadRequestException(e);
