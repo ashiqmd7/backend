@@ -2,35 +2,21 @@ package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
-import org.antlr.v4.runtime.Token;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
-import com.G2T5203.wingit.service.TokenService;
-import org.springframework.security.authentication.AuthenticationManager;
-
-
 
 import java.util.*;
 
 @RestController
 public class UserController {
     private final UserService service;
-    private final TokenService tokenService;
-    private final AuthenticationManager authenticationManager;
-
     private final BCryptPasswordEncoder encoder;
-    public UserController(UserService service, BCryptPasswordEncoder encoder, TokenService tokenService, AuthenticationManager authenticationManager) {
+    public UserController(UserService service, BCryptPasswordEncoder encoder) {
         this.service = service;
         this.encoder = encoder;
-        this.tokenService = tokenService;
-        this.authenticationManager = authenticationManager;
     }
 
     // GET all users
