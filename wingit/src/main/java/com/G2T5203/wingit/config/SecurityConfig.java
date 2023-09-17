@@ -77,12 +77,12 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/*")).permitAll()
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
-                            .anyRequest().hasAuthority("SCOPE_READ");
+                            .anyRequest().hasAuthority("SCOPE_READ"); // if hitting an endpoint in system, need to have this authority otherwise will be unauthorized
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .formLogin(withDefaults())
-                .httpBasic(withDefaults())
+//                .httpBasic(withDefaults())
                 .build();
     }
 
@@ -102,12 +102,12 @@ public class SecurityConfig {
 
 
 
-//    @Bean
-//    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
-//        var authProvider = new DaoAuthenticationProvider();
-//        authProvider.setUserDetailsService(userDetailsService);
-//        return new ProviderManager(authProvider);
-//    }
+    @Bean
+    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
+        var authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        return new ProviderManager(authProvider);
+    }
 //    @Bean
 //    public UserDetailsService userDetailsService() {
 //        return new InMemoryUserDetailsManager(
