@@ -1,4 +1,4 @@
-package com.G2T5203.wingit.service;
+package com.G2T5203.wingit.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

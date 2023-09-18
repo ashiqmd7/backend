@@ -1,6 +1,5 @@
-package com.G2T5203.wingit.controller;
+package com.G2T5203.wingit.security;
 
-import com.G2T5203.wingit.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

@@ -1,4 +1,4 @@
-package com.G2T5203.wingit.config;
+package com.G2T5203.wingit.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,15 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -22,14 +19,12 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.crypto.spec.SecretKeySpec;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -102,22 +97,9 @@ public class SecurityConfig {
 
 
 
-//    @Bean
-//    public AuthenticationManager authManager(UserDetailsService userDetailsService) {
-//        var authProvider = new DaoAuthenticationProvider();
-//        authProvider.setUserDetailsService(userDetailsService);
-//        return new ProviderManager(authProvider);
-//    }
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        return new InMemoryUserDetailsManager(
-//                User.withUsername("sample")
-//                        .password("{noop}password") // {noop} is to indicate that it's plain text.
-//                        .authorities("READ","ROLE_USER")
-//                        .build());
-//    }
-    // TODO: Need to clean this up with what's above. Below is taken from the class activity code.
-    // Might be good enough to just keep and delete the rest above. But leaving it to QJ to clean up since he knows best
+
+
+
     private UserDetailsService userDetailsService;
 
     public SecurityConfig(UserDetailsService userDetailsService) {

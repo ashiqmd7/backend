@@ -1,7 +1,7 @@
 //package com.G2T5203.wingit.controller;
 //
 //import com.G2T5203.wingit.config.SecurityConfig;
-//import com.G2T5203.wingit.service.TokenService;
+//import com.G2T5203.wingit.security.TokenService;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
