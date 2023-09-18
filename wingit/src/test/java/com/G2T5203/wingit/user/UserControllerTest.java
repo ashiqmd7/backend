@@ -75,7 +75,8 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
+        userRepository.save(createAdminUser());
+        userRepository.save(createSampleUser1());
     }
 
     @AfterEach
@@ -84,6 +85,8 @@ class UserControllerTest {
     }
 
     @Test
+    // TODO: This test does not make sense anymore, combine with below.
+    //       The BeforeEach already adds an admin user and also a normal user.
     void getAllUsers_Empty_Success() throws Exception {
         URI uri = constructUri("users");
         ResponseEntity<WingitUser[]> responseEntity = testRestTemplate.getForEntity(uri, WingitUser[].class);
@@ -94,6 +97,7 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_TwoUsers_Success() throws Exception {
+        // TODO: Should not need to use this already, at most just for data checking!
         WingitUser[] sampleUsers = {
                 createSampleUser1(),
                 createSampleUser2()
@@ -131,6 +135,7 @@ class UserControllerTest {
 
     @Test
     void getUser_Success() throws Exception {
+        // TODO: Just try to get the sampleUser 1 which is added at the @BeforeEach already!
         WingitUser[] sampleUsers = {
                 createSampleUser1(),
                 createSampleUser2()
