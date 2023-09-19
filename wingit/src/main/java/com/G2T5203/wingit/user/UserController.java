@@ -14,12 +14,7 @@ import java.util.*;
 @RestController
 public class UserController {
     private final UserService service;
-    // TODO: This should be moved to service!
-    private final BCryptPasswordEncoder encoder;
-    public UserController(UserService service, BCryptPasswordEncoder encoder) {
-        this.service = service;
-        this.encoder = encoder;
-    }
+    public UserController(UserService service) { this.service = service; }
 
     // GET all users
     @GetMapping(path = "/users")
@@ -48,10 +43,6 @@ public class UserController {
     @PostMapping(path = "/users/new")
     public WingitUser createUser(@Valid @RequestBody WingitUser newUser) {
         try {
-            if (newUser.getAuthorityRole() == null) {
-                newUser.setAuthorityRole("ROLE_USER");
-            }
-            newUser.setPassword(encoder.encode(newUser.getPassword()));
             return service.createUser(newUser);
         } catch (Exception e) {
             throw new UserBadRequestException(e);
@@ -62,7 +53,6 @@ public class UserController {
     @DeleteMapping(path = "/users/delete/{username}")
     public void deleteUser(@PathVariable String username) {
         // TODO: Make sure authenticated user is either admin role, or the exact same user.
-        // TODO: Then make sure it's in the unit test.
         try {
             service.deleteUserById(username);
         } catch (UserNotFoundException e) {

@@ -32,6 +32,10 @@ public class UserService {
     public WingitUser createUser(WingitUser newUser) {
         if (repo.existsById(newUser.getUsername())) throw new UserBadRequestException("Username already exists");
         if (repo.existsByEmail(newUser.getEmail())) throw new UserBadRequestException("Email already used for existing account.");
+        if (newUser.getAuthorityRole() == null) {
+            newUser.setAuthorityRole("ROLE_USER");
+        }
+        newUser.setPassword(encoder.encode(newUser.getPassword()));
         return repo.save(newUser);
     }
 
