@@ -125,12 +125,22 @@ class UserControllerTest {
     }
 
     @Test
-    void getUser_Success() throws Exception {
+    void getAllUsers_WrongAuth_Failure() throws Exception {
+        URI uri = constructUri("users");
+        ResponseEntity<WingitUser[]> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .getForEntity(uri, WingitUser[].class);
+
+        assertEquals(403, responseEntity.getStatusCode().value());
+    }
+
+    @Test
+    void getUser_SampleUser1_Success() throws Exception {
         WingitUser sampleUser = createSampleUser1();
 
         URI uri = constructUri("users/" + sampleUser.getUsername());
         ResponseEntity<WingitUser> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth("brandonDaddy", "goodpassword")
                 .getForEntity(uri, WingitUser.class);
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
@@ -148,7 +158,18 @@ class UserControllerTest {
     }
 
     @Test
-    void getUser_Failure() throws Exception {
+    void getUser_DifferentUsername_Failure() throws Exception {
+        URI uri = constructUri("users/admin");
+        ResponseEntity<WingitUser> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .getForEntity(uri, WingitUser.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is "Not the same user."
+    }
+
+    @Test
+    void getUser_NonExistentUser_Failure() throws Exception {
         URI uri = constructUri("users/1");
         ResponseEntity<WingitUser> responseEntity = testRestTemplate
                 .withBasicAuth("admin", "pass")
@@ -218,6 +239,17 @@ class UserControllerTest {
     }
 
     @Test
+    void deleteUser_DifferentUsername_Failure() throws Exception {
+        URI uri = constructUri("users/delete/admin");
+        ResponseEntity<Void> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .exchange(uri, HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is "Not the same user."
+    }
+
+    @Test
     void deleteUser_NotFound_Failure() throws Exception {
         URI uri = constructUri("users/delete/1");
         ResponseEntity<Void> responseEntity = testRestTemplate
@@ -238,7 +270,7 @@ class UserControllerTest {
         URI uri = constructUri("users/update/" + sampleUsername);
         HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(updatedUser);
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth("brandonDaddy", "goodpassword")
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
@@ -247,8 +279,20 @@ class UserControllerTest {
         assertEquals("User", retrievedUser.getLastName());
     }
 
+    @Test
+    void updateUser_DifferentUsername_Failure() throws Exception {
+        URI uri = constructUri("users/update/admin");
+        HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(createSampleUser1());
+        ResponseEntity<Void> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is "Not the same user."
+    }
+
     // TODO: Update User fail test case (not found).
-    // TODO: Update User tried to update password and role but verify not changed.
+    // TODO: Update User tried to maliciously update password and role but verify not changed.
 
 
     @Test
@@ -271,5 +315,17 @@ class UserControllerTest {
                 .withBasicAuth("brandonDaddy", NEW_PASSWORD)
                 .getForEntity(constructUri("users/authTest/password_changed"), Object.class);
         assertEquals("{pathInput=password_changed}", verificationEntity.getBody().toString());
+    }
+
+    @Test
+    void updateUserPassword_DifferentUsername_Failure() throws Exception {
+        URI uri = constructUri("users/updatePass/admin");
+        HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(createSampleUser1());
+        ResponseEntity<Void> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Assert that the passed message is "Not the same user."
     }
 }
