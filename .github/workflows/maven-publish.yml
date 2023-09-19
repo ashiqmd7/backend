@@ -47,7 +47,7 @@ jobs:
       with:
         name: "Artifact-${{steps.time.outputs.time}}"
         path: ./wingit/artifacts
-        retention-days: 5
+        retention-days: 8
 
     - name: Beanstalk Deploy for JAR
       uses: einaregilsson/beanstalk-deploy@v21
