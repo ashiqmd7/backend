@@ -5,6 +5,9 @@ import jakarta.validation.Valid;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +25,19 @@ public class UserController {
         return service.getAllUsers();
     }
 
+
+    private boolean isUserOrAdmin(String username, UserDetails userDetails) {
+        boolean isUser = username.equals(userDetails.getUsername());
+        boolean isAdmin = userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        return (isUser || isAdmin);
+    }
+
     // GET a specific user by username
     @GetMapping(path = "/users/{username}")
-    public WingitUser getUser(@PathVariable String username) {
-        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+    public WingitUser getUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!isUserOrAdmin(username, userDetails)) throw new UserBadRequestException("Not the same user.");
+
         WingitUser user = service.getById(username);
         if (user == null) throw new UserNotFoundException(username);
         return user;
@@ -51,8 +63,9 @@ public class UserController {
 
     // DELETE a specific user by username
     @DeleteMapping(path = "/users/delete/{username}")
-    public void deleteUser(@PathVariable String username) {
-        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+    public void deleteUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!isUserOrAdmin(username, userDetails)) throw new UserBadRequestException("Not the same user.");
+
         try {
             service.deleteUserById(username);
         } catch (UserNotFoundException e) {
@@ -64,8 +77,9 @@ public class UserController {
 
     // PUT to update a specific user by username
     @PutMapping("/users/update/{username}")
-    public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
-        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+    public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!isUserOrAdmin(username, userDetails)) throw new UserBadRequestException("Not the same user.");
+
         boolean usernamesMatch = username.equals(updatedUser.getUsername());
         if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismtach.");
 
@@ -79,8 +93,9 @@ public class UserController {
     }
 
     @PutMapping("/users/updatePass/{username}")
-    public WingitUser updatePassword(@PathVariable String username, @RequestBody Map<String, Object> newPassword) {
-        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+    public WingitUser updatePassword(@PathVariable String username, @RequestBody Map<String, Object> newPassword, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!isUserOrAdmin(username, userDetails)) throw new UserBadRequestException("Not the same user.");
+
         JSONObject jsonObj = new JSONObject(newPassword);
         try {
             String jsonPassword = jsonObj.getString("password");
