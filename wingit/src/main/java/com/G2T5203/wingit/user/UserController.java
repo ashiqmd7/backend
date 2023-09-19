@@ -14,6 +14,7 @@ import java.util.*;
 @RestController
 public class UserController {
     private final UserService service;
+    // TODO: This should be moved to service!
     private final BCryptPasswordEncoder encoder;
     public UserController(UserService service, BCryptPasswordEncoder encoder) {
         this.service = service;
@@ -78,14 +79,7 @@ public class UserController {
         boolean usernamesMatch = username.equals(updatedUser.getUsername());
         if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismtach.");
 
-        if (updatedUser.getAuthorityRole() == null) {
-            updatedUser.setAuthorityRole("ROLE_USER");
-        }
         try {
-            // TODO: These logic should be moved to Service.
-            WingitUser retrievedUser = service.getById(updatedUser.getUsername());
-            updatedUser.setPassword(retrievedUser.getPassword()); // So the hash doesn't change in this update.
-            updatedUser.setAuthorityRole(retrievedUser.getAuthorityRole()); // Ensures role remains the same.
             return service.updateUser(updatedUser);
         } catch (UserNotFoundException e) {
             throw e;
@@ -99,15 +93,8 @@ public class UserController {
         // TODO: Make sure authenticated user is either admin role, or the exact same user.
         JSONObject jsonObj = new JSONObject(newPassword);
         try {
-            // TODO: These logic should be moved to service.
             String jsonPassword = jsonObj.getString("password");
-            String hashedPassword = encoder.encode(jsonPassword);
-
-            WingitUser retrievedUser = service.getById(username);
-            if (retrievedUser == null) throw new UserNotFoundException(username);
-
-            retrievedUser.setPassword(hashedPassword);
-            return service.updateUser(retrievedUser);
+            return service.updatePassword(username, jsonPassword);
         } catch (Exception e) {
             throw new UserBadRequestException(e);
         }

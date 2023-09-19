@@ -248,6 +248,7 @@ class UserControllerTest {
     }
 
     // TODO: Update User fail test case (not found).
+    // TODO: Update User tried to update password and role but verify not changed.
 
 
     @Test
@@ -264,6 +265,8 @@ class UserControllerTest {
                 .withBasicAuth("brandonDaddy", "goodpassword")
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
+        // TODO: Get this check replaced by using repo.ExistsByUsernameAndPassword
+        //       Will need to figure out how to compare the password hashes correctly.
         ResponseEntity<Object> verificationEntity = testRestTemplate
                 .withBasicAuth("brandonDaddy", NEW_PASSWORD)
                 .getForEntity(constructUri("users/authTest/password_changed"), Object.class);
