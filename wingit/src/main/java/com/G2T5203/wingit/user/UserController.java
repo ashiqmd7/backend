@@ -2,6 +2,7 @@ package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -72,7 +73,6 @@ public class UserController {
 
     // PUT to update a specific user by username
     @PutMapping("/users/update/{username}")
-    // TODO: This update needs to be split, one is without password, and one is updating the password, due to the hash.
     public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
         // TODO: Make sure authenticated user is either admin role, or the exact same user.
         boolean usernamesMatch = username.equals(updatedUser.getUsername());
@@ -82,9 +82,32 @@ public class UserController {
             updatedUser.setAuthorityRole("ROLE_USER");
         }
         try {
+            // TODO: These logic should be moved to Service.
+            WingitUser retrievedUser = service.getById(updatedUser.getUsername());
+            updatedUser.setPassword(retrievedUser.getPassword()); // So the hash doesn't change in this update.
+            updatedUser.setAuthorityRole(retrievedUser.getAuthorityRole()); // Ensures role remains the same.
             return service.updateUser(updatedUser);
         } catch (UserNotFoundException e) {
             throw e;
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
+    }
+
+    @PutMapping("/users/updatePass/{username}")
+    public WingitUser updatePassword(@PathVariable String username, @RequestBody Map<String, Object> newPassword) {
+        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+        JSONObject jsonObj = new JSONObject(newPassword);
+        try {
+            // TODO: These logic should be moved to service.
+            String jsonPassword = jsonObj.getString("password");
+            String hashedPassword = encoder.encode(jsonPassword);
+
+            WingitUser retrievedUser = service.getById(username);
+            if (retrievedUser == null) throw new UserNotFoundException(username);
+
+            retrievedUser.setPassword(hashedPassword);
+            return service.updateUser(retrievedUser);
         } catch (Exception e) {
             throw new UserBadRequestException(e);
         }

@@ -69,7 +69,9 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/users/new")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/*")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/users/update/*")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/users/updatePass/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/users/delete/*")).authenticated()
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/**")).permitAll()

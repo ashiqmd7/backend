@@ -17,6 +17,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,7 +93,6 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_TwoUsers_Success() throws Exception {
-        // TODO: Should not need to use this already, at most just for data checking!
         WingitUser[] sampleUsers = {
                 createAdminUser(),
                 createSampleUser1()
@@ -125,7 +126,6 @@ class UserControllerTest {
 
     @Test
     void getUser_Success() throws Exception {
-        // TODO: Just try to get the sampleUser 1 which is added at the @BeforeEach already!
         WingitUser sampleUser = createSampleUser1();
 
         URI uri = constructUri("users/" + sampleUser.getUsername());
@@ -248,4 +248,25 @@ class UserControllerTest {
     }
 
     // TODO: Update User fail test case (not found).
+
+
+    @Test
+    void updateUserPassword_Success() throws Exception {
+        WingitUser sampleUser = createSampleUser1();
+        final String NEW_PASSWORD = "newPassword";
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("password", NEW_PASSWORD);
+        HttpEntity<Map<String, Object>> payloadEntity = new HttpEntity<>(requestBody);
+
+        URI uri = constructUri("users/updatePass/" + sampleUser.getUsername());
+        ResponseEntity<Void> responseEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", "goodpassword")
+                .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
+        assertEquals(200, responseEntity.getStatusCode().value());
+        ResponseEntity<Object> verificationEntity = testRestTemplate
+                .withBasicAuth("brandonDaddy", NEW_PASSWORD)
+                .getForEntity(constructUri("users/authTest/password_changed"), Object.class);
+        assertEquals("{pathInput=password_changed}", verificationEntity.getBody().toString());
+    }
 }
