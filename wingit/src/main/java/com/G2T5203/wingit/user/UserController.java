@@ -28,6 +28,7 @@ public class UserController {
     // GET a specific user by username
     @GetMapping(path = "/users/{username}")
     public WingitUser getUser(@PathVariable String username) {
+        // TODO: Make sure authenticated user is either admin role, or the exact same user.
         WingitUser user = service.getById(username);
         if (user == null) throw new UserNotFoundException(username);
         return user;
@@ -58,6 +59,8 @@ public class UserController {
     // DELETE a specific user by username
     @DeleteMapping(path = "/users/delete/{username}")
     public void deleteUser(@PathVariable String username) {
+        // TODO: Make sure authenticated user is either admin role, or the exact same user.
+        // TODO: Then make sure it's in the unit test.
         try {
             service.deleteUserById(username);
         } catch (UserNotFoundException e) {
@@ -69,7 +72,9 @@ public class UserController {
 
     // PUT to update a specific user by username
     @PutMapping("/users/update/{username}")
+    // TODO: This update needs to be split, one is without password, and one is updating the password, due to the hash.
     public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser) {
+        // TODO: Make sure authenticated user is either admin role, or the exact same user.
         boolean usernamesMatch = username.equals(updatedUser.getUsername());
         if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismtach.");
 
