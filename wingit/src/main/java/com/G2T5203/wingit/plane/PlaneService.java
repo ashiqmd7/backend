@@ -29,6 +29,7 @@ public class PlaneService {
 
     @Transactional
     public Plane createPlane(Plane newPlane) {
+        if (repo.existsById(newPlane.getPlaneId())) throw new PlaneBadRequestException("PlaneId already exists.");
         return repo.save(newPlane);
     }
 

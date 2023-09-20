@@ -1,10 +1,7 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.entities.WingitUser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestComponent;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
@@ -68,4 +65,11 @@ public class TestUtils {
                 "+65 6475 3846",
                 "Master");
     }
+
+
+
+
+
+    public Plane createSamplePlane1() { return new Plane("SQ123", 60, "B777"); }
+    public Plane createSamplePlane2() { return new Plane("SQ456", 120, "A350"); }
 }
