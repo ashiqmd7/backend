@@ -2,7 +2,6 @@ package com.G2T5203.wingit.route;
 
 import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.entities.Route;
-import com.G2T5203.wingit.entities.Route;
 import com.G2T5203.wingit.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,10 +85,29 @@ class RouteControllerTest {
         assertEquals(403, responseEntity.getStatusCode().value());
     }
 
-    // TODO: Flesh out these series of tests for route/departureDest
-    //       Likely just add both sample routes, and then result is only 1.
     @Test
-    void getAllRoutesWithDepartureDest() {
+    void getAllRoutesWithDepartureDest() throws Exception {
+        Route[] sampleRoutes = { testUtils.createSampleRoute1(), testUtils.createSampleRoute2() };
+        List<Route> savedRoutes = new ArrayList<>();
+        for (Route sampleRoute : sampleRoutes) { savedRoutes.add(routeRepository.save(sampleRoute)); }
+        final int sampleForTest = 0;
+
+        URI uri = testUtils.constructUri("routes/departureDest/" + sampleRoutes[sampleForTest].getDepartureDest());
+        ResponseEntity<Route[]> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
+                .getForEntity(uri, Route[].class);
+        Route[] retrievedRoutes = responseEntity.getBody();
+
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(retrievedRoutes);
+        assertEquals(1, retrievedRoutes.length);
+
+        Route sampleControl = savedRoutes.get(sampleForTest);
+        Route retrievedRoute = retrievedRoutes[0];
+        assertEquals(sampleControl.getRouteId(), retrievedRoute.getRouteId());
+        assertEquals(sampleControl.getDepartureDest(), retrievedRoute.getDepartureDest());
+        assertEquals(sampleControl.getArrivalDest(), retrievedRoute.getArrivalDest());
+        assertEquals(sampleControl.getFlightDuration(), retrievedRoute.getFlightDuration());
     }
 
     @Test
