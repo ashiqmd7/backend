@@ -34,7 +34,7 @@ public class DatabaseInitializer {
         UserRepository userRepository = context.getBean(UserRepository.class);
         List<WingitUser> wingitUserList = new ArrayList<>();
         wingitUserList.add(userRepository.save(new WingitUser(
-                "bradonDaddy",
+                "brandonDaddy",
                 encoder.encode("goodpassword"),
                 "ROLE_USER",
                 "Brandon",
