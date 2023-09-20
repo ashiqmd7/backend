@@ -56,7 +56,15 @@ public class RouteController {
 
     @PutMapping(path = "/routes/update/{routeId}")
     public Route updateRoute(@PathVariable Integer routeId, @Valid @RequestBody Route updatedRoute) {
+        if (routeId.intValue() != updatedRoute.getRouteId().intValue()) throw new RouteBadRequestException("Not the same routeId.");
+
         updatedRoute.setRouteId(routeId);
-        return service.updateRoute(updatedRoute);
+        try {
+            return service.updateRoute(updatedRoute);
+        } catch (RouteNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RouteBadRequestException(e);
+        }
     }
 }
