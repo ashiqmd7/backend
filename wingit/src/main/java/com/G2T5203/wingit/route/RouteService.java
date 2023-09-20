@@ -23,7 +23,10 @@ public class RouteService {
     }
 
     @Transactional
-    public Route createRoute(Route newRoute) { return repo.save(newRoute); }
+    public Route createRoute(Route newRoute) {
+        if (repo.existsById(newRoute.getRouteId())) throw new RouteBadRequestException("RouteId already exists");
+        return repo.save(newRoute);
+    }
 
     @Transactional
     public void deleteRoute(Integer routeId) {

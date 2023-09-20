@@ -1,11 +1,13 @@
 package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.entities.Plane;
+import com.G2T5203.wingit.entities.Route;
 import com.G2T5203.wingit.entities.WingitUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 
 public class TestUtils {
@@ -72,4 +74,20 @@ public class TestUtils {
 
     public Plane createSamplePlane1() { return new Plane("SQ123", 60, "B777"); }
     public Plane createSamplePlane2() { return new Plane("SQ456", 120, "A350"); }
+
+
+    public Route createSampleRoute1() {
+        return new Route(
+                1, // NOTE: It can be overridden as this is generated value.
+                "Singapore",
+                "Taiwan",
+                Duration.ofHours(5).plusMinutes(20));
+    }
+    public  Route createSampleRoute2() {
+        return new Route(
+                2, // NOTE: It can be overridden as this is generated value.
+                "Taiwan",
+                "Singapore",
+                Duration.ofHours(7).plusMinutes(10));
+    }
 }
