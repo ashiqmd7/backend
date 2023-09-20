@@ -73,19 +73,43 @@ public class DatabaseInitializer {
         List<Plane> planeList = new ArrayList<>();
         planeList.add(planeRepository.save(new Plane(
                 "SQ123",
-                100,
+                60,
                 "B777")));
         planeList.add(planeRepository.save(new Plane(
                 "SQ888",
-                200,
+                120,
                 "A350")));
         planeList.add(planeRepository.save(new Plane(
                 "SQ364",
-                100,
+                60,
                 "B777")));
         planeList.add(planeRepository.save(new Plane(
                 "SQ39",
-                200,
+                120,
+                "A350")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ28",
+                60,
+                "B777")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ493",
+                120,
+                "A350")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ789",
+                60,
+                "B777")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ364",
+                120,
+                "A350")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ34",
+                60,
+                "B777")));
+        planeList.add(planeRepository.save(new Plane(
+                "SQ977",
+                120,
                 "A350")));
         for (Plane plane : planeList) {
             Log("[Add Plane]: " + plane);
@@ -98,19 +122,88 @@ public class DatabaseInitializer {
         routeList.add(routeRepository.save(new Route(
                 "Singapore",
                 "Taiwan",
-                Duration.ofHours(4).plusMinutes(30) )));
-        routeList.add(routeRepository.save(new Route(
-                "Taiwan",
-                "Singapore",
                 Duration.ofHours(4).plusMinutes(45) )));
         routeList.add(routeRepository.save(new Route(
                 "Singapore",
                 "Japan",
-                Duration.ofHours(7).plusMinutes(20) )));
+                Duration.ofHours(7).plusMinutes(10) )));
+        routeList.add(routeRepository.save(new Route(
+                "Singapore",
+                "China",
+                Duration.ofHours(6).plusMinutes(10) )));
+        routeList.add(routeRepository.save(new Route(
+                "Singapore",
+                "India",
+                Duration.ofHours(5).plusMinutes(35) )));
+
+        routeList.add(routeRepository.save(new Route(
+                "Taiwan",
+                "Singapore",
+                Duration.ofHours(4).plusMinutes(50) )));
+        routeList.add(routeRepository.save(new Route(
+                "Taiwan",
+                "Japan",
+                Duration.ofHours(2).plusMinutes(40) )));
+        routeList.add(routeRepository.save(new Route(
+                "Taiwan",
+                "China",
+                Duration.ofHours(1).plusMinutes(50) )));
+        routeList.add(routeRepository.save(new Route(
+                "Taiwan",
+                "India",
+                Duration.ofHours(12).plusMinutes(25) )));
+
         routeList.add(routeRepository.save(new Route(
                 "Japan",
                 "Singapore",
-                Duration.ofHours(8).plusMinutes(10) )));
+                Duration.ofHours(7).plusMinutes(15) )));
+        routeList.add(routeRepository.save(new Route(
+                "Japan",
+                "Taiwan",
+                Duration.ofHours(2).plusMinutes(35) )));
+        routeList.add(routeRepository.save(new Route(
+                "Japan",
+                "China",
+                Duration.ofHours(3).plusMinutes(30) )));
+        routeList.add(routeRepository.save(new Route(
+                "Japan",
+                "India",
+                Duration.ofHours(10).plusMinutes(10) )));
+
+        routeList.add(routeRepository.save(new Route(
+                "China",
+                "Singapore",
+                Duration.ofHours(6).plusMinutes(15) )));
+        routeList.add(routeRepository.save(new Route(
+                "China",
+                "Taiwan",
+                Duration.ofHours(1).plusMinutes(40) )));
+        routeList.add(routeRepository.save(new Route(
+                "China",
+                "Japan",
+                Duration.ofHours(3).plusMinutes(40) )));
+        routeList.add(routeRepository.save(new Route(
+                "China",
+                "India",
+                Duration.ofHours(12).plusMinutes(55) )));
+
+        routeList.add(routeRepository.save(new Route(
+                "India",
+                "Singapore",
+                Duration.ofHours(5).plusMinutes(40) )));
+        routeList.add(routeRepository.save(new Route(
+                "India",
+                "Taiwan",
+                Duration.ofHours(12).plusMinutes(35) )));
+        routeList.add(routeRepository.save(new Route(
+                "India",
+                "Japan",
+                Duration.ofHours(10).plusMinutes(15) )));
+        routeList.add(routeRepository.save(new Route(
+                "India",
+                "China",
+                Duration.ofHours(12).plusMinutes(45) )));
+
         for (Route route : routeList) {
             Log("[Add Route]: " + route);
         }
