@@ -65,7 +65,7 @@ class UserControllerTest {
 
         URI uri = testUtils.constructUri("users");
         ResponseEntity<WingitUser[]> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .getForEntity(uri, WingitUser[].class);
         WingitUser[] retrievedUsers = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: Length = " + retrievedUsers.length + "\n" + Arrays.toString(retrievedUsers));
@@ -93,7 +93,7 @@ class UserControllerTest {
     void getAllUsers_WrongAuth_Failure() throws Exception {
         URI uri = testUtils.constructUri("users");
         ResponseEntity<WingitUser[]> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .getForEntity(uri, WingitUser[].class);
 
         assertEquals(403, responseEntity.getStatusCode().value());
@@ -105,7 +105,7 @@ class UserControllerTest {
 
         URI uri = testUtils.constructUri("users/" + sampleUser.getUsername());
         ResponseEntity<WingitUser> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .getForEntity(uri, WingitUser.class);
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
@@ -126,7 +126,7 @@ class UserControllerTest {
     void getUser_DifferentUsername_Failure() throws Exception {
         URI uri = testUtils.constructUri("users/admin");
         ResponseEntity<WingitUser> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .getForEntity(uri, WingitUser.class);
 
         assertEquals(400, responseEntity.getStatusCode().value());
@@ -137,7 +137,7 @@ class UserControllerTest {
     void getUser_NonExistentUser_Failure() throws Exception {
         URI uri = testUtils.constructUri("users/1");
         ResponseEntity<WingitUser> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .getForEntity(uri, WingitUser.class);
         WingitUser retrievedUser = responseEntity.getBody();
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
@@ -195,7 +195,7 @@ class UserControllerTest {
 
         URI uri = testUtils.constructUri("users/delete/" + username);
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .exchange(uri, HttpMethod.DELETE, null, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
@@ -207,7 +207,7 @@ class UserControllerTest {
     void deleteUser_DifferentUsername_Failure() throws Exception {
         URI uri = testUtils.constructUri("users/delete/admin");
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .exchange(uri, HttpMethod.DELETE, null, Void.class);
 
         assertEquals(400, responseEntity.getStatusCode().value());
@@ -218,7 +218,7 @@ class UserControllerTest {
     void deleteUser_NotFound_Failure() throws Exception {
         URI uri = testUtils.constructUri("users/delete/1");
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("admin", "pass")
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .exchange(uri, HttpMethod.DELETE, null, Void.class);
         assertEquals(404, responseEntity.getStatusCode().value());
     }
@@ -235,7 +235,7 @@ class UserControllerTest {
         URI uri = testUtils.constructUri("users/update/" + sampleUsername);
         HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(updatedUser);
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
@@ -249,7 +249,7 @@ class UserControllerTest {
         URI uri = testUtils.constructUri("users/update/admin");
         HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(testUtils.createSampleUser1());
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
 
         assertEquals(400, responseEntity.getStatusCode().value());
@@ -271,13 +271,13 @@ class UserControllerTest {
 
         URI uri = testUtils.constructUri("users/updatePass/" + sampleUser.getUsername());
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
         // TODO: Get this check replaced by using repo.ExistsByUsernameAndPassword
         //       Will need to figure out how to compare the password hashes correctly.
         ResponseEntity<Object> verificationEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", NEW_PASSWORD)
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, NEW_PASSWORD)
                 .getForEntity(testUtils.constructUri("users/authTest/password_changed"), Object.class);
         assertEquals("{pathInput=password_changed}", verificationEntity.getBody().toString());
     }
@@ -287,7 +287,7 @@ class UserControllerTest {
         URI uri = testUtils.constructUri("users/updatePass/admin");
         HttpEntity<WingitUser> payloadEntity = new HttpEntity<>(testUtils.createSampleUser1());
         ResponseEntity<Void> responseEntity = testRestTemplate
-                .withBasicAuth("brandonDaddy", "goodpassword")
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
 
         assertEquals(400, responseEntity.getStatusCode().value());

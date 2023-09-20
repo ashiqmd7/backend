@@ -15,6 +15,13 @@ public class TestUtils {
     private final int port;
     private final BCryptPasswordEncoder encoder;
 
+    public final String ADMIN_USERNAME = "admin";
+    public final String ADMIN_PASSWORD = "pass";
+    public final String SAMPLE_USERNAME_1 = "brandonDaddy";
+    public final String SAMPLE_PASSWORD_1 = "goodpassword";
+    public final String SAMPLE_USERNAME_2 = "DaddyChoy";
+    public final String SAMPLE_PASSWORD_2 = "password";
+
     public TestUtils(int port, BCryptPasswordEncoder encoder) {
         this.port = port;
         this.encoder = encoder;
@@ -27,8 +34,8 @@ public class TestUtils {
     // Helper functions
     public WingitUser createSampleUser1() {
         return new WingitUser(
-                "brandonDaddy",
-                encoder.encode("goodpassword"),
+                SAMPLE_USERNAME_1,
+                encoder.encode(SAMPLE_PASSWORD_1),
                 "ROLE_USER",
                 "Brandon",
                 "Choy",
@@ -39,8 +46,8 @@ public class TestUtils {
     }
     public WingitUser createSampleUser2() {
         return new WingitUser(
-                "DaddyChoy",
-                encoder.encode("password"),
+                SAMPLE_USERNAME_2,
+                encoder.encode(SAMPLE_PASSWORD_2),
                 "ROLE_USER",
                 "Jared",
                 "Hong",
@@ -51,8 +58,8 @@ public class TestUtils {
     }
     public WingitUser createAdminUser() {
         return new WingitUser(
-                "admin",
-                encoder.encode("pass"),
+                ADMIN_USERNAME,
+                encoder.encode(ADMIN_PASSWORD),
                 "ROLE_ADMIN",
                 "admin",
                 "admin",
