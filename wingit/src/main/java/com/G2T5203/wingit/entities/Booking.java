@@ -9,7 +9,8 @@ import java.util.List;
 @Entity
 public class Booking {
     @Id
-    private String bookingId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer bookingId;
     @ManyToOne
     @JoinColumn(name = "username")
     private WingitUser wingitUser;
@@ -35,8 +36,18 @@ public class Booking {
     @JsonIgnore
     private List<SeatListing> seatListing;
 
-    public Booking(String bookingId, WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
+    public Booking(Integer bookingId, WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
         this.bookingId = bookingId;
+        this.wingitUser = wingitUser;
+        this.outboundRouteListing = outboundRouteListing;
+        this.inboundRouteListing = inboundRouteListing;
+        this.startBookingDatetime = startBookingDatetime;
+        this.partySize = partySize;
+        this.chargedPrice = chargedPrice;
+        this.isPaid = isPaid;
+    }
+
+    public Booking(WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
         this.wingitUser = wingitUser;
         this.outboundRouteListing = outboundRouteListing;
         this.inboundRouteListing = inboundRouteListing;
@@ -50,11 +61,11 @@ public class Booking {
 
     }
 
-    public String getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(String bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 
