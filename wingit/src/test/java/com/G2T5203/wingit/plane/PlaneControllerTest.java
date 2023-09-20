@@ -60,7 +60,7 @@ class PlaneControllerTest {
         Plane[] retrievedPlanes = responseEntity.getBody();
 
         assertEquals(200, responseEntity.getStatusCode().value());
-        assert retrievedPlanes != null;
+        assertNotNull(retrievedPlanes);
         assertEquals(2, retrievedPlanes.length);
 
         for (int i = 0; i < retrievedPlanes.length; i++) {
@@ -110,6 +110,7 @@ class PlaneControllerTest {
         Plane retrievedPlane = responseEntity.getBody();
 
         assertEquals(404, responseEntity.getStatusCode().value());
+        assertNotNull(retrievedPlane);
         assertEquals(new Plane().toString(), retrievedPlane.toString());
     }
 

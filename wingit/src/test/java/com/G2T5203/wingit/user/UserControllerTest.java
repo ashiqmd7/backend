@@ -3,23 +3,18 @@ package com.G2T5203.wingit.user;
 import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.entities.WingitUser;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +22,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ComponentScan(basePackageClasses = TestUtils.class)
 class UserControllerTest {
     @LocalServerPort
     private int port;
@@ -71,6 +65,7 @@ class UserControllerTest {
         // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: Length = " + retrievedUsers.length + "\n" + Arrays.toString(retrievedUsers));
 
         assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(retrievedUsers);
         assertEquals(2, retrievedUsers.length);
 
         for (int i = 0; i < retrievedUsers.length; i++) {
@@ -85,7 +80,6 @@ class UserControllerTest {
             assertEquals(sampleControl.getEmail(), retrievedUser.getEmail());
             assertEquals(sampleControl.getPhone(), retrievedUser.getPhone());
             assertEquals(sampleControl.getSalutation(), retrievedUser.getSalutation());
-
         }
     }
 
@@ -140,9 +134,10 @@ class UserControllerTest {
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .getForEntity(uri, WingitUser.class);
         WingitUser retrievedUser = responseEntity.getBody();
-        // Logger.getLogger("UserControllerTest").log(Level.INFO, "QQQ: " + retrievedUser);
 
         assertEquals(404, responseEntity.getStatusCode().value());
+        assertNotNull(retrievedUser);
+        assertEquals(new WingitUser().toString(), retrievedUser.toString());
     }
 
     @Test
@@ -239,9 +234,10 @@ class UserControllerTest {
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
         assertEquals(200, responseEntity.getStatusCode().value());
 
-        WingitUser retrievedUser = userRepository.findById(sampleUsername).get();
-        assertEquals("Updated", retrievedUser.getFirstName());
-        assertEquals("User", retrievedUser.getLastName());
+        Optional<WingitUser> retrievedUser = userRepository.findById(sampleUsername);
+        assertTrue(retrievedUser.isPresent());
+        assertEquals("Updated", retrievedUser.get().getFirstName());
+        assertEquals("User", retrievedUser.get().getLastName());
     }
 
     @Test
@@ -279,6 +275,7 @@ class UserControllerTest {
         ResponseEntity<Object> verificationEntity = testRestTemplate
                 .withBasicAuth(testUtils.SAMPLE_USERNAME_1, NEW_PASSWORD)
                 .getForEntity(testUtils.constructUri("users/authTest/password_changed"), Object.class);
+        assertNotNull(verificationEntity.getBody());
         assertEquals("{pathInput=password_changed}", verificationEntity.getBody().toString());
     }
 
