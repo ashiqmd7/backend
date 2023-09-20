@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Class is used only in DEV profile to pre-populate it with data for testing purposes.
 
@@ -62,57 +63,57 @@ public class DatabaseInitializer {
                 "Master")));
     }
     private static void initialiseSamplePlanes(List<Plane> list, PlaneRepository repo) {
-        list.add(repo.save(new Plane( "SQ123", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ888", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ364", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ39", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ28", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ493", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ789", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ364", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ34", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ977", 120, "A350")));
+        list.add(repo.save(new Plane( "SQ123", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ888", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ364", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ39", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ28", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ493", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ789", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ364", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ34", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ977", 30, "A350")));
 
-        list.add(repo.save(new Plane( "SQ124", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ808", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ563", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ38", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ29", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ593", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ987", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ333", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ35", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ779", 120, "A350")));
+        list.add(repo.save(new Plane( "SQ124", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ808", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ563", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ38", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ29", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ593", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ987", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ333", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ35", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ779", 30, "A350")));
 
 
-        list.add(repo.save(new Plane( "SQ12", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ88", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ36", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ390", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ280", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ49", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ78", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ36", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ340", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ97", 120, "A350")));
+        list.add(repo.save(new Plane( "SQ12", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ88", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ36", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ390", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ280", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ49", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ78", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ36", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ340", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ97", 30, "A350")));
 
-        list.add(repo.save(new Plane( "SQ12", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ80", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ56", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ380", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ290", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ59", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ98", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ33", 120, "A350")));
-        list.add(repo.save(new Plane( "SQ350", 60, "B777")));
-        list.add(repo.save(new Plane( "SQ77", 120, "A350")));
+        list.add(repo.save(new Plane( "SQ12", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ80", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ56", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ380", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ290", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ59", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ98", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ33", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ350", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ77", 30, "A350")));
     }
     private static void initialiseSampleSeats(List<Seat> list, SeatRepository repo, List<Plane> planeList) {
         for (Plane plane : planeList) {
             int numNonEconomySeats = 0;
 
-            // First class (row 1 to 4) 4 rows, 2 seats per row, 8 seats
-            for (int row = 1; row <= 4; row++) {
+            // First class (row 1 to 3) 3 rows, 2 seats per row, 6 seats
+            for (int row = 1; row <= 3; row++) {
                 for (int seatAlphabet = 0; seatAlphabet < 2; seatAlphabet++) {
                     Character seatChar = (char) ('A' + seatAlphabet);
                     String seatNumber = seatChar + String.format("%02d", row);
@@ -121,8 +122,8 @@ public class DatabaseInitializer {
                 }
             }
 
-            // Business class (row 5 to 8) 4 rows, 4 seats per row, 16 seats
-            for (int row = 5; row <= 8; row++) {
+            // Business class (row 4 to 6) 3 rows, 4 seats per row, 12 seats
+            for (int row = 4; row <= 6; row++) {
                 for (int seatAlphabet = 0; seatAlphabet < 4; seatAlphabet++) {
                     Character seatChar = (char) ('A' + seatAlphabet);
                     String seatNumber = seatChar + String.format("%02d", row);
@@ -131,10 +132,10 @@ public class DatabaseInitializer {
                 }
             }
 
-            // Economy class (row 9 onwards), 6 seats per row.
+            // Economy class (row 7 onwards), 6 seats per row.
             int numEconomyRows = (plane.getCapacity() - numNonEconomySeats) / 6;
             int numEconomySeats = 0;
-            for (int row = 9; row <= 9 + numEconomyRows; row++) {
+            for (int row = 7; row <= 7 + numEconomyRows; row++) {
                 for (int seatAlphabet = 0; seatAlphabet < 6; seatAlphabet++) {
                     Character seatChar = (char) ('A' + seatAlphabet);
                     String seatNumber = seatChar + String.format("%02d", row);
@@ -233,8 +234,8 @@ public class DatabaseInitializer {
                 Duration.ofHours(12).plusMinutes(45) )));
     }
     private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
-        for (int year = 2023; year <= 2024; year++) {
-            for (int month = 1; month <= 12; month++) {
+        for (int year = 2023; year <= 2023; year++) {
+            for (int month = 10; month <= 12; month++) {
                 int daysInMonth;
                 if (month == 2) daysInMonth = 28;
                 else if (month == 4 || month == 6 || month == 9 || month == 11) daysInMonth = 30;
@@ -266,6 +267,23 @@ public class DatabaseInitializer {
             }
         }
     }
+    private static void initialiseSampleSeatListings(List<SeatListing> list, SeatListingRepository repo, List<RouteListing> routeListingList, List<Seat> seatList) {
+        long counter = 0;
+        for (RouteListing routeListing : routeListingList) {
+            Plane plane = routeListing.getRouteListingPk().getPlane();
+            List<Seat> seats = seatList.stream().filter(seat -> seat.getSeatPk().getPlane().getPlaneId().equals(plane.getPlaneId())).toList();
+            for (Seat seat : seats) {
+                list.add(repo.save(new SeatListing(
+                        new SeatListingPk(routeListing, seat),
+                        null,
+                        null
+                )));
+            }
+            counter++;
+            if (counter % 100 == 0 || counter == routeListingList.size())
+                Log(String.format("[SeatListing progress... %d/%d", counter, routeListingList.size()));
+        }
+    }
 
     public static void init(ApplicationContext context) {
         // Get encoder
@@ -275,37 +293,48 @@ public class DatabaseInitializer {
         UserRepository userRepository = context.getBean(UserRepository.class);
         List<WingitUser> wingitUserList = new ArrayList<>();
         initialiseSampleUsers(wingitUserList, userRepository, encoder);
-        for (WingitUser wingitUser : wingitUserList) { Log("[Add WingitUser]: " + wingitUser); }
+//        for (WingitUser wingitUser : wingitUserList) { Log("[Add WingitUser]: " + wingitUser); }
+        Log("[Added sample WingitUsers]");
 
 
         // Initialise Planes
         PlaneRepository planeRepository = context.getBean(PlaneRepository.class);
         List<Plane> planeList = new ArrayList<>();
         initialiseSamplePlanes(planeList, planeRepository);
-        for (Plane plane : planeList) { Log("[Add Plane]: " + plane); }
+//        for (Plane plane : planeList) { Log("[Add Plane]: " + plane); }
+        Log("[Added sample Planes]");
 
 
         // Initialise Seats
         SeatRepository seatRepository = context.getBean(SeatRepository.class);
         List<Seat> seatList = new ArrayList<>();
         initialiseSampleSeats(seatList, seatRepository, planeList);
-        for (Seat seat : seatList) { Log("[Add Seat]: " + seat); }
+//        for (Seat seat : seatList) { Log("[Add Seat]: " + seat); }
+        Log("[Added sample Seats]");
 
 
         // Initialise Routes
         RouteRepository routeRepository = context.getBean(RouteRepository.class);
         List<Route> routeList = new ArrayList<>();
         initialiseSampleRoutes(routeList, routeRepository);
-        for (Route route : routeList) { Log("[Add Route]: " + route); }
-        
+//        for (Route route : routeList) { Log("[Add Route]: " + route); }
+        Log("[Added sample Routes]");
+
 
         // Initialise RouteListings
         RouteListingRepository routeListingRepository = context.getBean(RouteListingRepository.class);
         List<RouteListing> routeListingList = new ArrayList<>();
         initialiseSampleRouteListings(routeListingList, routeListingRepository, planeList, routeList);
-        for (RouteListing routeListing : routeListingList) { Log("[Add RouteListing]: " + routeListing); }
+//        for (RouteListing routeListing : routeListingList) { Log("[Add RouteListing]: " + routeListing); }
+        Log("[Added sample RouteListings]");
 
 
+        // Initialise SeatListings
+        SeatListingRepository seatListingRepository = context.getBean(SeatListingRepository.class);
+        List<SeatListing> seatListingList = new ArrayList<>();
+        initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatList);
+//        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListingList); }
+        Log("[Added sample SeatListing]");
 
 
 
