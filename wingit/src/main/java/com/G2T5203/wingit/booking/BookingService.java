@@ -42,7 +42,7 @@ public class BookingService {
 
     // Get all the bookings under a user
     public List<BookingSimpleJson> getAllBookingsByUser(String username) {
-        List<Booking> bookings = repo.findByBookingUsername(username);
+        List<Booking> bookings = repo.findAllByWingitUserUsername(username);
         return bookings.stream()
                 .map(BookingSimpleJson::new)
                 .collect(Collectors.toList());
