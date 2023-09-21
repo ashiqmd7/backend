@@ -1,7 +1,6 @@
 package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.entities.SeatListing;
-import jakarta.persistence.JoinColumn;
 
 import java.util.Date;
 
@@ -16,12 +15,12 @@ public class SeatListingSimpleJson {
     public String seatNumber;
 
     // Booking's id
-    public String bookingId;
+    public Integer bookingId;
 
     // the rest
     public String occupantName;
 
-    public SeatListingSimpleJson(String routePlaneId, int routeId, Date departureDatetime, String seatPlaneId, String seatNumber, String bookingId, String occupantName) {
+    public SeatListingSimpleJson(String routePlaneId, int routeId, Date departureDatetime, String seatPlaneId, String seatNumber, Integer bookingId, String occupantName) {
         this.routePlaneId = routePlaneId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
@@ -82,11 +81,11 @@ public class SeatListingSimpleJson {
         this.seatNumber = seatNumber;
     }
 
-    public String getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(String bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 
