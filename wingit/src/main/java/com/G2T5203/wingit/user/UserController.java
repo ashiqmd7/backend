@@ -55,7 +55,10 @@ public class UserController {
 
     @GetMapping(path = "/users/adminAuthTest")
     public void getAdminAuthTest(@AuthenticationPrincipal UserDetails userDetails) {
-        if (!isAdmin(userDetails)) throw new UserBadRequestException("User is not admin.");
+        if (userDetails != null) {
+            // Possibly unecessary check. If JWTToken passed here, userDetails is null.
+            if (!isAdmin(userDetails)) throw new UserBadRequestException("User is not admin.");
+        }
     }
 
     // POST to add a new user
