@@ -26,9 +26,12 @@ public class UserController {
     }
 
 
+    private boolean isAdmin(UserDetails userDetails) {
+        return userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+    }
     private boolean isUserOrAdmin(String username, UserDetails userDetails) {
         boolean isUser = username.equals(userDetails.getUsername());
-        boolean isAdmin = userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = isAdmin(userDetails);
 
         return (isUser || isAdmin);
     }
@@ -48,6 +51,11 @@ public class UserController {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("pathInput", var);
         return new ResponseEntity<>(body, null, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/users/adminAuthTest")
+    public void getAdminAuthTest(@AuthenticationPrincipal UserDetails userDetails) {
+        if (!isAdmin(userDetails)) throw new UserBadRequestException("User is not admin.");
     }
 
     // POST to add a new user
