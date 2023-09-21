@@ -26,4 +26,11 @@ public class AuthController {
         return token;
     }
 
+    @PostMapping("/adminToken")
+    public String adminToken(Authentication authentication) {
+        LOG.debug("Admin Token requested for user: '{}'", authentication.getName());
+        String token = tokenService.generateToken(authentication);
+        LOG.debug("Admin Token granted {}", token);
+        return token;
+    }
 }

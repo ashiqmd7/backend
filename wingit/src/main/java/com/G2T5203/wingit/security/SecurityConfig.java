@@ -59,6 +59,7 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasAnyRole("USER", "ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/adminToken")).hasAnyRole("ADMIN")
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seats/new")).hasRole("ADMIN")
