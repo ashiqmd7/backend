@@ -59,4 +59,15 @@ public class BookingController {
             throw new BookingBadRequestException(e);
         }
     }
+
+    @DeleteMapping("bookings/delete/{bookingId}")
+    public void deleteBooking(@PathVariable int bookingId) {
+        try {
+            service.deleteBookingById(bookingId);
+        } catch (BookingNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
+    }
 }

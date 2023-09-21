@@ -110,4 +110,12 @@ public class BookingService {
         return repo.save(retrieveBooking.get());
     }
 
+    @Transactional
+    public void deleteBookingById(int bookingId) {
+        if (repo.existsById(bookingId)) {
+            repo.deleteById((bookingId));
+        } else {
+            throw new BookingNotFoundException("" + bookingId);
+        }
+    }
 }
