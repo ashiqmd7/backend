@@ -1,15 +1,13 @@
 package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.entities.Booking;
-import com.G2T5203.wingit.entities.RouteListingPk;
-import com.G2T5203.wingit.entities.SeatListing;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class BookingSimpleJson {
-    private String bookingId;
+    private Integer bookingId;
     private String username;
 
     // Outbound Routelisting
@@ -32,7 +30,7 @@ public class BookingSimpleJson {
     private List<String> outboundSeatNumbers;
     private List<String> inboundSeatNumbers;
 
-    public BookingSimpleJson(String bookingId, String username, String outboundPlaneId, int outboundRouteId, Date outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, Date inboundDepartureDatetime, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, List<String> outboundSeatNumbers, List<String> inboundSeatNumbers) {
+    public BookingSimpleJson(Integer bookingId, String username, String outboundPlaneId, int outboundRouteId, Date outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, Date inboundDepartureDatetime, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, List<String> outboundSeatNumbers, List<String> inboundSeatNumbers) {
         this.bookingId = bookingId;
         this.username = username;
 
@@ -85,11 +83,11 @@ public class BookingSimpleJson {
         );
     }
 
-    public String getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(String bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 
