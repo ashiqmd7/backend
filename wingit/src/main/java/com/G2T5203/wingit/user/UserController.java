@@ -57,18 +57,20 @@ public class UserController {
         return user;
     }
 
-    @GetMapping(path = "/users/authTest/{var}")
-    public ResponseEntity<Object> getAuthTest(@PathVariable String var) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("pathInput", var);
-        return new ResponseEntity<>(body, null, HttpStatus.OK);
+    @GetMapping(path = "/users/authTest")
+    public void getAuthTest() {
+        // Intentionally left empty. Just a status check.
     }
 
+
     @GetMapping(path = "/users/adminAuthTest")
-    public void getAdminAuthTest(@AuthenticationPrincipal UserDetails userDetails) {
+    public void getAdminAuthTest(@AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
         if (userDetails != null) {
-            // Possibly unecessary check. If JWTToken passed here, userDetails is null.
             if (!isAdmin(userDetails)) throw new UserBadRequestException("User is not admin.");
+        } else if (jwt != null) {
+            if (!isAdmin(jwt)) throw new UserBadRequestException("User is not admin.");
+        } else {
+            throw new UserBadRequestException("No Authentication passed to check.");
         }
     }
 
