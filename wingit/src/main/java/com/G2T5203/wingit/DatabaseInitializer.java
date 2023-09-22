@@ -70,43 +70,43 @@ public class DatabaseInitializer {
         list.add(repo.save(new Plane( "SQ28", 42, "B777")));
         list.add(repo.save(new Plane( "SQ493", 30, "A350")));
         list.add(repo.save(new Plane( "SQ789", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ364", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ34", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ394", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ347", 42, "B777")));
         list.add(repo.save(new Plane( "SQ977", 30, "A350")));
 
         list.add(repo.save(new Plane( "SQ124", 42, "B777")));
         list.add(repo.save(new Plane( "SQ808", 30, "A350")));
         list.add(repo.save(new Plane( "SQ563", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ38", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ29", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ381", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ293", 42, "B777")));
         list.add(repo.save(new Plane( "SQ593", 30, "A350")));
         list.add(repo.save(new Plane( "SQ987", 42, "B777")));
         list.add(repo.save(new Plane( "SQ333", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ35", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ352", 42, "B777")));
         list.add(repo.save(new Plane( "SQ779", 30, "A350")));
 
 
-        list.add(repo.save(new Plane( "SQ12", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ88", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ36", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ21", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ800", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ362", 42, "B777")));
         list.add(repo.save(new Plane( "SQ390", 30, "A350")));
         list.add(repo.save(new Plane( "SQ280", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ49", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ78", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ36", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ492", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ787", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ360", 30, "A350")));
         list.add(repo.save(new Plane( "SQ340", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ97", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ979", 30, "A350")));
 
-        list.add(repo.save(new Plane( "SQ12", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ80", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ56", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ121", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ87", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ568", 42, "B777")));
         list.add(repo.save(new Plane( "SQ380", 30, "A350")));
         list.add(repo.save(new Plane( "SQ290", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ59", 30, "A350")));
-        list.add(repo.save(new Plane( "SQ98", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ33", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ595", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ989", 42, "B777")));
+        list.add(repo.save(new Plane( "SQ343", 30, "A350")));
         list.add(repo.save(new Plane( "SQ350", 42, "B777")));
-        list.add(repo.save(new Plane( "SQ77", 30, "A350")));
+        list.add(repo.save(new Plane( "SQ777", 30, "A350")));
     }
     private static void initialiseSampleSeats(List<Seat> list, SeatRepository repo, List<Plane> planeList) {
         for (Plane plane : planeList) {
