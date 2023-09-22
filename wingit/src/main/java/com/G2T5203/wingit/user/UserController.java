@@ -83,6 +83,16 @@ public class UserController {
         }
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "/users/newAdmin")
+    public WingitUser createAdmin(@Valid @RequestBody WingitUser newAdmin) {
+        try {
+            return service.createAdmin(newAdmin);
+        } catch (Exception e) {
+            throw new UserBadRequestException(e);
+        }
+    }
+
     // DELETE a specific user by username
     @DeleteMapping(path = "/users/delete/{username}")
     public void deleteUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
