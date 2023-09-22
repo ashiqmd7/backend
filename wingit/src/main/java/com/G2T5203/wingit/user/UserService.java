@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +33,18 @@ public class UserService {
     public WingitUser createUser(WingitUser newUser) {
         if (repo.existsById(newUser.getUsername())) throw new UserBadRequestException("Username already exists");
         if (repo.existsByEmail(newUser.getEmail())) throw new UserBadRequestException("Email already used for existing account.");
-        if (newUser.getAuthorityRole() == null) {
-            newUser.setAuthorityRole("ROLE_USER");
-        }
+        newUser.setAuthorityRole("ROLE_USER"); // ALWAYS non-admin
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         return repo.save(newUser);
+    }
+
+    @Transactional
+    public WingitUser createAdmin(WingitUser newAdmin) {
+        if (repo.existsById(newAdmin.getUsername())) throw new UserBadRequestException("Username already exists");
+        if (repo.existsByEmail(newAdmin.getEmail())) throw new UserBadRequestException("Email already used for existing account.");
+        newAdmin.setAuthorityRole("ROLE_ADMIN"); // ALWAYS admin
+        newAdmin.setPassword(encoder.encode(newAdmin.getPassword()));
+        return repo.save(newAdmin);
     }
 
     @Transactional
