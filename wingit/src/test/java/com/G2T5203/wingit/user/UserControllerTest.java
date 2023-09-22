@@ -274,9 +274,8 @@ class UserControllerTest {
         //       Will need to figure out how to compare the password hashes correctly.
         ResponseEntity<Object> verificationEntity = testRestTemplate
                 .withBasicAuth(testUtils.SAMPLE_USERNAME_1, NEW_PASSWORD)
-                .getForEntity(testUtils.constructUri("users/authTest/password_changed"), Object.class);
-        assertNotNull(verificationEntity.getBody());
-        assertEquals("{pathInput=password_changed}", verificationEntity.getBody().toString());
+                .getForEntity(testUtils.constructUri("users/authTest"), Object.class);
+        assertEquals(200, verificationEntity.getStatusCode().value());
     }
 
     @Test
