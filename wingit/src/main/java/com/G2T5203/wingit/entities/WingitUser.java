@@ -1,6 +1,7 @@
 package com.G2T5203.wingit.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -35,7 +36,7 @@ public class WingitUser implements UserDetails {
     @NotEmpty @Pattern(regexp = "Mr|Mrs|Miss|Mdm|Master")
     private String salutation;
     @OneToMany(mappedBy = "wingitUser", cascade = CascadeType.ALL)
-    @JsonIgnore
+    //@JsonManagedReference
     private List<Booking> bookings;
 
 
