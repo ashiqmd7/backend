@@ -1,5 +1,6 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.booking.BookingRepository;
 import com.G2T5203.wingit.entities.*;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
@@ -336,7 +337,39 @@ public class DatabaseInitializer {
 //        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListingList); }
         Log("[Added sample SeatListing]");
 
-
+        // Initialise Bookings
+        BookingRepository bookingRepository = context.getBean(BookingRepository.class);
+        List<Booking> bookingList = new ArrayList<>();
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                1,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
+                false
+        )));
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                2,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 2,
+                false
+        )));
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                1,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
+                true
+        )));
+        for(Booking booking : bookingList) {
+            Log("[Add Booking]" + booking);
+        }
 
         Log("[Finished Initialising Sample Database Data]");
     }
