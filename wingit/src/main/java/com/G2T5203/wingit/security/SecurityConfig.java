@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -58,21 +59,38 @@ public class SecurityConfig {
                             // new AntPathRequestMatcher() allows you to set additional properties on 'AntPathRequestMatcher' instance during instantiation
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
-                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).hasAnyRole("USER", "ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/token")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/adminToken")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/checkJwt")).hasRole("ADMIN")
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/planes/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seats/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routeListings/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seatListings/new")).hasRole("ADMIN")
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/users/new")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/users/newAdmin")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/adminAuthTest")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/*")).authenticated()
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/users/update/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/users/updatePass/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/users/delete/*")).authenticated()
+
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/planes")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/planes/*")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/planes/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/planes/delete/*")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/planes/update/*")).hasRole("ADMIN")
+
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routes")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routes/*")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routes/departureDest/*")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/routes/delete/*")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/routes/update/*")).hasRole("ADMIN")
+
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/**")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/bookings")).authenticated()
@@ -82,7 +100,12 @@ public class SecurityConfig {
                             .anyRequest().hasAuthority("SCOPE_READ");
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                //.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter())
+                        )
+                )
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults())
                 .build();
@@ -93,6 +116,13 @@ public class SecurityConfig {
     @Bean
     JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(jwtKey.getBytes()));
+    }
+
+    @Bean
+    public JwtAuthenticationConverter customJwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new CustomJwtGrantedAuthoritiesConverter());
+        return converter;
     }
 
     @Bean

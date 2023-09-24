@@ -59,6 +59,8 @@ public class PlaneController {
     // PUT to update a specific plane by planeId
     @PutMapping("/planes/update/{planeId}")
     public Plane updatePlane(@PathVariable String planeId, @RequestBody Plane updatedPlane) {
+        if (!planeId.equals(updatedPlane.getPlaneId())) throw new PlaneBadRequestException("Not the same planeId.");
+
         updatedPlane.setPlaneId(planeId);
         try {
             return service.updatePlane(updatedPlane);
