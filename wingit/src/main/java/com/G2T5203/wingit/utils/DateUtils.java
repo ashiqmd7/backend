@@ -12,6 +12,9 @@ public class DateUtils {
     private static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
     public static LocalDateTime parseDateTime(String datetimeString) throws ParseException {
+        if (datetimeString.contains("T")) {
+            datetimeString = datetimeString.replace("T", " ");
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN);
         return LocalDateTime.parse(datetimeString, formatter);
     }

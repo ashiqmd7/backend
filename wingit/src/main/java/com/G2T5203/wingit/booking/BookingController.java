@@ -4,14 +4,12 @@ import com.G2T5203.wingit.entities.Booking;
 import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +68,11 @@ public class BookingController {
     }
 
     @PutMapping("bookings/updateInbound/{bookingId}")
-    public Booking updateInboundBooking(@PathVariable int bookingId, @Valid @RequestBody Map<String, Object> inboundRouteListingPk) {
-        JSONObject jsonObj = new JSONObject(inboundRouteListingPk);
+    public Booking updateInboundBooking(@PathVariable int bookingId, @RequestBody Map<String, Object> inboundRouteListingPk) {
         try {
-            String inboundPlaneId = jsonObj.getString("inboundPlaneId");
-            int inboundRouteId = jsonObj.getInt("inboundRouteId");
-            // Parse the inboundDepartureDatetime as a String from JSON
-            String inboundDepartureDatetimeStr = jsonObj.getString("inboundDepartureDatetime");
-            LocalDateTime inboundDepartureDatetime = DateUtils.handledParseDateTime(inboundDepartureDatetimeStr);
+            String inboundPlaneId = (String) inboundRouteListingPk.get("inboundPlaneId");
+            int inboundRouteId = (Integer) inboundRouteListingPk.get("inboundRouteId");
+            LocalDateTime inboundDepartureDatetime = DateUtils.handledParseDateTime((String) inboundRouteListingPk.get("inboundDepartureDatetime"));
 
             return service.updateInboundBooking(bookingId, inboundPlaneId, inboundRouteId, inboundDepartureDatetime);
         } catch (Exception e) {
