@@ -37,7 +37,7 @@ public class SeatListingSimpleJson {
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getPlane().getPlaneId(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
-                seatListing.getBooking().getBookingId(),
+                seatListing.getBooking() != null ? seatListing.getBooking().getBookingId() : null,
                 seatListing.getOccupantName());
     }
 
