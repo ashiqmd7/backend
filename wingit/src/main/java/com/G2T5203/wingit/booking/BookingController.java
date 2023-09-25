@@ -68,7 +68,7 @@ public class BookingController {
         }
     }
 
-    @PutMapping("bookings/update/{bookingId}")
+    @PutMapping("bookings/updateInbound/{bookingId}")
     public Booking updateInboundBooking(@PathVariable int bookingId, @Valid @RequestBody Map<String, Object> inboundRouteListingPk) {
         JSONObject jsonObj = new JSONObject(inboundRouteListingPk);
         try {
@@ -85,7 +85,7 @@ public class BookingController {
         }
     }
 
-    @PutMapping("bookings/update/{bookingId}/{paymentStatus}")
+    @PutMapping("bookings/updatePaymentStatus/{bookingId}/{paymentStatus}")
     public Booking updateIsPaid(@PathVariable int bookingId, @Valid @RequestBody boolean paymentStatus) {
         try {
             return service.updateIsPaid(bookingId, paymentStatus);
