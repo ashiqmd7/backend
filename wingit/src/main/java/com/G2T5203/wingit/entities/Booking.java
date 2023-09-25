@@ -94,6 +94,8 @@ public class Booking {
         this.inboundRouteListing = inboundRouteListing;
     }
 
+    public boolean hasInboundRouteListing() { return this.inboundRouteListing != null; }
+
     public Date getStartBookingDatetime() {
         return startBookingDatetime;
     }
