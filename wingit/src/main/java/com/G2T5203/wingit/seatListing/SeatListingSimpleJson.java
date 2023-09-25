@@ -5,26 +5,17 @@ import com.G2T5203.wingit.entities.SeatListing;
 import java.time.LocalDateTime;
 
 public class SeatListingSimpleJson {
-    // RouteListingPk
-    private String routePlaneId;
+    private String planeId;
     public int routeId;
     public LocalDateTime departureDatetime;
-
-    // SeatPk
-    public String seatPlaneId;
     public String seatNumber;
-
-    // Booking's id
     public Integer bookingId;
-
-    // the rest
     public String occupantName;
 
-    public SeatListingSimpleJson(String routePlaneId, int routeId, LocalDateTime departureDatetime, String seatPlaneId, String seatNumber, Integer bookingId, String occupantName) {
-        this.routePlaneId = routePlaneId;
+    public SeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, Integer bookingId, String occupantName) {
+        this.planeId = planeId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
-        this.seatPlaneId = seatPlaneId;
         this.seatNumber = seatNumber;
         this.bookingId = bookingId;
         this.occupantName = occupantName;
@@ -35,18 +26,17 @@ public class SeatListingSimpleJson {
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getPlane().getPlaneId(),
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getRoute().getRouteId(),
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
-                seatListing.getSeatListingPk().getSeat().getSeatPk().getPlane().getPlaneId(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
                 seatListing.getBooking() != null ? seatListing.getBooking().getBookingId() : null,
                 seatListing.getOccupantName());
     }
 
-    public String getRoutePlaneId() {
-        return routePlaneId;
+    public String getPlaneId() {
+        return planeId;
     }
 
-    public void setRoutePlaneId(String routePlaneId) {
-        this.routePlaneId = routePlaneId;
+    public void setPlaneId(String planeId) {
+        this.planeId = planeId;
     }
 
     public int getRouteId() {
@@ -63,14 +53,6 @@ public class SeatListingSimpleJson {
 
     public void setDepartureDatetime(LocalDateTime departureDatetime) {
         this.departureDatetime = departureDatetime;
-    }
-
-    public String getSeatPlaneId() {
-        return seatPlaneId;
-    }
-
-    public void setSeatPlaneId(String seatPlaneId) {
-        this.seatPlaneId = seatPlaneId;
     }
 
     public String getSeatNumber() {

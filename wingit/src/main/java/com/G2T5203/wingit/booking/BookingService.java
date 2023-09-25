@@ -82,7 +82,7 @@ public class BookingService {
     @Transactional
     public Booking updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
         Optional<Booking> retrievedBooking = repo.findById(bookingId);
-        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException("" + bookingId);
+        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
 
         // For inbound, get Plane, Route, and departureDatetime to form RouteListingPk
         // Afterwards use RouteListingPk to find RouteListing
@@ -104,7 +104,7 @@ public class BookingService {
     @Transactional
     public Booking updateIsPaid(int bookingId, boolean paymentStatus) {
         Optional<Booking> retrieveBooking = repo.findById(bookingId);
-        if (retrieveBooking.isEmpty()) throw new BookingNotFoundException("" + bookingId);
+        if (retrieveBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
 
         retrieveBooking.get().setPaid(paymentStatus);
         return repo.save(retrieveBooking.get());
@@ -115,7 +115,7 @@ public class BookingService {
         if (repo.existsById(bookingId)) {
             repo.deleteById((bookingId));
         } else {
-            throw new BookingNotFoundException("" + bookingId);
+            throw new BookingNotFoundException(bookingId);
         }
     }
 }

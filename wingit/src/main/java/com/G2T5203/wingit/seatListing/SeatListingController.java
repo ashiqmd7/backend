@@ -35,11 +35,39 @@ public class SeatListingController {
         }
     }
 
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/seatListings/new")
-    public SeatListing createSeatListing(@Valid @RequestBody SeatListingSimpleJson newSeatListingJson) {
+    public SeatListingSimpleJson createSeatListing(@Valid @RequestBody SeatListingSimpleJson newSeatListingJson) {
         try {
-            return service.createSeatListing(newSeatListingJson);
+            return new SeatListingSimpleJson(service.createSeatListing(newSeatListingJson));
+        } catch (Exception e) {
+            throw new SeatListingBadRequestException(e);
+        }
+    }
+
+    @PutMapping(path = "/seatListings/bookSeat")
+    public SeatListing bookSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+        try {
+            return service.setSeatListing(
+                    seatBookingInfo.getPlaneId(),
+                    seatBookingInfo.routeId,
+                    seatBookingInfo.departureDatetime,
+                    seatBookingInfo.seatNumber,
+                    seatBookingInfo.bookingId,
+                    seatBookingInfo.occupantName);
+        } catch (Exception e) {
+            throw new SeatListingBadRequestException(e);
+        }
+    }
+
+    @PutMapping(path = "/seatListings/cancelSeatBooking")
+    public SeatListing cancelSeatListingBooking(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+        try {
+            return service.cancelSeatListingBooking(
+                    seatBookingInfo.getPlaneId(),
+                    seatBookingInfo.routeId,
+                    seatBookingInfo.departureDatetime,
+                    seatBookingInfo.seatNumber);
         } catch (Exception e) {
             throw new SeatListingBadRequestException(e);
         }
