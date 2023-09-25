@@ -2,9 +2,7 @@ package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -131,9 +129,8 @@ public class UserController {
                                      @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
         checkIfNotUserNorAdmin(username, userDetails, jwt);
 
-        JSONObject jsonObj = new JSONObject(newPassword);
         try {
-            String jsonPassword = jsonObj.getString("password");
+            String jsonPassword = (String) newPassword.get("password");
             return service.updatePassword(username, jsonPassword);
         } catch (Exception e) {
             throw new UserBadRequestException(e);

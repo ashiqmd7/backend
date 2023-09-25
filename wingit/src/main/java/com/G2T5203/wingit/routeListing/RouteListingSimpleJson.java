@@ -3,16 +3,16 @@ package com.G2T5203.wingit.routeListing;
 import com.G2T5203.wingit.entities.RouteListing;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class RouteListingSimpleJson {
     private Integer routeId;
     private String planeId;
-    private Date departureDatetime;
+    private LocalDateTime departureDatetime;
     private Duration flightDuration;
     private double basePrice;
 
-    public RouteListingSimpleJson(Integer routeId, String planeId, Date departureDatetime, Duration flightDuration, double basePrice) {
+    public RouteListingSimpleJson(Integer routeId, String planeId, LocalDateTime departureDatetime, Duration flightDuration, double basePrice) {
         this.routeId = routeId;
         this.planeId = planeId;
         this.departureDatetime = departureDatetime;
@@ -47,11 +47,11 @@ public class RouteListingSimpleJson {
         this.planeId = planeId;
     }
 
-    public Date getDepartureDatetime() {
+    public LocalDateTime getDepartureDatetime() {
         return departureDatetime;
     }
 
-    public void setDepartureDatetime(Date departureDatetime) {
+    public void setDepartureDatetime(LocalDateTime departureDatetime) {
         this.departureDatetime = departureDatetime;
     }
 

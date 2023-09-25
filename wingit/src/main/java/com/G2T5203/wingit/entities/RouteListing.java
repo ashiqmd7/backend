@@ -1,6 +1,7 @@
 package com.G2T5203.wingit.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,10 +14,12 @@ public class RouteListing {
     private double basePrice;
 
     @OneToMany(mappedBy = "outboundRouteListing", cascade = CascadeType.ALL)
+//    @JsonManagedReference
     @JsonIgnore
     private List<Booking> outboundBooking;
 
     @OneToMany(mappedBy = "inboundRouteListing", cascade = CascadeType.ALL)
+//    @JsonManagedReference
     @JsonIgnore
     private List<Booking> inboundBooking;
 

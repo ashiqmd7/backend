@@ -1,27 +1,26 @@
 package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.entities.SeatListing;
-import jakarta.persistence.JoinColumn;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class SeatListingSimpleJson {
     // RouteListingPk
     private String routePlaneId;
     public int routeId;
-    public Date departureDatetime;
+    public LocalDateTime departureDatetime;
 
     // SeatPk
     public String seatPlaneId;
     public String seatNumber;
 
     // Booking's id
-    public String bookingId;
+    public Integer bookingId;
 
     // the rest
     public String occupantName;
 
-    public SeatListingSimpleJson(String routePlaneId, int routeId, Date departureDatetime, String seatPlaneId, String seatNumber, String bookingId, String occupantName) {
+    public SeatListingSimpleJson(String routePlaneId, int routeId, LocalDateTime departureDatetime, String seatPlaneId, String seatNumber, Integer bookingId, String occupantName) {
         this.routePlaneId = routePlaneId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
@@ -38,7 +37,7 @@ public class SeatListingSimpleJson {
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getPlane().getPlaneId(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
-                seatListing.getBooking().getBookingId(),
+                seatListing.getBooking() != null ? seatListing.getBooking().getBookingId() : null,
                 seatListing.getOccupantName());
     }
 
@@ -58,11 +57,11 @@ public class SeatListingSimpleJson {
         this.routeId = routeId;
     }
 
-    public Date getDepartureDatetime() {
+    public LocalDateTime getDepartureDatetime() {
         return departureDatetime;
     }
 
-    public void setDepartureDatetime(Date departureDatetime) {
+    public void setDepartureDatetime(LocalDateTime departureDatetime) {
         this.departureDatetime = departureDatetime;
     }
 
@@ -82,11 +81,11 @@ public class SeatListingSimpleJson {
         this.seatNumber = seatNumber;
     }
 
-    public String getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(String bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 

@@ -1,18 +1,25 @@
 package com.G2T5203.wingit.utils;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
     private static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
-    public static Date parseDateTime(String datetimeString) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATETIME_PATTERN);
-        return dateFormat.parse(datetimeString);
+    public static LocalDateTime parseDateTime(String datetimeString) throws ParseException {
+        if (datetimeString.contains("T")) {
+            datetimeString = datetimeString.replace("T", " ");
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN);
+        return LocalDateTime.parse(datetimeString, formatter);
     }
 
-    public static Date handledParseDateTime(String datetimeString) {
+    public static LocalDateTime handledParseDateTime(String datetimeString) {
         try {
             return parseDateTime(datetimeString);
         } catch (ParseException e) {
@@ -21,12 +28,12 @@ public class DateUtils {
         }
     }
 
-    public static Date parseDate(String dateString) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_PATTERN);
-        return dateFormat.parse(dateString);
+    public static LocalDate parseDate(String dateString) throws ParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_PATTERN);
+        return LocalDate.parse(dateString, formatter);
     }
 
-    public static Date handledParseDate(String dateString) {
+    public static LocalDate handledParseDate(String dateString) {
         try {
             return parseDate(dateString);
         } catch (ParseException e) {
@@ -39,7 +46,7 @@ public class DateUtils {
         String datetimeString = "2023-09-15 14:30:00";
 
         try {
-            Date date = parseDateTime(datetimeString);
+            LocalDateTime date = parseDateTime(datetimeString);
             System.out.println(date);
         } catch (ParseException e) {
             e.printStackTrace();

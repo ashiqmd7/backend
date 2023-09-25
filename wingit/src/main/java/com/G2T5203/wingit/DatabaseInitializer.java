@@ -1,5 +1,6 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.booking.BookingRepository;
 import com.G2T5203.wingit.entities.*;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
@@ -8,21 +9,15 @@ import com.G2T5203.wingit.seat.SeatRepository;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.utils.DateUtils;
-import org.hibernate.type.descriptor.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // Class is used only in DEV profile to pre-populate it with data for testing purposes.
 
@@ -336,7 +331,39 @@ public class DatabaseInitializer {
 //        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListingList); }
         Log("[Added sample SeatListing]");
 
-
+        // Initialise Bookings
+        BookingRepository bookingRepository = context.getBean(BookingRepository.class);
+        List<Booking> bookingList = new ArrayList<>();
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                1,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
+                false
+        )));
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                2,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 2,
+                false
+        )));
+        bookingList.add(bookingRepository.save( new Booking(
+                wingitUserList.get(0),
+                routeListingList.get(0),
+                routeListingList.get(1),
+                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
+                1,
+                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
+                true
+        )));
+        for(Booking booking : bookingList) {
+            Log("[Add Booking]" + booking);
+        }
 
         Log("[Finished Initialising Sample Database Data]");
     }
