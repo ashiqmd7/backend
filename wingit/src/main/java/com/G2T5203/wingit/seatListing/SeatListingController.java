@@ -46,28 +46,30 @@ public class SeatListingController {
     }
 
     @PutMapping(path = "/seatListings/bookSeat")
-    public SeatListing bookSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+    public SeatListingSimpleJson bookSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
         try {
-            return service.setSeatListing(
+            SeatListing updatedSeatListing = service.setSeatListing(
                     seatBookingInfo.getPlaneId(),
                     seatBookingInfo.routeId,
                     seatBookingInfo.departureDatetime,
                     seatBookingInfo.seatNumber,
                     seatBookingInfo.bookingId,
                     seatBookingInfo.occupantName);
+            return new SeatListingSimpleJson(updatedSeatListing);
         } catch (Exception e) {
             throw new SeatListingBadRequestException(e);
         }
     }
 
     @PutMapping(path = "/seatListings/cancelSeatBooking")
-    public SeatListing cancelSeatListingBooking(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+    public SeatListingSimpleJson cancelSeatListingBooking(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
         try {
-            return service.cancelSeatListingBooking(
+            SeatListing updatedSeatListing =  service.cancelSeatListingBooking(
                     seatBookingInfo.getPlaneId(),
                     seatBookingInfo.routeId,
                     seatBookingInfo.departureDatetime,
                     seatBookingInfo.seatNumber);
+            return new SeatListingSimpleJson(updatedSeatListing);
         } catch (Exception e) {
             throw new SeatListingBadRequestException(e);
         }
