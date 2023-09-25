@@ -15,10 +15,12 @@ public class RouteListing {
 
     @OneToMany(mappedBy = "outboundRouteListing", cascade = CascadeType.ALL)
     //@JsonManagedReference
+    @JsonIgnore
     private List<Booking> outboundBooking;
 
     @OneToMany(mappedBy = "inboundRouteListing", cascade = CascadeType.ALL)
-    //@JsonManagedReference
+    @JsonManagedReference
+    //@JsonIgnore
     private List<Booking> inboundBooking;
 
     public RouteListing(RouteListingPk routeListingPk, double basePrice) {
