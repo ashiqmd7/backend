@@ -13,6 +13,7 @@ import com.G2T5203.wingit.seat.SeatRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +40,22 @@ public class SeatListingService {
     public List<SeatListingSimpleJson> getAllSeatListings() {
         List<SeatListing> seatListings = repo.findAll();
         return seatListings.stream()
+                .map(SeatListingSimpleJson::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<SeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
+        Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
+        if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
+
+        Optional<Route> retrievedRoute = routeRepo.findById(routeId);
+        if (retrievedRoute.isEmpty()) throw new RouteNotFoundException(routeId);
+
+        RouteListingPk retrievedRoutListingPk = new RouteListingPk(retrievedPlane.get(), retrievedRoute.get(), departureDateTime);
+        List<SeatListing> matchingSeatListings = repo.findBySeatListingPkRouteListingRouteListingPk(retrievedRoutListingPk);
+        if (matchingSeatListings.isEmpty()) throw new SeatListingNotFoundException("No seatListing with sepcified routeListingPk");
+
+        return matchingSeatListings.stream()
                 .map(SeatListingSimpleJson::new)
                 .collect(Collectors.toList());
     }

@@ -9,4 +9,7 @@ public class SeatListingNotFoundException extends RuntimeException {
     SeatListingNotFoundException(SeatListing seatListing) {
         super("Could not find seatlisting " + seatListing);
     }
+    SeatListingNotFoundException(String msg) {
+        super(msg);
+    }
 }
