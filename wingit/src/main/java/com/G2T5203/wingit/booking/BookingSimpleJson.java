@@ -2,7 +2,7 @@ package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.entities.Booking;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,15 +13,15 @@ public class BookingSimpleJson {
     // Outbound Routelisting
     private String outboundPlaneId;
     private int outboundRouteId;
-    private Date outboundDepartureDatetime;
+    private LocalDateTime outboundDepartureDatetime;
 
     // Inbound Routelisting
     private String inboundPlaneId;
     private int inboundRouteId;
-    private Date inboundDepartureDatetime;
+    private LocalDateTime inboundDepartureDatetime;
 
     // The rest
-    private Date startBookingDatetime;
+    private LocalDateTime startBookingDatetime;
     private int partySize;
     private double chargedPrice;
     private boolean isPaid;
@@ -30,7 +30,7 @@ public class BookingSimpleJson {
     private List<String> outboundSeatNumbers;
     private List<String> inboundSeatNumbers;
 
-    public BookingSimpleJson(Integer bookingId, String username, String outboundPlaneId, int outboundRouteId, Date outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, Date inboundDepartureDatetime, Date startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, List<String> outboundSeatNumbers, List<String> inboundSeatNumbers) {
+    public BookingSimpleJson(Integer bookingId, String username, String outboundPlaneId, int outboundRouteId, LocalDateTime outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime, LocalDateTime startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, List<String> outboundSeatNumbers, List<String> inboundSeatNumbers) {
         this.bookingId = bookingId;
         this.username = username;
 
@@ -115,11 +115,11 @@ public class BookingSimpleJson {
         this.outboundRouteId = outboundRouteId;
     }
 
-    public Date getOutboundDepartureDatetime() {
+    public LocalDateTime getOutboundDepartureDatetime() {
         return outboundDepartureDatetime;
     }
 
-    public void setOutboundDepartureDatetime(Date outboundDepartureDatetime) {
+    public void setOutboundDepartureDatetime(LocalDateTime outboundDepartureDatetime) {
         this.outboundDepartureDatetime = outboundDepartureDatetime;
     }
 
@@ -139,19 +139,19 @@ public class BookingSimpleJson {
         this.inboundRouteId = inboundRouteId;
     }
 
-    public Date getInboundDepartureDatetime() {
+    public LocalDateTime getInboundDepartureDatetime() {
         return inboundDepartureDatetime;
     }
 
-    public void setInboundDepartureDatetime(Date inboundDepartureDatetime) {
+    public void setInboundDepartureDatetime(LocalDateTime inboundDepartureDatetime) {
         this.inboundDepartureDatetime = inboundDepartureDatetime;
     }
 
-    public Date getStartBookingDatetime() {
+    public LocalDateTime getStartBookingDatetime() {
         return startBookingDatetime;
     }
 
-    public void setStartBookingDatetime(Date startBookingDatetime) {
+    public void setStartBookingDatetime(LocalDateTime startBookingDatetime) {
         this.startBookingDatetime = startBookingDatetime;
     }
 

@@ -5,7 +5,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Embeddable
@@ -17,9 +17,9 @@ public class RouteListingPk implements Serializable {
     @ManyToOne
     @JoinColumn(name = "routeId")
     private Route route;
-    private Date departureDatetime;
+    private LocalDateTime departureDatetime;
 
-    public RouteListingPk(Plane plane, Route route, Date departureDatetime) {
+    public RouteListingPk(Plane plane, Route route, LocalDateTime departureDatetime) {
         this.plane = plane;
         this.route = route;
         this.departureDatetime = departureDatetime;
@@ -43,11 +43,11 @@ public class RouteListingPk implements Serializable {
         this.route = route;
     }
 
-    public Date getDepartureDatetime() {
+    public LocalDateTime getDepartureDatetime() {
         return departureDatetime;
     }
 
-    public void setDepartureDatetime(Date departureDatetime) {
+    public void setDepartureDatetime(LocalDateTime departureDatetime) {
         this.departureDatetime = departureDatetime;
     }
 

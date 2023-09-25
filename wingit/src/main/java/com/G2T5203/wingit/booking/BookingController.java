@@ -2,6 +2,7 @@ package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.entities.Booking;
 import com.G2T5203.wingit.user.UserBadRequestException;
+import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -76,8 +77,7 @@ public class BookingController {
             int inboundRouteId = jsonObj.getInt("inboundRouteId");
             // Parse the inboundDepartureDatetime as a String from JSON
             String inboundDepartureDatetimeStr = jsonObj.getString("inboundDepartureDatetime");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // can change the format if needed
-            Date inboundDepartureDatetime = dateFormat.parse(inboundDepartureDatetimeStr);
+            LocalDateTime inboundDepartureDatetime = DateUtils.handledParseDateTime(inboundDepartureDatetimeStr);
 
             return service.updateInboundBooking(bookingId, inboundPlaneId, inboundRouteId, inboundDepartureDatetime);
         } catch (Exception e) {

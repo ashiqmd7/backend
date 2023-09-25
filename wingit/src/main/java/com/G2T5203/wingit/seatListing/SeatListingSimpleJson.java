@@ -2,13 +2,13 @@ package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.entities.SeatListing;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class SeatListingSimpleJson {
     // RouteListingPk
     private String routePlaneId;
     public int routeId;
-    public Date departureDatetime;
+    public LocalDateTime departureDatetime;
 
     // SeatPk
     public String seatPlaneId;
@@ -20,7 +20,7 @@ public class SeatListingSimpleJson {
     // the rest
     public String occupantName;
 
-    public SeatListingSimpleJson(String routePlaneId, int routeId, Date departureDatetime, String seatPlaneId, String seatNumber, Integer bookingId, String occupantName) {
+    public SeatListingSimpleJson(String routePlaneId, int routeId, LocalDateTime departureDatetime, String seatPlaneId, String seatNumber, Integer bookingId, String occupantName) {
         this.routePlaneId = routePlaneId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
@@ -57,11 +57,11 @@ public class SeatListingSimpleJson {
         this.routeId = routeId;
     }
 
-    public Date getDepartureDatetime() {
+    public LocalDateTime getDepartureDatetime() {
         return departureDatetime;
     }
 
-    public void setDepartureDatetime(Date departureDatetime) {
+    public void setDepartureDatetime(LocalDateTime departureDatetime) {
         this.departureDatetime = departureDatetime;
     }
 

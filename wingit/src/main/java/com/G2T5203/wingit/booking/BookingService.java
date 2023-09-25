@@ -12,7 +12,7 @@ import com.G2T5203.wingit.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,7 +80,7 @@ public class BookingService {
 
     // PUT to update for inbound
     @Transactional
-    public Booking updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, Date inboundDepartureDatetime) {
+    public Booking updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
         Optional<Booking> retrieveBooking = repo.findById(bookingId);
         if (retrieveBooking.isEmpty()) throw new BookingNotFoundException("" + bookingId);
 

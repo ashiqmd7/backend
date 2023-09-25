@@ -3,8 +3,7 @@ package com.G2T5203.wingit.entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Embeddable
 public class SeatListingPk implements Serializable {
@@ -34,12 +33,12 @@ public class SeatListingPk implements Serializable {
         // outbound/inbound route listing's PK, to check against this seatListing's route listing
         String routePlaneId = routeListingPk.getPlane().getPlaneId();
         int routeRouteId = routeListingPk.getRoute().getRouteId();
-        Date routeDepartureDatetime = routeListingPk.getDepartureDatetime();
+        LocalDateTime routeDepartureDatetime = routeListingPk.getDepartureDatetime();
 
         // this seatListing's route listing PK
         String planeId = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getPlane().getPlaneId();
         int routeId = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getRoute().getRouteId();
-        Date departureDatetime = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime();
+        LocalDateTime departureDatetime = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime();
 
         // compare
         if (planeId.equals(routePlaneId)) {

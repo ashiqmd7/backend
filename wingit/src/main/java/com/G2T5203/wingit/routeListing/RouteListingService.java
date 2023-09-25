@@ -11,9 +11,7 @@ import com.G2T5203.wingit.route.RouteRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,9 +52,7 @@ public class RouteListingService {
     public List<RouteListingSimpleJson> getAllRouteListingsMatchingFullSearch(String departureDest, String arrivalDest, LocalDate matchingDate) {
         List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(departureDest, arrivalDest);
         return routeListings.stream().filter(routeListing -> {
-            LocalDate routeListingDate = routeListing.getRouteListingPk().getDepartureDatetime().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
+            LocalDate routeListingDate = routeListing.getRouteListingPk().getDepartureDatetime().toLocalDate();
             return routeListingDate.equals(matchingDate);
         }).map(RouteListingSimpleJson::new).collect(Collectors.toList());
     }
