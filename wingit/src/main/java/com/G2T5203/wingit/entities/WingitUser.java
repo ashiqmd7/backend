@@ -37,6 +37,7 @@ public class WingitUser implements UserDetails {
     private String salutation;
     @OneToMany(mappedBy = "wingitUser", cascade = CascadeType.ALL)
     //@JsonManagedReference
+    @JsonIgnore
     private List<Booking> bookings;
 
 

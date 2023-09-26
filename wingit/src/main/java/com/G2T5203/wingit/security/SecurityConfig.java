@@ -98,7 +98,16 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/bookings/**")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/bookings/**")).permitAll()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/bookings/**")).permitAll()
+
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seatListings")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seatListings/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seatListings/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/seatListings/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/seatListings/**")).permitAll()
+
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/*")).permitAll()
+
+
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
                             .anyRequest().hasAuthority("SCOPE_READ");

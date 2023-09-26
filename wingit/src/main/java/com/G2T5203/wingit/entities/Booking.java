@@ -1,5 +1,6 @@
 package com.G2T5203.wingit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,8 @@ public class Booking {
     private double chargedPrice;
     private boolean isPaid;
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    //@JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     private List<SeatListing> seatListing;
 
     public Booking(Integer bookingId, WingitUser wingitUser, RouteListing outboundRouteListing, RouteListing inboundRouteListing, LocalDateTime startBookingDatetime, int partySize, double chargedPrice, boolean isPaid) {
