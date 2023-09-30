@@ -2,13 +2,16 @@ package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.entities.Route;
+import com.G2T5203.wingit.entities.RouteListing;
 import com.G2T5203.wingit.entities.WingitUser;
+import com.G2T5203.wingit.routeListing.RouteListingSimpleJson;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TestUtils {
     private final int port;
@@ -83,11 +86,21 @@ public class TestUtils {
                 "Taiwan",
                 Duration.ofHours(5).plusMinutes(20));
     }
-    public  Route createSampleRoute2() {
+    public Route createSampleRoute2() {
         return new Route(
                 2, // NOTE: It can be overridden as this is generated value.
                 "Taiwan",
                 "Singapore",
                 Duration.ofHours(7).plusMinutes(10));
+    }
+
+    public RouteListingSimpleJson createSampleRouteListingSimpleJson(Route route, Plane plane) {
+        return new RouteListingSimpleJson(
+                route.getRouteId(),
+                plane.getPlaneId(),
+                LocalDateTime.now(),
+                Duration.ofHours(3),
+                100.0
+        );
     }
 }
