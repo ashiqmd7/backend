@@ -76,10 +76,11 @@ public class BookingSimpleJson {
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getOutboundRouteListing().getRouteListingPk()))
                         .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())
                         .collect(Collectors.toList()),
+                booking.hasInboundRouteListing() ?
                 booking.getSeatListing().stream()
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getInboundRouteListing().getRouteListingPk()))
                         .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()) : null
         );
     }
 
