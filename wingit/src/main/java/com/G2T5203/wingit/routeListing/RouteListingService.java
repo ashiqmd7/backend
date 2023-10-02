@@ -1,5 +1,6 @@
 package com.G2T5203.wingit.routeListing;
 
+import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.entities.*;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
@@ -9,6 +10,7 @@ import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +22,19 @@ public class RouteListingService {
     private final RouteRepository routeRepo;
     private final PlaneRepository planeRepo;
     private final SeatListingRepository seatListingRepo;
+    private final BookingService bookingService;
 
-    public RouteListingService(RouteListingRepository repo, RouteRepository routeRepo, PlaneRepository planeRepo, SeatListingRepository seatListingRepo) {
+    public RouteListingService(
+            RouteListingRepository repo,
+            RouteRepository routeRepo,
+            PlaneRepository planeRepo,
+            SeatListingRepository seatListingRepo,
+            BookingService bookingService) {
         this.repo = repo;
         this.routeRepo = routeRepo;
         this.planeRepo = planeRepo;
         this.seatListingRepo = seatListingRepo;
+        this.bookingService = bookingService;
     }
 
     public List<RouteListingSimpleJson> getAllRouteListings() {
@@ -59,12 +68,14 @@ public class RouteListingService {
 
     public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
         List<SeatListing> availableSeats = seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(routeListingPk);
-        // TODO: Need to implement this!
-        //       Next is to check if there are currently processed bookings.
-        //       Make sure not to double count also... but not fatal if we do.
-        //       So here we remove from the List any with bookingIDs that are unfinished for the routelisting.
+        List<Booking> activeBookingsForRouteListing = bookingService.getActiveUnfinishedBookingsForRouteListing(routeListingPk);
+        int numRemainingSeats = availableSeats.size();
+        for (Booking booking : activeBookingsForRouteListing) {
+            numRemainingSeats -= booking.getPartySize(); // Remove reserved number of seats for active booking
+            numRemainingSeats += booking.getSeatListing().size(); // Add back to tally those they already booked to undo doublecount.
+        }
 
-        return availableSeats.size();
+        return numRemainingSeats;
     }
 
     @Transactional

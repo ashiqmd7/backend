@@ -7,14 +7,15 @@ import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
+import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.UserNotFoundException;
 import com.G2T5203.wingit.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,13 +25,21 @@ public class BookingService {
     private final PlaneRepository planeRepo;
     private final RouteRepository routeRepo;
     private final RouteListingRepository routeListingRepo;
+    private final SeatListingService seatListingService;
 
-    public BookingService(BookingRepository repo, UserRepository userRepo, PlaneRepository planeRepo, RouteRepository routeRepo, RouteListingRepository routeListingRepo) {
+    public BookingService(
+            BookingRepository repo,
+            UserRepository userRepo,
+            PlaneRepository planeRepo,
+            RouteRepository routeRepo,
+            RouteListingRepository routeListingRepo,
+            SeatListingService seatListingService) {
         this.repo = repo;
         this.userRepo = userRepo;
         this.planeRepo = planeRepo;
         this.routeRepo = routeRepo;
         this.routeListingRepo = routeListingRepo;
+        this.seatListingService = seatListingService;
     }
 
     public List<BookingSimpleJson> getAllBookings() {
@@ -117,5 +126,51 @@ public class BookingService {
         } else {
             throw new BookingNotFoundException(bookingId);
         }
+    }
+
+    @Transactional
+    private void forceDeleteBookingById(int bookingId) {
+        Optional<Booking> booking = repo.findById(bookingId);
+        if (booking.isPresent()) {
+            forceDeleteBooking(booking.get());
+        } else {
+            throw new BookingNotFoundException(bookingId);
+        }
+    }
+
+    @Transactional
+    private void forceDeleteBooking(Booking booking) {
+        try {
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                // Delete all seatListings if any.
+                RouteListingPk routeListingPk = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk();
+                seatListingService.cancelSeatListingBooking(
+                        routeListingPk.getPlane().getPlaneId(),
+                        routeListingPk.getRoute().getRouteId(),
+                        routeListingPk.getDepartureDatetime(),
+                        seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
+            }
+            repo.deleteById((booking.getBookingId()));
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
+    }
+
+    @Transactional
+    public List<Booking> getActiveUnfinishedBookingsForRouteListing(RouteListingPk routeListingPk) {
+        List<Booking> matchingUnfinishedOutboundRouteListing = repo.findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(routeListingPk);
+        List<Booking> activeUnfinishedBookings = new ArrayList<>();
+        for (Booking booking : matchingUnfinishedOutboundRouteListing) {
+            // TODO: Sort through those "expired" and delete them.
+            final int MAX_DURATION_IN_MINUTES = 15;
+            boolean isAfter15Minutes = Duration.between(booking.getStartBookingDatetime(), LocalDateTime.now()).toMinutes() > MAX_DURATION_IN_MINUTES;
+            if (isAfter15Minutes) {
+                forceDeleteBooking(booking);
+            } else {
+                activeUnfinishedBookings.add(booking);
+            }
+        }
+
+        return activeUnfinishedBookings;
     }
 }
