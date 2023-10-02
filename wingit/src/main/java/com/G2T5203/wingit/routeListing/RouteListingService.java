@@ -31,21 +31,21 @@ public class RouteListingService {
     public List<RouteListingSimpleJson> getAllRouteListings() {
         List<RouteListing> routeListings = repo.findAll();
         return routeListings.stream()
-                .map(RouteListingSimpleJson::new)
+                .map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk())))
                 .collect(Collectors.toList());
     }
 
     public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDest(String departureDest) {
         List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDest(departureDest);
         return routeListings.stream()
-                .map(RouteListingSimpleJson::new)
+                .map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk())))
                 .collect(Collectors.toList());
     }
 
     public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDestAndArrivalDestination(String departureDest, String arrivalDest) {
         List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(departureDest, arrivalDest);
         return routeListings.stream()
-                .map(RouteListingSimpleJson::new)
+                .map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk())))
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +54,12 @@ public class RouteListingService {
         return routeListings.stream().filter(routeListing -> {
             LocalDate routeListingDate = routeListing.getRouteListingPk().getDepartureDatetime().toLocalDate();
             return routeListingDate.equals(matchingDate);
-        }).map(RouteListingSimpleJson::new).collect(Collectors.toList());
+        }).map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk()))).collect(Collectors.toList());
+    }
+
+    public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
+        // TODO: Need to implement this!
+        return 0;
     }
 
     @Transactional
