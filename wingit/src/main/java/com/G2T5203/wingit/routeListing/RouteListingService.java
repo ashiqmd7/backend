@@ -1,13 +1,11 @@
 package com.G2T5203.wingit.routeListing;
 
-import com.G2T5203.wingit.entities.Plane;
-import com.G2T5203.wingit.entities.Route;
-import com.G2T5203.wingit.entities.RouteListing;
-import com.G2T5203.wingit.entities.RouteListingPk;
+import com.G2T5203.wingit.entities.*;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +19,13 @@ public class RouteListingService {
     private final RouteListingRepository repo;
     private final RouteRepository routeRepo;
     private final PlaneRepository planeRepo;
+    private final SeatListingRepository seatListingRepo;
 
-    public RouteListingService(RouteListingRepository repo, RouteRepository routeRepo, PlaneRepository planeRepo) {
+    public RouteListingService(RouteListingRepository repo, RouteRepository routeRepo, PlaneRepository planeRepo, SeatListingRepository seatListingRepo) {
         this.repo = repo;
         this.routeRepo = routeRepo;
         this.planeRepo = planeRepo;
+        this.seatListingRepo = seatListingRepo;
     }
 
     public List<RouteListingSimpleJson> getAllRouteListings() {
@@ -58,8 +58,13 @@ public class RouteListingService {
     }
 
     public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
+        List<SeatListing> availableSeats = seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(routeListingPk);
         // TODO: Need to implement this!
-        return 0;
+        //       Next is to check if there are currently processed bookings.
+        //       Make sure not to double count also... but not fatal if we do.
+        //       So here we remove from the List any with bookingIDs that are unfinished for the routelisting.
+
+        return availableSeats.size();
     }
 
     @Transactional
