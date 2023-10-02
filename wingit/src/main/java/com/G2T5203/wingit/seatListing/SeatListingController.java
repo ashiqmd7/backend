@@ -45,10 +45,27 @@ public class SeatListingController {
         }
     }
 
-    @PutMapping(path = "/seatListings/bookSeat")
-    public SeatListingSimpleJson bookSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+    @PutMapping(path = "/seatListings/bookSeat/reserve")
+    public SeatListingSimpleJson reserveSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
         try {
-            SeatListing updatedSeatListing = service.setSeatListing(
+            if (seatBookingInfo.occupantName != null) throw new SeatListingBadRequestException("Reservation does not need occupant name yet!");
+            SeatListing updatedSeatListing = service.reserveSeatListing(
+                    seatBookingInfo.getPlaneId(),
+                    seatBookingInfo.routeId,
+                    seatBookingInfo.departureDatetime,
+                    seatBookingInfo.seatNumber,
+                    seatBookingInfo.bookingId);
+            return new SeatListingSimpleJson(updatedSeatListing);
+        } catch (Exception e) {
+            throw new SeatListingBadRequestException(e);
+        }
+    }
+
+    @PutMapping(path = "/seatListings/bookSeat/setOccupant")
+    public SeatListingSimpleJson setOccupantForSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+        try {
+            if (seatBookingInfo.occupantName == null) throw new SeatListingBadRequestException("Occupant Name is Empty!");
+            SeatListing updatedSeatListing = service.setOccupantForSeatListing(
                     seatBookingInfo.getPlaneId(),
                     seatBookingInfo.routeId,
                     seatBookingInfo.departureDatetime,
