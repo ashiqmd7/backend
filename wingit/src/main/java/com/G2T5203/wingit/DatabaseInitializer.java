@@ -230,7 +230,7 @@ public class DatabaseInitializer {
     }
     private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
         for (int year = 2023; year <= 2023; year++) {
-            for (int month = 10; month <= 12; month++) {
+            for (int month = 12; month <= 12; month++) {
                 int daysInMonth;
                 if (month == 2) daysInMonth = 28;
                 else if (month == 4 || month == 6 || month == 9 || month == 11) daysInMonth = 30;
