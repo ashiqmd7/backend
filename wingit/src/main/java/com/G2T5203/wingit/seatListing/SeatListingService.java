@@ -101,7 +101,15 @@ public class SeatListingService {
     }
 
     @Transactional
-    public SeatListing setSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
+    public SeatListing reserveSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId) {
+        return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, null);
+    }
+    @Transactional
+    public SeatListing setOccupantForSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
+        return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, occupantName);
+    }
+    @Transactional
+    private SeatListing setSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
         Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
         if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
 
