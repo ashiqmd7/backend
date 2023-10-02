@@ -173,4 +173,49 @@ public class BookingService {
 
         return activeUnfinishedBookings;
     }
+
+    @Transactional
+    public double calculateAndSaveChargedPrice(int bookingId) {
+        Optional<Booking> bookingOptional = repo.findById(bookingId);
+        if (bookingOptional.isPresent()) {
+            Booking booking = bookingOptional.get();
+            // TODO: Check if we should be expecting empty or 0 charged price? Cause we shouldn't be calculating if already have...?
+
+            // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbout and outbound, should expect 10 seats total.
+            double outboundPriceTotal = 0.0;
+            double inboundPriceTotal = 0.0;
+            final double outboundBasePrice = booking.getOutboundRouteListing().getBasePrice();
+            final double inboundBasePrice = booking.hasInboundRouteListing() ? booking.getInboundRouteListing().getBasePrice() : 0.0;
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                boolean isOutboundRouteListing = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk() == booking.getOutboundRouteListing().getRouteListingPk();
+                if (isOutboundRouteListing) {
+                    outboundPriceTotal += seatListing.getSeatListingPk().getSeat().getPriceFactor() * outboundBasePrice;
+                } else {
+                    inboundPriceTotal += seatListing.getSeatListingPk().getSeat().getPriceFactor() * inboundBasePrice;
+                }
+            }
+            double totalChargedPrice = outboundPriceTotal + inboundPriceTotal;
+            booking.setChargedPrice(totalChargedPrice);
+            repo.save(booking);
+
+            return totalChargedPrice;
+        } else {
+            throw new BookingNotFoundException(bookingId);
+        }
+    }
+
+    @Transactional
+    public void markBookingAsPaid(int bookingId) {
+        Optional<Booking> bookingOptional = repo.findById(bookingId);
+        if (bookingOptional.isPresent()) {
+            Booking booking = bookingOptional.get();
+            // TODO: Maybe some logic checks here....? With stripe. Not sure how it works yet.
+
+            // TODO: ALSO!!! Need to check here that booking is fully booked. i.e. all seatlistings are filled correctly.
+            booking.setPaid(true);
+            repo.save(booking);
+        } else {
+            throw new BookingNotFoundException(bookingId);
+        }
+    }
 }
