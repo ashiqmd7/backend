@@ -11,22 +11,26 @@ public class RouteListingSimpleJson {
     private LocalDateTime departureDatetime;
     private Duration flightDuration;
     private double basePrice;
+    private int availableSeats;
 
-    public RouteListingSimpleJson(Integer routeId, String planeId, LocalDateTime departureDatetime, Duration flightDuration, double basePrice) {
+    public RouteListingSimpleJson(Integer routeId, String planeId, LocalDateTime departureDatetime, Duration flightDuration, double basePrice, int availableSeats) {
         this.routeId = routeId;
         this.planeId = planeId;
         this.departureDatetime = departureDatetime;
         this.flightDuration = flightDuration;
         this.basePrice = basePrice;
+        this.availableSeats = availableSeats;
     }
 
-    public RouteListingSimpleJson(RouteListing routeListing) {
+    public RouteListingSimpleJson(RouteListing routeListing, int availableSeats) {
         this(
                 routeListing.getRouteListingPk().getRoute().getRouteId(),
                 routeListing.getRouteListingPk().getPlane().getPlaneId(),
                 routeListing.getRouteListingPk().getDepartureDatetime(),
                 routeListing.getRouteListingPk().getRoute().getFlightDuration(),
-                routeListing.getBasePrice()
+                routeListing.getBasePrice(),
+
+                availableSeats
         );
     }
     public RouteListingSimpleJson() {}
@@ -66,4 +70,8 @@ public class RouteListingSimpleJson {
     public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
     }
+
+    public int getAvailableSeats() { return availableSeats; }
+
+    public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
 }

@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,19 +81,35 @@ public class BookingController {
         }
     }
 
-    @PutMapping("bookings/updatePaymentStatus/{bookingId}/{paymentStatus}")
-    public Booking updateIsPaid(@PathVariable int bookingId, @Valid @RequestBody boolean paymentStatus) {
+    @DeleteMapping("bookings/delete/{bookingId}")
+    public void deleteBooking(@PathVariable int bookingId) {
         try {
-            return service.updateIsPaid(bookingId, paymentStatus);
+            service.deleteBookingById(bookingId);
+        } catch (BookingNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
         }
     }
 
-    @DeleteMapping("bookings/delete/{bookingId}")
-    public void deleteBooking(@PathVariable int bookingId) {
+    @PutMapping("bookings/calculateChargedPrice/{bookingId}")
+    public Map<String, Object> calculateAndSaveChargedPrice(@PathVariable int bookingId) {
         try {
-            service.deleteBookingById(bookingId);
+            Map<String, Object> priceResult = new HashMap<>();
+            double totalChargedPrice = service.calculateAndSaveChargedPrice(bookingId);
+            priceResult.put("totalChargedPrice", totalChargedPrice);
+            return priceResult;
+        } catch (BookingNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
+    }
+
+    @PutMapping("bookings/markAsPaid/{bookingId}")
+    public void markBookingAsPaid(@PathVariable int bookingId) {
+        try {
+            service.markBookingAsPaid(bookingId);
         } catch (BookingNotFoundException e) {
             throw e;
         } catch (Exception e) {

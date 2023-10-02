@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface SeatListingRepository extends JpaRepository<SeatListing, SeatListingPk> {
     List<SeatListing> findBySeatListingPkRouteListingRouteListingPk(RouteListingPk routeListingPk);
+    List<SeatListing> findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(RouteListingPk routeListingPk);
 }
