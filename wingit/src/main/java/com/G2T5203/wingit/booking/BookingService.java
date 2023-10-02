@@ -52,6 +52,18 @@ public class BookingService {
     // Get all the bookings under a user
     public List<BookingSimpleJson> getAllBookingsByUser(String username) {
         List<Booking> bookings = repo.findAllByWingitUserUsername(username);
+        // Checking for expired bookings.
+        boolean hasDeletedSomeExpiredBookings = false;
+        for (Booking booking : bookings) {
+            if (isBookingExpired(booking)) {
+                forceDeleteBooking(booking);
+                hasDeletedSomeExpiredBookings = true;
+            }
+        }
+        if (hasDeletedSomeExpiredBookings) {
+            bookings = repo.findAllByWingitUserUsername(username);
+        }
+
         return bookings.stream()
                 .map(BookingSimpleJson::new)
                 .collect(Collectors.toList());
@@ -109,15 +121,6 @@ public class BookingService {
         return repo.save(retrievedBooking.get());
     }
 
-    // PUT to update isPaid after payment
-    @Transactional
-    public Booking updateIsPaid(int bookingId, boolean paymentStatus) {
-        Optional<Booking> retrieveBooking = repo.findById(bookingId);
-        if (retrieveBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
-
-        retrieveBooking.get().setPaid(paymentStatus);
-        return repo.save(retrieveBooking.get());
-    }
 
     @Transactional
     public void deleteBookingById(int bookingId) {
@@ -161,10 +164,7 @@ public class BookingService {
         List<Booking> matchingUnfinishedOutboundRouteListing = repo.findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(routeListingPk);
         List<Booking> activeUnfinishedBookings = new ArrayList<>();
         for (Booking booking : matchingUnfinishedOutboundRouteListing) {
-            // TODO: Sort through those "expired" and delete them.
-            final int MAX_DURATION_IN_MINUTES = 15;
-            boolean isAfter15Minutes = Duration.between(booking.getStartBookingDatetime(), LocalDateTime.now()).toMinutes() > MAX_DURATION_IN_MINUTES;
-            if (isAfter15Minutes) {
+            if (isBookingExpired(booking)) {
                 forceDeleteBooking(booking);
             } else {
                 activeUnfinishedBookings.add(booking);
@@ -172,6 +172,14 @@ public class BookingService {
         }
 
         return activeUnfinishedBookings;
+    }
+
+    private boolean isBookingExpired(Booking booking) {
+        if (booking.isPaid()) return false;
+        final int MAX_DURATION_IN_MINUTES = 15;
+        boolean isPastExpiry = Duration.between(booking.getStartBookingDatetime(), LocalDateTime.now()).toMinutes() > MAX_DURATION_IN_MINUTES;
+        // Only expired if it's not paid and past the timings.
+        return isPastExpiry && !booking.isPaid();
     }
 
     @Transactional

@@ -81,15 +81,6 @@ public class BookingController {
         }
     }
 
-    @PutMapping("bookings/updatePaymentStatus/{bookingId}/{paymentStatus}")
-    public Booking updateIsPaid(@PathVariable int bookingId, @Valid @RequestBody boolean paymentStatus) {
-        try {
-            return service.updateIsPaid(bookingId, paymentStatus);
-        } catch (Exception e) {
-            throw new BookingBadRequestException(e);
-        }
-    }
-
     @DeleteMapping("bookings/delete/{bookingId}")
     public void deleteBooking(@PathVariable int bookingId) {
         try {
