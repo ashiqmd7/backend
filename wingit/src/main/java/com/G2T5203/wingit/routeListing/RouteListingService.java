@@ -44,20 +44,6 @@ public class RouteListingService {
                 .collect(Collectors.toList());
     }
 
-    public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDest(String departureDest) {
-        List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDest(departureDest);
-        return routeListings.stream()
-                .map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk())))
-                .collect(Collectors.toList());
-    }
-
-    public List<RouteListingSimpleJson> getAllRouteListingsWithDepartureDestAndArrivalDestination(String departureDest, String arrivalDest) {
-        List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(departureDest, arrivalDest);
-        return routeListings.stream()
-                .map(routeListing -> new RouteListingSimpleJson(routeListing, calculateRemainingSeatsForRouteListing(routeListing.getRouteListingPk())))
-                .collect(Collectors.toList());
-    }
-
     public List<RouteListingSimpleJson> getAllRouteListingsMatchingFullSearch(String departureDest, String arrivalDest, LocalDate matchingDate) {
         List<RouteListing> routeListings = repo.findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(departureDest, arrivalDest);
         return routeListings.stream().filter(routeListing -> {

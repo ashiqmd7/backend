@@ -17,16 +17,6 @@ public class RouteListingController {
     @GetMapping(path = "/routeListings")
     public List<RouteListingSimpleJson> getAllRouteListings() { return service.getAllRouteListings(); }
 
-    @GetMapping(path = "/routeListings/depart/{departureDest}")
-    public List<RouteListingSimpleJson> getAllRouteListingsByDepartureDest(@PathVariable String departureDest) {
-        return service.getAllRouteListingsWithDepartureDest(departureDest);
-    }
-
-    @GetMapping(path = "/routeListings/departAndArrive/{departureDest}/{arrivalDest}")
-    public List<RouteListingSimpleJson> getAllRouteListingsByDepartAndArrive(@PathVariable String departureDest, @PathVariable String arrivalDest) {
-        return service.getAllRouteListingsWithDepartureDestAndArrivalDestination(departureDest, arrivalDest);
-    }
-
     @GetMapping(path = "/routeListings/fullSearch/{departureDest}/{arrivalDest}/{year}/{month}/{day}")
     public List<RouteListingSimpleJson> getAllRoutesMatchingFullSearch(
             @PathVariable String departureDest,
