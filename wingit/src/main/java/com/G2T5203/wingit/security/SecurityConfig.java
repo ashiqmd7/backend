@@ -92,7 +92,10 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/routes/update/*")).hasRole("ADMIN")
 
 
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/fullSearch/**")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/routeListings/new")).hasRole("ADMIN")
+
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/bookings")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/bookings/**")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/bookings/**")).authenticated()
