@@ -1,6 +1,7 @@
 package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.entities.*;
+import com.G2T5203.wingit.exception.GeneralMessageException;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteNotFoundException;
@@ -86,6 +87,12 @@ public class BookingService {
         Optional<RouteListing> retrievedOutboundRouteListing = routeListingRepo.findById(thisOutboundRouteListingPk);
         if (retrievedOutboundRouteListing.isEmpty()) throw new RouteListingNotFoundException(thisOutboundRouteListingPk);
 
+        // Check if routeListing has enough seatListings
+        // First find & sum all seatListings that contain routeListing
+        // Find capacity of the Plane in routeListing
+        // Subtract capacity - number of seat
+
+
         Booking newBooking = new Booking(
                 retrievedUser.get(),
                 retrievedOutboundRouteListing.get(),
@@ -116,6 +123,13 @@ public class BookingService {
         RouteListingPk thisInboundRouteListingPk = new RouteListingPk(retrievedInboundPlane.get(), retrievedInboundRoute.get(), inboundDepartureDatetime);
         Optional<RouteListing> retrievedInboundRouteListing = routeListingRepo.findById(thisInboundRouteListingPk);
         if (retrievedInboundRouteListing.isEmpty()) throw new RouteListingNotFoundException(thisInboundRouteListingPk);
+
+        // Check date of InboundRouteListing. If it is before OutboundRouteListing, throw exception
+        // Do this by retrieving the outboundRouteListing's departureDatetime & compare with the inboundRouteListing departureDatetime
+        LocalDateTime outboundDatetime = retrievedBooking.get().getOutboundRouteListing().getRouteListingPk().getDepartureDatetime();
+        if (inboundDepartureDatetime.isBefore(outboundDatetime)) {
+            throw new GeneralMessageException("Inbound flight departure datetime is before outbound");
+        }
 
         retrievedBooking.get().setInboundRouteListing(retrievedInboundRouteListing.get());
         return repo.save(retrievedBooking.get());
