@@ -1,6 +1,7 @@
 package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.booking.BookingBadRequestException;
+import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.entities.SeatListing;
 import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
@@ -42,9 +43,11 @@ public class SeatListingController {
     }
 
     private final SeatListingService service;
+    private final BookingService bookingService;
 
-    public SeatListingController(SeatListingService service) {
+    public SeatListingController(SeatListingService service, BookingService bookingService) {
         this.service = service;
+        this.bookingService = bookingService;
     }
 
     @GetMapping(path = "/seatListings")
@@ -89,9 +92,12 @@ public class SeatListingController {
         }
     }
 
-    @PutMapping(path = "/seatListings/bookSeat/setOccupant/{username}")
-    public SeatListingSimpleJson setOccupantForSeatListing(@PathVariable String username, @Valid @RequestBody SeatListingSimpleJson seatBookingInfo,
+    @PutMapping(path = "/seatListings/bookSeat/setOccupant/{bookingId}")
+    public SeatListingSimpleJson setOccupantForSeatListing(@PathVariable int bookingId, @Valid @RequestBody SeatListingSimpleJson seatBookingInfo,
                                                            @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
+        // get username of this Booking's user
+        String username = bookingService.getBookingUserUsername(bookingId);
+
         checkIfNotUserNorAdmin(username, userDetails, jwt);
         try {
             if (seatBookingInfo.occupantName == null) throw new SeatListingBadRequestException("Occupant Name is Empty!");
@@ -108,9 +114,12 @@ public class SeatListingController {
         }
     }
 
-    @PutMapping(path = "/seatListings/cancelSeatBooking/{username}")
-    public SeatListingSimpleJson cancelSeatListingBooking(@PathVariable String username, @Valid @RequestBody SeatListingSimpleJson seatBookingInfo,
+    @PutMapping(path = "/seatListings/cancelSeatBooking/{bookingId}")
+    public SeatListingSimpleJson cancelSeatListingBooking(@PathVariable int bookingId, @Valid @RequestBody SeatListingSimpleJson seatBookingInfo,
                                                           @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
+        // get username of this Booking's user
+        String username = bookingService.getBookingUserUsername(bookingId);
+
         checkIfNotUserNorAdmin(username, userDetails, jwt);
         try {
             SeatListing updatedSeatListing =  service.cancelSeatListingBooking(
