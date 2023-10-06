@@ -8,6 +8,7 @@ import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
 import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.UserNotFoundException;
 import com.G2T5203.wingit.user.UserRepository;
@@ -27,23 +28,22 @@ public class BookingService {
     private final RouteRepository routeRepo;
     private final RouteListingRepository routeListingRepo;
     private final SeatListingService seatListingService;
-    private final RouteListingService routeListingService;
+    private final SeatListingRepository seatListingRepo;
 
-    public BookingService(
-            BookingRepository repo,
-            UserRepository userRepo,
-            PlaneRepository planeRepo,
-            RouteRepository routeRepo,
-            RouteListingRepository routeListingRepo,
-            SeatListingService seatListingService,
-            RouteListingService routeListingService) {
+    public BookingService(BookingRepository repo,
+                          UserRepository userRepo,
+                          PlaneRepository planeRepo,
+                          RouteRepository routeRepo,
+                          RouteListingRepository routeListingRepo,
+                          SeatListingService seatListingService,
+                          SeatListingRepository seatListingRepo) {
         this.repo = repo;
         this.userRepo = userRepo;
         this.planeRepo = planeRepo;
         this.routeRepo = routeRepo;
         this.routeListingRepo = routeListingRepo;
         this.seatListingService = seatListingService;
-        this.routeListingService = routeListingService;
+        this.seatListingRepo = seatListingRepo;
     }
 
     public List<BookingSimpleJson> getAllBookings() {
@@ -73,6 +73,19 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    // Need to copy over this function from RouteListingService due to circular dependency error (bookingService uses routeListingService uses bookingService)
+    public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
+        List<SeatListing> availableSeats = seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(routeListingPk);
+        List<Booking> activeBookingsForRouteListing = getActiveUnfinishedBookingsForRouteListing(routeListingPk);
+        int numRemainingSeats = availableSeats.size();
+        for (Booking booking : activeBookingsForRouteListing) {
+            numRemainingSeats -= booking.getPartySize(); // Remove reserved number of seats for active booking
+            numRemainingSeats += booking.getSeatListing().size(); // Add back to tally those they already booked to undo doublecount.
+        }
+
+        return numRemainingSeats;
+    }
+
     @Transactional
     public Booking createBooking(BookingSimpleJson bookingSimpleJson) {
         Optional<WingitUser> retrievedUser = userRepo.findByUsername(bookingSimpleJson.getUsername());
@@ -92,7 +105,7 @@ public class BookingService {
 
         // Check if routeListing has enough seatListings for Booking's partySize
         int bookingPax = bookingSimpleJson.getPartySize();
-        int remainingSeatsForRouteListing = routeListingService.calculateRemainingSeatsForRouteListing(thisOutboundRouteListingPk);
+        int remainingSeatsForRouteListing = calculateRemainingSeatsForRouteListing(thisOutboundRouteListingPk);
         if (remainingSeatsForRouteListing < bookingPax) {
             throw new BookingBadRequestException("Routelisting has insufficient seats for selected pax");
         }
@@ -208,8 +221,35 @@ public class BookingService {
             Booking booking = bookingOptional.get();
             // TODO: Check if we should be expecting empty or 0 charged price? Cause we shouldn't be calculating if already have...?
 
-            // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbout and outbound, should expect 10 seats total.
-            // hihi
+            // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbound and outbound, should expect 10 seats total.
+            // retrieve outbound & inbound routeListings
+            // count number of seatListing's routeListingPks that matches outboundRoutelistingPk
+            // count number of seatListing's routeListingPks that matches inboundRoutelistingPk
+            // check if count == count == booking's partySize
+            RouteListingPk outboundRouteListingPk = booking.getOutboundRouteListing().getRouteListingPk();
+            int outboundSeatListingCount = 0;
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, outboundRouteListingPk)) {
+                    outboundSeatListingCount++;
+                }
+            }
+            if (outboundSeatListingCount != booking.getPartySize()) {
+                throw new BookingBadRequestException("Incorrect number of seats booked for partySize.");
+            }
+            if (booking.hasInboundRouteListing()) {
+                RouteListingPk inboundRouteListingPk = booking.getInboundRouteListing().getRouteListingPk();
+                int inboundSeatListingCount = 0;
+                for (SeatListing seatListing : booking.getSeatListing()) {
+                    if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, inboundRouteListingPk)) {
+                        inboundSeatListingCount++;
+                    }
+                }
+                if (outboundSeatListingCount != inboundSeatListingCount) {
+                    throw new BookingBadRequestException("Number of outbound seatListings does not match number of inbound seatListings.");
+                }
+            }
+
+
             double outboundPriceTotal = 0.0;
             double inboundPriceTotal = 0.0;
             final double outboundBasePrice = booking.getOutboundRouteListing().getBasePrice();
