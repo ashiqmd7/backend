@@ -133,6 +133,10 @@ public class SeatListingService {
         if (bookingId != null) {
             Optional<Booking> retrievedBooking = bookingRepo.findById(bookingId);
             if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+            // If bookingId given, check if it matches bookingId from the retrivedBooking
+            if (!retrievedBooking.get().getBookingId().equals(bookingId)) {
+                throw new SeatListingBadRequestException("Invalid booking ID");
+            }
             seatListing.setBooking(retrievedBooking.get());
 
         } else {
