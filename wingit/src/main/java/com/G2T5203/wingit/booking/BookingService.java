@@ -7,6 +7,7 @@ import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
+import com.G2T5203.wingit.routeListing.RouteListingService;
 import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.UserNotFoundException;
 import com.G2T5203.wingit.user.UserRepository;
@@ -26,6 +27,7 @@ public class BookingService {
     private final RouteRepository routeRepo;
     private final RouteListingRepository routeListingRepo;
     private final SeatListingService seatListingService;
+    private final RouteListingService routeListingService;
 
     public BookingService(
             BookingRepository repo,
@@ -33,13 +35,15 @@ public class BookingService {
             PlaneRepository planeRepo,
             RouteRepository routeRepo,
             RouteListingRepository routeListingRepo,
-            SeatListingService seatListingService) {
+            SeatListingService seatListingService,
+            RouteListingService routeListingService) {
         this.repo = repo;
         this.userRepo = userRepo;
         this.planeRepo = planeRepo;
         this.routeRepo = routeRepo;
         this.routeListingRepo = routeListingRepo;
         this.seatListingService = seatListingService;
+        this.routeListingService = routeListingService;
     }
 
     public List<BookingSimpleJson> getAllBookings() {
@@ -86,10 +90,12 @@ public class BookingService {
         Optional<RouteListing> retrievedOutboundRouteListing = routeListingRepo.findById(thisOutboundRouteListingPk);
         if (retrievedOutboundRouteListing.isEmpty()) throw new RouteListingNotFoundException(thisOutboundRouteListingPk);
 
-        // Check if routeListing has enough seatListings
-        // First find & sum all seatListings that contain routeListing
-        // Find capacity of the Plane in routeListing
-        // Subtract capacity - number of seat
+        // Check if routeListing has enough seatListings for Booking's partySize
+        int bookingPax = bookingSimpleJson.getPartySize();
+        int remainingSeatsForRouteListing = routeListingService.calculateRemainingSeatsForRouteListing(thisOutboundRouteListingPk);
+        if (remainingSeatsForRouteListing < bookingPax) {
+            throw new BookingBadRequestException("Routelisting has insufficient seats for selected pax");
+        }
 
 
         Booking newBooking = new Booking(
@@ -203,6 +209,7 @@ public class BookingService {
             // TODO: Check if we should be expecting empty or 0 charged price? Cause we shouldn't be calculating if already have...?
 
             // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbout and outbound, should expect 10 seats total.
+            // hihi
             double outboundPriceTotal = 0.0;
             double inboundPriceTotal = 0.0;
             final double outboundBasePrice = booking.getOutboundRouteListing().getBasePrice();
