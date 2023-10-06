@@ -86,8 +86,10 @@ public class SeatListingController {
         }
     }
 
-    @PutMapping(path = "/seatListings/bookSeat/setOccupant")
-    public SeatListingSimpleJson setOccupantForSeatListing(@Valid @RequestBody SeatListingSimpleJson seatBookingInfo) {
+    @PutMapping(path = "/seatListings/bookSeat/setOccupant/{username}")
+    public SeatListingSimpleJson setOccupantForSeatListing(@PathVariable String username, @Valid @RequestBody SeatListingSimpleJson seatBookingInfo,
+                                                           @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
+        checkIfNotUserNorAdmin(username, userDetails, jwt);
         try {
             if (seatBookingInfo.occupantName == null) throw new SeatListingBadRequestException("Occupant Name is Empty!");
             SeatListing updatedSeatListing = service.setOccupantForSeatListing(
