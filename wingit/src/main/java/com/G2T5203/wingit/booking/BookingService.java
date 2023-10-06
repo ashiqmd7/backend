@@ -1,7 +1,6 @@
 package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.entities.*;
-import com.G2T5203.wingit.exception.GeneralMessageException;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteNotFoundException;
@@ -128,7 +127,7 @@ public class BookingService {
         // Do this by retrieving the outboundRouteListing's departureDatetime & compare with the inboundRouteListing departureDatetime
         LocalDateTime outboundDatetime = retrievedBooking.get().getOutboundRouteListing().getRouteListingPk().getDepartureDatetime();
         if (inboundDepartureDatetime.isBefore(outboundDatetime)) {
-            throw new GeneralMessageException("Inbound flight departure datetime is before outbound");
+            throw new BookingBadRequestException("Inbound flight departure datetime is before outbound");
         }
 
         retrievedBooking.get().setInboundRouteListing(retrievedInboundRouteListing.get());
