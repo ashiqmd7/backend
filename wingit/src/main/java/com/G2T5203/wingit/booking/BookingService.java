@@ -46,6 +46,15 @@ public class BookingService {
         this.seatListingRepo = seatListingRepo;
     }
 
+    // get username of booking's user using bookingId
+    public String getBookingUserUsername(int bookingId) {
+        Optional<Booking> retrievedBooking = repo.findById(bookingId);
+        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+
+        String username = retrievedBooking.get().getWingitUser().getUsername();
+        return  username;
+    }
+
     public List<BookingSimpleJson> getAllBookings() {
         List<Booking> bookings = repo.findAll();
         return bookings.stream()
