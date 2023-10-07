@@ -171,6 +171,16 @@ public class SeatListingService {
                 throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
             }
 
+            // Another check: Ensure that this seatListing's routeListingPk matches either the
+            // inbound or outbound routeListingPk, otherwise it is possible to add any seatListing to the booking
+            if (!seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, retrievedBooking.get().getOutboundRouteListing().getRouteListingPk())) {
+                if (!seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, retrievedBooking.get().getInboundRouteListing().getRouteListingPk())) {
+                    // if reach here means that this seatListing's routeListing matches neither the outbound/inbound routeListing
+                    // hence the seatListing does not match this booking
+                    throw new SeatListingBadRequestException("SeatListing does not exist for this booking");
+                }
+            }
+
             seatListing.setBooking(retrievedBooking.get());
 
         } else {
