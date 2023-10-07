@@ -102,6 +102,37 @@ public class SeatListingService {
 
     @Transactional
     public SeatListing reserveSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId) {
+        // Retrieve routeListing, check if exists
+        Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
+        if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
+
+        Optional<Route> retrievedRoute = routeRepo.findById(routeId);
+        if (retrievedRoute.isEmpty()) throw new RouteNotFoundException(routeId);
+
+        RouteListingPk routeListingPk = new RouteListingPk(retrievedPlane.get(), retrievedRoute.get(), departureDateTime);
+        Optional<RouteListing> retrievedRouteListing = routeListingRepo.findById(routeListingPk);
+        if (retrievedRouteListing.isEmpty()) throw new RouteListingNotFoundException(routeListingPk);
+
+        // Retrieve booking, check if exists
+        Optional<Booking> retrievedBooking = bookingRepo.findById(bookingId);
+        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+
+        // Retrieve booking's seatlisting (list). For each seatListing in it
+        // such that the seatListing's routeListing's routeListingPk matches this routeListingPk
+        // If matches, count++.
+        // Afterwards, check if count < booking's partySize
+        List<SeatListing> seatListings = retrievedBooking.get().getSeatListing();
+        int count = 0;
+        for (SeatListing seatListing : seatListings) {
+            if (seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().equals(routeListingPk)) {
+                count++;
+            }
+        }
+        
+        if (count >= retrievedBooking.get().getPartySize()) {
+            throw new SeatListingBadRequestException("Max number of seats have been selected");
+        }
+
         return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, null);
     }
     @Transactional
