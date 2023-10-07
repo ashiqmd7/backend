@@ -1,12 +1,15 @@
 package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.booking.BookingRepository;
+import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.entities.*;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
 import com.G2T5203.wingit.seat.SeatRepository;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
+import com.G2T5203.wingit.seatListing.SeatListingService;
+import com.G2T5203.wingit.seatListing.SeatListingSimpleJson;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.utils.DateUtils;
 import org.slf4j.Logger;
@@ -14,10 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.awt.print.Book;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 // Class is used only in DEV profile to pre-populate it with data for testing purposes.
 
@@ -56,6 +61,16 @@ public class DatabaseInitializer {
                 "admin@admin.com",
                 "+65 6475 3846",
                 "Master")));
+        list.add(repo.save(new WingitUser(
+                "richman",
+                encoder.encode("iamrich"),
+                "ROLE_USER",
+                "Richmond",
+                "Musk",
+                LocalDate.parse("1960-04-02"),
+                "rich@richmond.com",
+                "+65 8888 8888",
+                "Mr")));
     }
     private static void initialiseSamplePlanes(List<Plane> list, PlaneRepository repo) {
         list.add(repo.save(new Plane( "SQ123", 42, "B777")));
@@ -230,7 +245,7 @@ public class DatabaseInitializer {
     }
     private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
         for (int year = 2023; year <= 2023; year++) {
-            for (int month = 10; month <= 12; month++) {
+            for (int month = 12; month <= 12; month++) {
                 int daysInMonth;
                 if (month == 2) daysInMonth = 28;
                 else if (month == 4 || month == 6 || month == 9 || month == 11) daysInMonth = 30;
@@ -277,6 +292,64 @@ public class DatabaseInitializer {
             counter++;
             if (counter % 100 == 0 || counter == routeListingList.size())
                 Log(String.format("[SeatListing progress... %d/%d", counter, routeListingList.size()));
+        }
+    }
+
+    private static void initialiseSampleBookings(List<Booking> list, BookingRepository repo, List<WingitUser> userList, List<RouteListing> routeListingList, SeatListingService seatListingService, BookingService bookingService) {
+        // Go through each and every routeListing
+        // Book maybe half of the tickets... So seeded Randomization of what tickets to book.
+        // Book it all under this one mega user
+
+        final long RANDOM_SEED = 777L;
+        WingitUser richUser = userList.get(3);
+        Random outerRandom = new Random(RANDOM_SEED);
+        for (RouteListing routeListing : routeListingList) {
+            final int NUM_BOOKINGS_PER_ROUTELISTING = 5;
+            for (int k = 0 ; k < NUM_BOOKINGS_PER_ROUTELISTING; k++) {
+                Random random = new Random(RANDOM_SEED + k);
+                int partySize = outerRandom.nextInt(5) + 1;
+
+                Booking newBooking = repo.save(new Booking(
+                        richUser,
+                        routeListing,
+                        null,
+                        DateUtils.handledParseDateTime("2023-09-01 16:30:00"),
+                        partySize,
+                        -1,
+                        false));
+                list.add(newBooking);
+
+                List<SeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
+                        routeListing.getRouteListingPk().getPlane().getPlaneId(),
+                        routeListing.getRouteListingPk().getRoute().getRouteId(),
+                        routeListing.getRouteListingPk().getDepartureDatetime());
+
+                for (int i = 0; i < partySize; i++) {
+                    int seatIndex = random.nextInt(seatListings.size());
+                    SeatListingSimpleJson seatChosen = seatListings.get(seatIndex);
+                    while (seatChosen.bookingId != null) {
+                        seatIndex = random.nextInt(seatListings.size());
+                        seatChosen = seatListings.get(seatIndex);
+                    }
+
+                    seatListingService.reserveSeatListing(
+                            seatChosen.getPlaneId(),
+                            seatChosen.getRouteId(),
+                            seatChosen.getDepartureDatetime(),
+                            seatChosen.getSeatNumber(),
+                            newBooking.getBookingId());
+                    seatListingService.setOccupantForSeatListing(
+                            seatChosen.getPlaneId(),
+                            seatChosen.getRouteId(),
+                            seatChosen.getDepartureDatetime(),
+                            seatChosen.getSeatNumber(),
+                            newBooking.getBookingId(),
+                            richUser.getFirstName() + "_" + k + "_" + i);
+                }
+
+                bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
+                bookingService.markBookingAsPaid(newBooking.getBookingId());
+            }
         }
     }
 
@@ -328,42 +401,17 @@ public class DatabaseInitializer {
         SeatListingRepository seatListingRepository = context.getBean(SeatListingRepository.class);
         List<SeatListing> seatListingList = new ArrayList<>();
         initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatList);
-//        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListingList); }
+//        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListing); }
         Log("[Added sample SeatListing]");
 
         // Initialise Bookings
         BookingRepository bookingRepository = context.getBean(BookingRepository.class);
+        SeatListingService seatListingService = context.getBean(SeatListingService.class);
+        BookingService bookingService = context.getBean(BookingService.class);
         List<Booking> bookingList = new ArrayList<>();
-        bookingList.add(bookingRepository.save( new Booking(
-                wingitUserList.get(0),
-                routeListingList.get(0),
-                routeListingList.get(1),
-                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
-                1,
-                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
-                false
-        )));
-        bookingList.add(bookingRepository.save( new Booking(
-                wingitUserList.get(0),
-                routeListingList.get(0),
-                routeListingList.get(1),
-                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
-                2,
-                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 2,
-                false
-        )));
-        bookingList.add(bookingRepository.save( new Booking(
-                wingitUserList.get(0),
-                routeListingList.get(0),
-                routeListingList.get(1),
-                DateUtils.handledParseDateTime(String.format("2023-09-01 16:30:00")),
-                1,
-                (routeListingList.get(0).getBasePrice() + routeListingList.get(1).getBasePrice()) * 1,
-                true
-        )));
-        for(Booking booking : bookingList) {
-            Log("[Add Booking]" + booking);
-        }
+        initialiseSampleBookings(bookingList, bookingRepository, wingitUserList, routeListingList, seatListingService, bookingService);
+//        for (Booking booking : bookingList) { Log("[Add Booking]: " + booking); }
+        Log("[Added sample Bookings]");
 
         Log("[Finished Initialising Sample Database Data]");
     }
