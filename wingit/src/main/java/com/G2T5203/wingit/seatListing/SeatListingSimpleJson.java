@@ -9,14 +9,16 @@ public class SeatListingSimpleJson {
     public int routeId;
     public LocalDateTime departureDatetime;
     public String seatNumber;
+    public String seatClass;
     public Integer bookingId;
     public String occupantName;
 
-    public SeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, Integer bookingId, String occupantName) {
+    public SeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, String seatClass, Integer bookingId, String occupantName) {
         this.planeId = planeId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
         this.seatNumber = seatNumber;
+        this.seatClass = seatClass;
         this.bookingId = bookingId;
         this.occupantName = occupantName;
     }
@@ -27,6 +29,7 @@ public class SeatListingSimpleJson {
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getRoute().getRouteId(),
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                seatListing.getSeatListingPk().getSeat().getSeatClass(),
                 seatListing.getBooking() != null ? seatListing.getBooking().getBookingId() : null,
                 seatListing.getOccupantName());
     }
@@ -62,6 +65,10 @@ public class SeatListingSimpleJson {
     public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
     }
+
+    public String getSeatClass() { return seatClass; }
+
+    public void setSeatClass(String seatClass) { this.seatClass = seatClass; }
 
     public Integer getBookingId() {
         return bookingId;
