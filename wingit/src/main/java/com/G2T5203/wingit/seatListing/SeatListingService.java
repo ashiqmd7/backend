@@ -128,7 +128,7 @@ public class SeatListingService {
                 count++;
             }
         }
-        
+
         if (count >= retrievedBooking.get().getPartySize()) {
             throw new SeatListingBadRequestException("Max number of seats have been selected");
         }
@@ -164,13 +164,20 @@ public class SeatListingService {
         if (bookingId != null) {
             Optional<Booking> retrievedBooking = bookingRepo.findById(bookingId);
             if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
-            // If bookingId given, check if it matches bookingId from the retrivedBooking
-            if (!retrievedBooking.get().getBookingId().equals(bookingId)) {
-                throw new SeatListingBadRequestException("Invalid booking ID");
+
+            // If bookingId given (setOccupantName called), check if it matches bookingId from the seatListing
+            // Different means that user is updating occupantName to the wrong seat
+            if (!seatListing.getBooking().getBookingId().equals(bookingId)) {
+                throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
             }
+
             seatListing.setBooking(retrievedBooking.get());
 
         } else {
+            // If bookingId is null BUT occupant name is given (setOccupantName called wrongly), means wrong endpoint called
+            if (occupantName != null) {
+                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
+            }
             seatListing.setBooking(null);
         }
 
