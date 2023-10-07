@@ -22,13 +22,10 @@ public class SeatListingController {
     @GetMapping(path = "/seatListings")
     public List<SeatListingSimpleJson> getAllSeatListings() { return service.getAllSeatListings(); }
 
-    @GetMapping(path = "/seatListings/matchingRouteListing")
-    public List<SeatListingSimpleJson> getAllSeatListings(@RequestBody Map<String, Object> routeListingPk) {
+    @GetMapping(path = "/seatListings/matchingRouteListing/{planeId}/{routeId}/{departureDatetimeStr}")
+    public List<SeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
         try {
-            String planeId = (String) routeListingPk.get("planeId");
-            int routeId = (Integer) routeListingPk.get("routeId");
-            LocalDateTime departureDatetime = DateUtils.handledParseDateTime((String) routeListingPk.get("departureDatetime"));
-
+            LocalDateTime departureDatetime = DateUtils.handledParseDateTime(departureDatetimeStr);
             return service.getAllSeatListingsInRouteListing(planeId, routeId, departureDatetime);
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
