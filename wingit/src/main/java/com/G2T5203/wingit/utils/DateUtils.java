@@ -15,6 +15,12 @@ public class DateUtils {
         if (datetimeString.contains("T")) {
             datetimeString = datetimeString.replace("T", " ");
         }
+        if (datetimeString.contains("_")) {
+            datetimeString = datetimeString.replace("_", "-");
+        }
+        if (datetimeString.contains("x")) {
+            datetimeString = datetimeString.replace("x", ":");
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN);
         return LocalDateTime.parse(datetimeString, formatter);
     }
