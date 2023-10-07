@@ -245,7 +245,7 @@ public class DatabaseInitializer {
     }
     private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
         for (int year = 2023; year <= 2023; year++) {
-            for (int month = 10; month <= 12; month++) {
+            for (int month = 12; month <= 12; month++) {
                 int daysInMonth;
                 if (month == 2) daysInMonth = 28;
                 else if (month == 4 || month == 6 || month == 9 || month == 11) daysInMonth = 30;
@@ -302,43 +302,54 @@ public class DatabaseInitializer {
 
         final long RANDOM_SEED = 777L;
         WingitUser richUser = userList.get(3);
+        Random outerRandom = new Random(RANDOM_SEED);
         for (RouteListing routeListing : routeListingList) {
-            Random random = new Random(RANDOM_SEED);
+            final int NUM_BOOKINGS_PER_ROUTELISTING = 5;
+            for (int k = 0 ; k < NUM_BOOKINGS_PER_ROUTELISTING; k++) {
+                Random random = new Random(RANDOM_SEED + k);
+                int partySize = outerRandom.nextInt(5) + 1;
 
-            Booking newBooking = repo.save(new Booking(
-                    richUser,
-                    routeListing,
-                    null,
-                    DateUtils.handledParseDateTime("2023-09-01 16:30:00"),
-                    1,
-                    -1,
-                    false));
-            list.add(newBooking);
+                Booking newBooking = repo.save(new Booking(
+                        richUser,
+                        routeListing,
+                        null,
+                        DateUtils.handledParseDateTime("2023-09-01 16:30:00"),
+                        partySize,
+                        -1,
+                        false));
+                list.add(newBooking);
 
-            List<SeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
-                    routeListing.getRouteListingPk().getPlane().getPlaneId(),
-                    routeListing.getRouteListingPk().getRoute().getRouteId(),
-                    routeListing.getRouteListingPk().getDepartureDatetime());
+                List<SeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
+                        routeListing.getRouteListingPk().getPlane().getPlaneId(),
+                        routeListing.getRouteListingPk().getRoute().getRouteId(),
+                        routeListing.getRouteListingPk().getDepartureDatetime());
 
-            int seatIndex = random.nextInt(seatListings.size());
-            SeatListingSimpleJson seatChosen = seatListings.get(seatIndex);
+                for (int i = 0; i < partySize; i++) {
+                    int seatIndex = random.nextInt(seatListings.size());
+                    SeatListingSimpleJson seatChosen = seatListings.get(seatIndex);
+                    while (seatChosen.bookingId != null) {
+                        seatIndex = random.nextInt(seatListings.size());
+                        seatChosen = seatListings.get(seatIndex);
+                    }
 
-            seatListingService.reserveSeatListing(
-                    seatChosen.getPlaneId(),
-                    seatChosen.getRouteId(),
-                    seatChosen.getDepartureDatetime(),
-                    seatChosen.getSeatNumber(),
-                    newBooking.getBookingId());
-            seatListingService.setOccupantForSeatListing(
-                    seatChosen.getPlaneId(),
-                    seatChosen.getRouteId(),
-                    seatChosen.getDepartureDatetime(),
-                    seatChosen.getSeatNumber(),
-                    newBooking.getBookingId(),
-                    richUser.getFirstName());
+                    seatListingService.reserveSeatListing(
+                            seatChosen.getPlaneId(),
+                            seatChosen.getRouteId(),
+                            seatChosen.getDepartureDatetime(),
+                            seatChosen.getSeatNumber(),
+                            newBooking.getBookingId());
+                    seatListingService.setOccupantForSeatListing(
+                            seatChosen.getPlaneId(),
+                            seatChosen.getRouteId(),
+                            seatChosen.getDepartureDatetime(),
+                            seatChosen.getSeatNumber(),
+                            newBooking.getBookingId(),
+                            richUser.getFirstName() + "_" + k + "_" + i);
+                }
 
-            bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
-            bookingService.markBookingAsPaid(newBooking.getBookingId());
+                bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
+                bookingService.markBookingAsPaid(newBooking.getBookingId());
+            }
         }
     }
 
