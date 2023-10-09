@@ -102,6 +102,37 @@ public class SeatListingService {
 
     @Transactional
     public SeatListing reserveSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId) {
+        // Retrieve routeListing, check if exists
+        Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
+        if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
+
+        Optional<Route> retrievedRoute = routeRepo.findById(routeId);
+        if (retrievedRoute.isEmpty()) throw new RouteNotFoundException(routeId);
+
+        RouteListingPk routeListingPk = new RouteListingPk(retrievedPlane.get(), retrievedRoute.get(), departureDateTime);
+        Optional<RouteListing> retrievedRouteListing = routeListingRepo.findById(routeListingPk);
+        if (retrievedRouteListing.isEmpty()) throw new RouteListingNotFoundException(routeListingPk);
+
+        // Retrieve booking, check if exists
+        Optional<Booking> retrievedBooking = bookingRepo.findById(bookingId);
+        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+
+        // Retrieve booking's seatlisting (list). For each seatListing in it
+        // such that the seatListing's routeListing's routeListingPk matches this routeListingPk
+        // If matches, count++.
+        // Afterwards, check if count < booking's partySize
+        List<SeatListing> seatListings = retrievedBooking.get().getSeatListing();
+        int count = 0;
+        for (SeatListing seatListing : seatListings) {
+            if (seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().equals(routeListingPk)) {
+                count++;
+            }
+        }
+
+        if (count >= retrievedBooking.get().getPartySize()) {
+            throw new SeatListingBadRequestException("Max number of seats have been selected");
+        }
+
         return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, null);
     }
     @Transactional
@@ -133,9 +164,30 @@ public class SeatListingService {
         if (bookingId != null) {
             Optional<Booking> retrievedBooking = bookingRepo.findById(bookingId);
             if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+
+            // If bookingId given (setOccupantName called), check if it matches bookingId from the seatListing
+            // Different means that user is updating occupantName to the wrong seat
+            if (!seatListing.getBooking().getBookingId().equals(bookingId)) {
+                throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
+            }
+
+            // Another check: Ensure that this seatListing's routeListingPk matches either the
+            // inbound or outbound routeListingPk, otherwise it is possible to add any seatListing to the booking
+            if (!seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, retrievedBooking.get().getOutboundRouteListing().getRouteListingPk())) {
+                if (!seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, retrievedBooking.get().getInboundRouteListing().getRouteListingPk())) {
+                    // if reach here means that this seatListing's routeListing matches neither the outbound/inbound routeListing
+                    // hence the seatListing does not match this booking
+                    throw new SeatListingBadRequestException("SeatListing does not exist for this booking");
+                }
+            }
+
             seatListing.setBooking(retrievedBooking.get());
 
         } else {
+            // If bookingId is null BUT occupant name is given (setOccupantName called wrongly), means wrong endpoint called
+            if (occupantName != null) {
+                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
+            }
             seatListing.setBooking(null);
         }
 
