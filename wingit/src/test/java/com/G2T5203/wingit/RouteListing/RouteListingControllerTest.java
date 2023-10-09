@@ -92,7 +92,7 @@ class RouteListingControllerTest {
 
     @Test
     void createRouteListing_Success() throws Exception {
-        Route route = testUtils.createSampleRoute1();
+        Route route = new Route("Singapore", "Taiwan", Duration.ofHours(5).plusMinutes(20));
         Plane plane = testUtils.createSamplePlane1();
         routeRepository.save(route);
         planeRepository.save(plane);
@@ -109,5 +109,25 @@ class RouteListingControllerTest {
         assertTrue(postedRouteListing.isPresent());
     }
 
+    @Test
+    void createRouteListing_Unauthorized() throws Exception {
+        // Create a sample route and plane
+        Route route = testUtils.createSampleRoute1();
+        Plane plane = testUtils.createSamplePlane1();
+        routeRepository.save(route);
+        planeRepository.save(plane);
 
+        // Create a sample RouteListingSimpleJson
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+
+        // Create URI for creating a new route listing
+        URI uri = testUtils.constructUri("routeListings/new");
+
+        // Send a POST request without authentication
+        ResponseEntity<Void> responseEntity = testRestTemplate
+                .postForEntity(uri, routeListingSimpleJson, Void.class);
+
+        // Verify that the response status code is 401 (Unauthorized)
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+    }
 }
