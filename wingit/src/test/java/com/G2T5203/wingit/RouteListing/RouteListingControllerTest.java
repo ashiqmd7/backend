@@ -4,6 +4,7 @@ import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.entities.Route;
 import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.entities.RouteListing;
+import com.G2T5203.wingit.entities.RouteListingPk;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
@@ -62,6 +63,34 @@ class RouteListingControllerTest {
     }
 
     @Test
+    void getAllRouteListings_Success() {
+        Route route1 = new Route("Singapore", "Taiwan", Duration.ofHours(5).plusMinutes(20));
+        Route route2 = new Route("Taiwan", "Singapore", Duration.ofHours(7).plusMinutes(10));
+        routeRepository.saveAll(List.of(route1, route2));
+
+        Plane plane1 = testUtils.createSamplePlane1();
+        Plane plane2 = testUtils.createSamplePlane2();
+        planeRepository.saveAll(List.of(plane1, plane2));
+
+        RouteListingSimpleJson routeListing1 = new RouteListingSimpleJson(route1.getRouteId(), plane1.getPlaneId(), LocalDateTime.now(), Duration.ofHours(3), 100.0);
+        RouteListingSimpleJson routeListing2 = new RouteListingSimpleJson(route2.getRouteId(), plane2.getPlaneId(), LocalDateTime.now(), Duration.ofHours(4), 120.0);
+
+        routeListingRepository.saveAll(List.of(
+                new RouteListing(new RouteListingPk(plane1, route1, routeListing1.getDepartureDatetime()), routeListing1.getBasePrice()),
+                new RouteListing(new RouteListingPk(plane2, route2, routeListing2.getDepartureDatetime()), routeListing2.getBasePrice())
+        ));
+
+        ResponseEntity<RouteListing[]> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .getForEntity("/routeListings", RouteListing[].class);
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        RouteListing[] routeListings = responseEntity.getBody();
+        assertNotNull(routeListings);
+        assertEquals(2, routeListings.length);
+    }
+
+    @Test
     void createRouteListing_Success() throws Exception {
         Route route = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
@@ -69,7 +98,6 @@ class RouteListingControllerTest {
         planeRepository.save(plane);
 
         RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
-
 
         URI uri = testUtils.constructUri("routeListings/new");
         ResponseEntity<RouteListing> responseEntity = testRestTemplate
@@ -80,6 +108,6 @@ class RouteListingControllerTest {
         Optional<RouteListing> postedRouteListing = routeListingRepository.findById(responseEntity.getBody().getRouteListingPk());
         assertTrue(postedRouteListing.isPresent());
     }
-    
+
 
 }
