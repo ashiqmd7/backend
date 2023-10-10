@@ -338,15 +338,16 @@ public class DatabaseInitializer {
                             seatChosen.getDepartureDatetime(),
                             seatChosen.getSeatNumber(),
                             newBooking.getBookingId());
-                    seatListingService.setOccupantForSeatListing(
+                    SeatListing updatedSeatListing = seatListingService.setOccupantForSeatListing(
                             seatChosen.getPlaneId(),
                             seatChosen.getRouteId(),
                             seatChosen.getDepartureDatetime(),
                             seatChosen.getSeatNumber(),
                             newBooking.getBookingId(),
                             richUser.getFirstName() + "_" + k + "_" + i);
+                    seatListings.set(seatIndex, new SeatListingSimpleJson(updatedSeatListing));
                 }
-
+                
                 bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
                 bookingService.markBookingAsPaid(newBooking.getBookingId());
             }

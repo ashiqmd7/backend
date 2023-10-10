@@ -167,7 +167,8 @@ public class SeatListingService {
 
             // If bookingId given (setOccupantName called), check if it matches bookingId from the seatListing
             // Different means that user is updating occupantName to the wrong seat
-            if (!seatListing.getBooking().getBookingId().equals(bookingId)) {
+            if (seatListing.getBooking() != null && // If it's null, means we are setting the bookingID value.
+                    !seatListing.getBooking().getBookingId().equals(bookingId)) {
                 throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
             }
 
