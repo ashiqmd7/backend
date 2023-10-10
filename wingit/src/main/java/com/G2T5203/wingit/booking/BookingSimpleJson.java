@@ -70,11 +70,12 @@ public class BookingSimpleJson {
                 // Check if seat listing matches outbound route listing's planeId, routeId, departureDatetime
                 // If yes, add the seatNumber to the outbound list
                 // Repeat for inbound route listing
+                booking.getSeatListing() != null ?
                 booking.getSeatListing().stream()
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getOutboundRouteListing().getRouteListingPk()))
                         .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())
-                        .collect(Collectors.toList()),
-                booking.hasInboundRouteListing() ?
+                        .collect(Collectors.toList()) : null,
+                booking.hasInboundRouteListing() && booking.getSeatListing() != null ?
                 booking.getSeatListing().stream()
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getInboundRouteListing().getRouteListingPk()))
                         .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())

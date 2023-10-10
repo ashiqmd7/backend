@@ -100,7 +100,7 @@ public class BookingService {
     }
 
     @Transactional
-    public Booking createBooking(BookingSimpleJson bookingSimpleJson) {
+    public BookingSimpleJson createBooking(BookingSimpleJson bookingSimpleJson) {
         Optional<WingitUser> retrievedUser = userRepo.findByUsername(bookingSimpleJson.getUsername());
         if (retrievedUser.isEmpty()) throw new UserNotFoundException(bookingSimpleJson.getUsername());
 
@@ -134,12 +134,14 @@ public class BookingService {
                 false
         );
 
-        return repo.save(newBooking);
+        repo.save(newBooking);
+
+        return new BookingSimpleJson(newBooking);
     }
 
     // PUT to update for inbound
     @Transactional
-    public Booking updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
+    public BookingSimpleJson updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
         Optional<Booking> retrievedBooking = repo.findById(bookingId);
         if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
 
@@ -163,7 +165,9 @@ public class BookingService {
         }
 
         retrievedBooking.get().setInboundRouteListing(retrievedInboundRouteListing.get());
-        return repo.save(retrievedBooking.get());
+        repo.save(retrievedBooking.get());
+
+        return new BookingSimpleJson(retrievedBooking.get());
     }
 
 
