@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.user;
 
-import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

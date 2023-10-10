@@ -1,8 +1,8 @@
 package com.G2T5203.wingit;
 
-import com.G2T5203.wingit.entities.Plane;
-import com.G2T5203.wingit.entities.Route;
-import com.G2T5203.wingit.entities.WingitUser;
+import com.G2T5203.wingit.plane.Plane;
+import com.G2T5203.wingit.route.Route;
+import com.G2T5203.wingit.user.WingitUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;

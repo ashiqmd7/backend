@@ -1,7 +1,5 @@
 package com.G2T5203.wingit.user;
 
-import com.G2T5203.wingit.entities.WingitUser;
-
 import java.time.LocalDate;
 
 public class WingitUserSimpleJson {

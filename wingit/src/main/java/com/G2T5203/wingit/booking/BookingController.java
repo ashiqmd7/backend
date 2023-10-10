@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.booking;
 
-import com.G2T5203.wingit.entities.Booking;
 import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;

@@ -1,7 +1,6 @@
 package com.G2T5203.wingit.user;
 
 import com.G2T5203.wingit.TestUtils;
-import com.G2T5203.wingit.entities.WingitUser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

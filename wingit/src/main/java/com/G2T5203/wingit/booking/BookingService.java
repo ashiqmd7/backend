@@ -1,17 +1,21 @@
 package com.G2T5203.wingit.booking;
 
-import com.G2T5203.wingit.entities.*;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
+import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.UserNotFoundException;
 import com.G2T5203.wingit.user.UserRepository;
+import com.G2T5203.wingit.user.WingitUser;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

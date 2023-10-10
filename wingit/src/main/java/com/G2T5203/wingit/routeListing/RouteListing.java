@@ -1,7 +1,7 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.routeListing;
 
+import com.G2T5203.wingit.booking.Booking;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;

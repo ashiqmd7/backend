@@ -1,5 +1,7 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.routeListing;
 
+import com.G2T5203.wingit.plane.Plane;
+import com.G2T5203.wingit.route.Route;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

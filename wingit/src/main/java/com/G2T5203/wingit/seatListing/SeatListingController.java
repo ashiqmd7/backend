@@ -2,11 +2,8 @@ package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.booking.BookingBadRequestException;
 import com.G2T5203.wingit.booking.BookingService;
-import com.G2T5203.wingit.entities.SeatListing;
-import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class SeatListingController {

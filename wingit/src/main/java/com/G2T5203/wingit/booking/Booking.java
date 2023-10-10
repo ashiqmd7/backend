@@ -1,5 +1,8 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.booking;
 
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.seatListing.SeatListing;
+import com.G2T5203.wingit.user.WingitUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 

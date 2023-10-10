@@ -1,4 +1,4 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.plane;
 
 import jakarta.persistence.*;
 

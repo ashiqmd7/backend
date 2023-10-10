@@ -1,23 +1,27 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingRepository;
 import com.G2T5203.wingit.booking.BookingService;
-import com.G2T5203.wingit.entities.*;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneRepository;
+import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
+import com.G2T5203.wingit.seat.Seat;
+import com.G2T5203.wingit.seat.SeatPk;
 import com.G2T5203.wingit.seat.SeatRepository;
-import com.G2T5203.wingit.seatListing.SeatListingRepository;
-import com.G2T5203.wingit.seatListing.SeatListingService;
-import com.G2T5203.wingit.seatListing.SeatListingSimpleJson;
+import com.G2T5203.wingit.seatListing.*;
 import com.G2T5203.wingit.user.UserRepository;
+import com.G2T5203.wingit.user.WingitUser;
 import com.G2T5203.wingit.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.awt.print.Book;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -347,7 +351,7 @@ public class DatabaseInitializer {
                             richUser.getFirstName() + "_" + k + "_" + i);
                     seatListings.set(seatIndex, new SeatListingSimpleJson(updatedSeatListing));
                 }
-                
+
                 bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
                 bookingService.markBookingAsPaid(newBooking.getBookingId());
             }

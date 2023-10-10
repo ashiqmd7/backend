@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.routeListing;
 
-import com.G2T5203.wingit.entities.RouteListingPk;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

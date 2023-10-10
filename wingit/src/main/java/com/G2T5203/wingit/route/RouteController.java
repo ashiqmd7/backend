@@ -1,16 +1,10 @@
 package com.G2T5203.wingit.route;
 
-import com.G2T5203.wingit.entities.Route;
 import jakarta.validation.Valid;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @RestController
 public class RouteController {

@@ -1,4 +1,4 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.route;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;

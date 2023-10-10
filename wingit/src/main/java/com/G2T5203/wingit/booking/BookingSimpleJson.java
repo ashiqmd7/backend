@@ -1,7 +1,5 @@
 package com.G2T5203.wingit.booking;
 
-import com.G2T5203.wingit.entities.Booking;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

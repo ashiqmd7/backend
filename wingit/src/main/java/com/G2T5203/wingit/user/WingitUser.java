@@ -1,7 +1,8 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.user;
 
+import com.G2T5203.wingit.booking.Booking;
+import com.G2T5203.wingit.user.CustomAuthorityDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

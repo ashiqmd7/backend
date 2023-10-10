@@ -1,7 +1,5 @@
 package com.G2T5203.wingit.seat;
 
-import com.G2T5203.wingit.entities.Seat;
-
 public class SeatSimpleJson {
     private String planeId;
     private String seatNumber;
