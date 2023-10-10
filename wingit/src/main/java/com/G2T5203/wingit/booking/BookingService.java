@@ -234,41 +234,42 @@ public class BookingService {
         return isPastExpiry && !booking.isPaid();
     }
 
+    private void throwIfSeatBookingsIncomplete(Booking booking) throws BookingBadRequestException {
+        // retrieve outbound & inbound routeListings
+        // count number of seatListing's routeListingPks that matches outboundRoutelistingPk
+        // count number of seatListing's routeListingPks that matches inboundRoutelistingPk
+        // check if count == count == booking's partySize
+        RouteListingPk outboundRouteListingPk = booking.getOutboundRouteListing().getRouteListingPk();
+        int outboundSeatListingCount = 0;
+        for (SeatListing seatListing : booking.getSeatListing()) {
+            if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, outboundRouteListingPk)) {
+                outboundSeatListingCount++;
+            }
+        }
+        if (outboundSeatListingCount != booking.getPartySize()) {
+            throw new BookingBadRequestException("Incorrect number of seats booked for partySize.");
+        }
+        if (booking.hasInboundRouteListing()) {
+            RouteListingPk inboundRouteListingPk = booking.getInboundRouteListing().getRouteListingPk();
+            int inboundSeatListingCount = 0;
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, inboundRouteListingPk)) {
+                    inboundSeatListingCount++;
+                }
+            }
+            if (outboundSeatListingCount != inboundSeatListingCount) {
+                throw new BookingBadRequestException("Number of outbound seatListings does not match number of inbound seatListings.");
+            }
+        }
+    }
+
     @Transactional
     public double calculateAndSaveChargedPrice(int bookingId) {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
-            // TODO: Check if we should be expecting empty or 0 charged price? Cause we shouldn't be calculating if already have...?
-
-            // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbound and outbound, should expect 10 seats total.
-            // retrieve outbound & inbound routeListings
-            // count number of seatListing's routeListingPks that matches outboundRoutelistingPk
-            // count number of seatListing's routeListingPks that matches inboundRoutelistingPk
-            // check if count == count == booking's partySize
-            RouteListingPk outboundRouteListingPk = booking.getOutboundRouteListing().getRouteListingPk();
-            int outboundSeatListingCount = 0;
-            for (SeatListing seatListing : booking.getSeatListing()) {
-                if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, outboundRouteListingPk)) {
-                    outboundSeatListingCount++;
-                }
-            }
-            if (outboundSeatListingCount != booking.getPartySize()) {
-                throw new BookingBadRequestException("Incorrect number of seats booked for partySize.");
-            }
-            if (booking.hasInboundRouteListing()) {
-                RouteListingPk inboundRouteListingPk = booking.getInboundRouteListing().getRouteListingPk();
-                int inboundSeatListingCount = 0;
-                for (SeatListing seatListing : booking.getSeatListing()) {
-                    if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, inboundRouteListingPk)) {
-                        inboundSeatListingCount++;
-                    }
-                }
-                if (outboundSeatListingCount != inboundSeatListingCount) {
-                    throw new BookingBadRequestException("Number of outbound seatListings does not match number of inbound seatListings.");
-                }
-            }
-
+            // TODO: Shoule we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
+            throwIfSeatBookingsIncomplete(booking);
 
             double outboundPriceTotal = 0.0;
             double inboundPriceTotal = 0.0;
@@ -296,10 +297,11 @@ public class BookingService {
     public void markBookingAsPaid(int bookingId) {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
+            // TODO: Logic checks here... if we have time to integrate with stripe.
+            //       Not sure how it works yet. When it comes to it then we figure out. But likely some logic here.
             Booking booking = bookingOptional.get();
-            // TODO: Maybe some logic checks here....? With stripe. Not sure how it works yet.
+            throwIfSeatBookingsIncomplete(booking);
 
-            // TODO: ALSO!!! Need to check here that booking is fully booked. i.e. all seatlistings are filled correctly.
             booking.setPaid(true);
             repo.save(booking);
         } else {
