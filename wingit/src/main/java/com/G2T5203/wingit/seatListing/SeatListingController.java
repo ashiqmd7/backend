@@ -47,7 +47,7 @@ public class SeatListingController {
     }
 
     @GetMapping(path = "/seatListings/matchingRouteListing/{planeId}/{routeId}/{departureDatetimeStr}")
-    public List<SeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
+    public List<PrivacySeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
         try {
             LocalDateTime departureDatetime = DateUtils.handledParseDateTime(departureDatetimeStr);
             return service.getAllSeatListingsInRouteListing(planeId, routeId, departureDatetime);

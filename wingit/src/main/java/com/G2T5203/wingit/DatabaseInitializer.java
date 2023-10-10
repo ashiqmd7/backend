@@ -323,15 +323,15 @@ public class DatabaseInitializer {
                         false));
                 list.add(newBooking);
 
-                List<SeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
+                List<PrivacySeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
                         routeListing.getRouteListingPk().getPlane().getPlaneId(),
                         routeListing.getRouteListingPk().getRoute().getRouteId(),
                         routeListing.getRouteListingPk().getDepartureDatetime());
 
                 for (int i = 0; i < partySize; i++) {
                     int seatIndex = random.nextInt(seatListings.size());
-                    SeatListingSimpleJson seatChosen = seatListings.get(seatIndex);
-                    while (seatChosen.bookingId != null) {
+                    PrivacySeatListingSimpleJson seatChosen = seatListings.get(seatIndex);
+                    while (seatChosen.getIsBooked()) {
                         seatIndex = random.nextInt(seatListings.size());
                         seatChosen = seatListings.get(seatIndex);
                     }
@@ -349,7 +349,7 @@ public class DatabaseInitializer {
                             seatChosen.getSeatNumber(),
                             newBooking.getBookingId(),
                             richUser.getFirstName() + "_" + k + "_" + i);
-                    seatListings.set(seatIndex, new SeatListingSimpleJson(updatedSeatListing));
+                    seatListings.set(seatIndex, new PrivacySeatListingSimpleJson(updatedSeatListing));
                 }
 
                 bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());

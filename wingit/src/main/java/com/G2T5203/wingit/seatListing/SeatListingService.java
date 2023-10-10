@@ -51,7 +51,7 @@ public class SeatListingService {
                 .collect(Collectors.toList());
     }
 
-    public List<SeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
+    public List<PrivacySeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
         Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
         if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
 
@@ -63,7 +63,7 @@ public class SeatListingService {
         if (matchingSeatListings.isEmpty()) throw new SeatListingNotFoundException("No seatListing with sepcified routeListingPk");
 
         return matchingSeatListings.stream()
-                .map(SeatListingSimpleJson::new)
+                .map(PrivacySeatListingSimpleJson::new)
                 .collect(Collectors.toList());
     }
 
