@@ -52,18 +52,15 @@ public class BookingService {
 
     // get username of booking's user using bookingId
     public String getBookingUserUsername(int bookingId) {
-        Optional<Booking> retrievedBooking = repo.findById(bookingId);
-        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Optional<Booking> optionalRetrievedBooking = repo.findById(bookingId);
+        if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Booking retrievedBooking = optionalRetrievedBooking.get();
+        if (isBookingExpired(retrievedBooking)) {
+            forceDeleteBooking(retrievedBooking);
+            throw new BookingExpiredException();
+        }
 
-        String username = retrievedBooking.get().getWingitUser().getUsername();
-        return  username;
-    }
-
-    public List<BookingSimpleJson> getAllBookings() {
-        List<Booking> bookings = repo.findAll();
-        return bookings.stream()
-                .map(BookingSimpleJson::new)
-                .collect(Collectors.toList());
+        return retrievedBooking.getWingitUser().getUsername();
     }
 
     // Get all the bookings under a user
@@ -86,7 +83,10 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    // Need to copy over this function from RouteListingService due to circular dependency error (bookingService uses routeListingService uses bookingService)
+    // Needed to copy over this function from RouteListingService due to circular dependency error
+    // (bookingService uses routeListingService uses bookingService)
+    // Also makes sense for this to be here since we are grabbing a lot of data from the bookings as well to calculate
+    // those currently booking.
     public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
         List<SeatListing> availableSeats = seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(routeListingPk);
         List<Booking> activeBookingsForRouteListing = getActiveUnfinishedBookingsForRouteListing(routeListingPk);
@@ -147,6 +147,10 @@ public class BookingService {
     public BookingSimpleJson updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
         Optional<Booking> retrievedBooking = repo.findById(bookingId);
         if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        if (isBookingExpired(retrievedBooking.get())) {
+            forceDeleteBooking(retrievedBooking.get());
+            throw new BookingExpiredException();
+        }
 
         // For inbound, get Plane, Route, and departureDatetime to form RouteListingPk
         // Afterwards use RouteListingPk to find RouteListing
@@ -268,6 +272,10 @@ public class BookingService {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
+            if (isBookingExpired(booking)) {
+                forceDeleteBooking(booking);
+                throw new BookingExpiredException();
+            }
             // TODO: Shoule we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
             throwIfSeatBookingsIncomplete(booking);
 
@@ -297,6 +305,8 @@ public class BookingService {
     public void markBookingAsPaid(int bookingId) {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
+            // Since payment might take time here... let's skip the expiry check...?
+
             // TODO: Logic checks here... if we have time to integrate with stripe.
             //       Not sure how it works yet. When it comes to it then we figure out. But likely some logic here.
             Booking booking = bookingOptional.get();

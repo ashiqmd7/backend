@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -317,7 +318,7 @@ public class DatabaseInitializer {
                         richUser,
                         routeListing,
                         null,
-                        DateUtils.handledParseDateTime("2023-09-01 16:30:00"),
+                        LocalDateTime.now(),
                         partySize,
                         -1,
                         false));
