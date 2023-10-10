@@ -50,9 +50,6 @@ public class SeatListingController {
         this.bookingService = bookingService;
     }
 
-    @GetMapping(path = "/seatListings")
-    public List<SeatListingSimpleJson> getAllSeatListings() { return service.getAllSeatListings(); }
-
     @GetMapping(path = "/seatListings/matchingRouteListing/{planeId}/{routeId}/{departureDatetimeStr}")
     public List<SeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
         try {
@@ -60,16 +57,6 @@ public class SeatListingController {
             return service.getAllSeatListingsInRouteListing(planeId, routeId, departureDatetime);
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
-        }
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/seatListings/new")
-    public SeatListingSimpleJson createSeatListing(@Valid @RequestBody SeatListingSimpleJson newSeatListingJson) {
-        try {
-            return new SeatListingSimpleJson(service.createSeatListing(newSeatListingJson));
-        } catch (Exception e) {
-            throw new SeatListingBadRequestException(e);
         }
     }
 
