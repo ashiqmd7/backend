@@ -124,6 +124,9 @@ public class BookingService {
         }
 
 
+        // When creating, always force isPaid to false and chargedPrice as -1 to indicate that they are not yet set.
+        bookingSimpleJson.setChargedPrice(-1.0);
+        bookingSimpleJson.setPaid(false);
         Booking newBooking = new Booking(
                 retrievedUser.get(),
                 retrievedOutboundRouteListing.get(),
