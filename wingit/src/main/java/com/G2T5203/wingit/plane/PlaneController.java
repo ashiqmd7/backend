@@ -2,6 +2,7 @@ package com.G2T5203.wingit.plane;
 
 import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.user.UserController;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class PlaneController {
     // POST to add a new plane
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/planes/new")
-    public Plane createPlane(@RequestBody Plane newPlane) {
+    public Plane createPlane(@Valid @RequestBody Plane newPlane) {
         try {
             return service.createPlane(newPlane);
         } catch (Exception e) {
