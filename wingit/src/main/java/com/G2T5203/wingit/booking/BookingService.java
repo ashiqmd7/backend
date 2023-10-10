@@ -127,6 +127,9 @@ public class BookingService {
         // When creating, always force isPaid to false and chargedPrice as -1 to indicate that they are not yet set.
         bookingSimpleJson.setChargedPrice(-1.0);
         bookingSimpleJson.setPaid(false);
+
+        // also always override startDateTime with server side LocalDateTime.
+        bookingSimpleJson.setStartBookingDatetime(LocalDateTime.now());
         Booking newBooking = new Booking(
                 retrievedUser.get(),
                 retrievedOutboundRouteListing.get(),
