@@ -10,6 +10,7 @@ public class SeatListing {
     @ManyToOne
     @JoinColumn(name = "bookingId")
     private Booking booking;
+    // NOTE: This can be null! So no need for @NotEmpty
     private String occupantName;
 
     public SeatListing(SeatListingPk seatListingPk, Booking booking, String occupantName) {

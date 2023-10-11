@@ -5,6 +5,7 @@ import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.user.WingitUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,8 +32,13 @@ public class Booking {
             @JoinColumn(name = "inboundDepartureDatetime", referencedColumnName = "departureDatetime")
     })
     private RouteListing inboundRouteListing;
+    @Past
     private LocalDateTime startBookingDatetime;
+    @Min(value = 1, message = "Party size cannot be lower than 1")
+    @Max(value = 10, message = "Party size cannot be more than 10")
     private int partySize;
+    // NOTE: Charged price can set to -1.0 to indicate that the final price has yet to be calculated.
+    @DecimalMin(value = "-1.0", message = "Charged price cannot be negative!")
     private double chargedPrice;
     private boolean isPaid;
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)

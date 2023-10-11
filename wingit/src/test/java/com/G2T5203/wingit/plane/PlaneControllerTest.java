@@ -188,7 +188,7 @@ class PlaneControllerTest {
         Plane samplePlane = testUtils.createSamplePlane1();
         String samplePlaneId = planeRepository.save(samplePlane).getPlaneId();
         Plane updatedPlane = testUtils.createSamplePlane1();
-        updatedPlane.setModel("NEW_MODEL");
+        updatedPlane.setModel("C790");
         updatedPlane.setCapacity(123);
 
         URI uri = testUtils.constructUri("planes/update/" + samplePlaneId);
@@ -200,7 +200,7 @@ class PlaneControllerTest {
 
         Optional<Plane> retrievedPlane = planeRepository.findById(samplePlaneId);
         assertTrue(retrievedPlane.isPresent());
-        assertEquals("NEW_MODEL", retrievedPlane.get().getModel());
+        assertEquals("C790", retrievedPlane.get().getModel());
         assertEquals(123, retrievedPlane.get().getCapacity());
     }
 

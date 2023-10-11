@@ -14,7 +14,7 @@ public class Route {
     private String departureDest;
     @NotEmpty
     private String arrivalDest;
-    @DurationMin(hours = 1)
+    @DurationMin(hours = 1, message = "The minimum flight duration is 1h")
     private Duration flightDuration;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
