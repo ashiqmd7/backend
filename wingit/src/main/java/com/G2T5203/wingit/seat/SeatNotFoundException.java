@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.seat;
 
-import com.G2T5203.wingit.entities.SeatPk;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

@@ -2,34 +2,31 @@ package com.G2T5203.wingit.seatListing;
 
 import java.time.LocalDateTime;
 
-public class SeatListingSimpleJson {
+public class PrivacySeatListingSimpleJson {
     private String planeId;
     public int routeId;
     public LocalDateTime departureDatetime;
     public String seatNumber;
     public String seatClass;
-    public Integer bookingId;
-    public String occupantName;
+    public boolean isBooked;
 
-    public SeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, String seatClass, Integer bookingId, String occupantName) {
+    public PrivacySeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, String seatClass, boolean isBooked) {
         this.planeId = planeId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
-        this.bookingId = bookingId;
-        this.occupantName = occupantName;
+        this.isBooked = isBooked;
     }
 
-    public SeatListingSimpleJson(SeatListing seatListing) {
+    public PrivacySeatListingSimpleJson(SeatListing seatListing) {
         this(
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getPlane().getPlaneId(),
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getRoute().getRouteId(),
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
                 seatListing.getSeatListingPk().getSeat().getSeatClass(),
-                seatListing.getBooking() != null ? seatListing.getBooking().getBookingId() : null,
-                seatListing.getOccupantName());
+                seatListing.getBooking() != null);
     }
 
     public String getPlaneId() {
@@ -68,19 +65,7 @@ public class SeatListingSimpleJson {
 
     public void setSeatClass(String seatClass) { this.seatClass = seatClass; }
 
-    public Integer getBookingId() {
-        return bookingId;
-    }
+    public boolean getIsBooked() { return isBooked; }
 
-    public void setBookingId(Integer bookingId) {
-        this.bookingId = bookingId;
-    }
-
-    public String getOccupantName() {
-        return occupantName;
-    }
-
-    public void setOccupantName(String occupantName) {
-        this.occupantName = occupantName;
-    }
+    public void setIsBooked(boolean booked) { isBooked = booked; }
 }

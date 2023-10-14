@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.user;
 
-import com.G2T5203.wingit.entities.WingitUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +8,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -17,8 +17,10 @@ public class UserController {
 
     // GET all users
     @GetMapping(path = "/users")
-    public List<WingitUser> getAllUsers() {
-        return service.getAllUsers();
+    public List<WingitUserSimpleJson> getAllUsers() {
+        return service.getAllUsers().stream()
+                .map(WingitUserSimpleJson::new)
+                .collect(Collectors.toList());
     }
 
 
@@ -48,16 +50,16 @@ public class UserController {
 
     // GET a specific user by username
     @GetMapping(path = "/users/{username}")
-    public WingitUser getUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
+    public WingitUserSimpleJson getUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
         checkIfNotUserNorAdmin(username, userDetails, jwt);
         WingitUser user = service.getById(username);
         if (user == null) throw new UserNotFoundException(username);
-        return user;
+        return new WingitUserSimpleJson(user);
     }
 
     @GetMapping(path = "/users/authTest")
     public void getAuthTest() {
-        // Intentionally left empty. Just a status check.
+        // Intentionally left empty. Just a status check from SecurityConfig's .authenticated().
     }
 
 
@@ -75,9 +77,9 @@ public class UserController {
     // POST to add a new user
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/users/new")
-    public WingitUser createUser(@Valid @RequestBody WingitUser newUser) {
+    public WingitUserSimpleJson createUser(@Valid @RequestBody WingitUser newUser) {
         try {
-            return service.createUser(newUser);
+            return new WingitUserSimpleJson(service.createUser(newUser));
         } catch (Exception e) {
             throw new UserBadRequestException(e);
         }
@@ -85,9 +87,9 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/users/newAdmin")
-    public WingitUser createAdmin(@Valid @RequestBody WingitUser newAdmin) {
+    public WingitUserSimpleJson createAdmin(@Valid @RequestBody WingitUser newAdmin) {
         try {
-            return service.createAdmin(newAdmin);
+            return new WingitUserSimpleJson(service.createAdmin(newAdmin));
         } catch (Exception e) {
             throw new UserBadRequestException(e);
         }
@@ -108,7 +110,7 @@ public class UserController {
 
     // PUT to update a specific user by username
     @PutMapping("/users/update/{username}")
-    public WingitUser updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser,
+    public WingitUserSimpleJson updateUser(@PathVariable String username, @Valid @RequestBody WingitUser updatedUser,
                                  @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
         checkIfNotUserNorAdmin(username, userDetails, jwt);
 
@@ -116,7 +118,7 @@ public class UserController {
         if (!usernamesMatch) throw new UserBadRequestException("Path username and payload username mismatch.");
 
         try {
-            return service.updateUser(updatedUser);
+            return new WingitUserSimpleJson(service.updateUser(updatedUser));
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -125,13 +127,13 @@ public class UserController {
     }
 
     @PutMapping("/users/updatePass/{username}")
-    public WingitUser updatePassword(@PathVariable String username, @RequestBody Map<String, Object> newPassword,
+    public WingitUserSimpleJson updatePassword(@PathVariable String username, @RequestBody Map<String, Object> newPassword,
                                      @AuthenticationPrincipal UserDetails userDetails, @AuthenticationPrincipal Jwt jwt) {
         checkIfNotUserNorAdmin(username, userDetails, jwt);
 
         try {
             String jsonPassword = (String) newPassword.get("password");
-            return service.updatePassword(username, jsonPassword);
+            return new WingitUserSimpleJson(service.updatePassword(username, jsonPassword));
         } catch (Exception e) {
             throw new UserBadRequestException(e);
         }

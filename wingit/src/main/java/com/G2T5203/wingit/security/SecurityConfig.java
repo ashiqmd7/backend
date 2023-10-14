@@ -102,7 +102,7 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/bookings/**")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/bookings/**")).authenticated()
 
-                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seatListings")).authenticated()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seatListings")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seatListings/**")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/seatListings/**")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/seatListings/**")).hasRole("ADMIN")

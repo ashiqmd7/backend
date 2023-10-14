@@ -1,15 +1,21 @@
 package com.G2T5203.wingit.seatListing;
 
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingNotFoundException;
 import com.G2T5203.wingit.booking.BookingRepository;
-import com.G2T5203.wingit.entities.*;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
+import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
+import com.G2T5203.wingit.seat.Seat;
 import com.G2T5203.wingit.seat.SeatNotFoundException;
+import com.G2T5203.wingit.seat.SeatPk;
 import com.G2T5203.wingit.seat.SeatRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -45,7 +51,7 @@ public class SeatListingService {
                 .collect(Collectors.toList());
     }
 
-    public List<SeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
+    public List<PrivacySeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
         Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
         if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
 
@@ -57,7 +63,7 @@ public class SeatListingService {
         if (matchingSeatListings.isEmpty()) throw new SeatListingNotFoundException("No seatListing with sepcified routeListingPk");
 
         return matchingSeatListings.stream()
-                .map(SeatListingSimpleJson::new)
+                .map(PrivacySeatListingSimpleJson::new)
                 .collect(Collectors.toList());
     }
 
@@ -167,7 +173,8 @@ public class SeatListingService {
 
             // If bookingId given (setOccupantName called), check if it matches bookingId from the seatListing
             // Different means that user is updating occupantName to the wrong seat
-            if (!seatListing.getBooking().getBookingId().equals(bookingId)) {
+            if (seatListing.getBooking() != null && // If it's null, means we are setting the bookingID value.
+                    !seatListing.getBooking().getBookingId().equals(bookingId)) {
                 throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
             }
 

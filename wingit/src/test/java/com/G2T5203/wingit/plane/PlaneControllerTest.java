@@ -1,7 +1,6 @@
 package com.G2T5203.wingit.plane;
 
 import com.G2T5203.wingit.TestUtils;
-import com.G2T5203.wingit.entities.Plane;
 import com.G2T5203.wingit.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -189,7 +188,7 @@ class PlaneControllerTest {
         Plane samplePlane = testUtils.createSamplePlane1();
         String samplePlaneId = planeRepository.save(samplePlane).getPlaneId();
         Plane updatedPlane = testUtils.createSamplePlane1();
-        updatedPlane.setModel("NEW_MODEL");
+        updatedPlane.setModel("C790");
         updatedPlane.setCapacity(123);
 
         URI uri = testUtils.constructUri("planes/update/" + samplePlaneId);
@@ -201,7 +200,7 @@ class PlaneControllerTest {
 
         Optional<Plane> retrievedPlane = planeRepository.findById(samplePlaneId);
         assertTrue(retrievedPlane.isPresent());
-        assertEquals("NEW_MODEL", retrievedPlane.get().getModel());
+        assertEquals("C790", retrievedPlane.get().getModel());
         assertEquals(123, retrievedPlane.get().getCapacity());
     }
 

@@ -1,17 +1,21 @@
 package com.G2T5203.wingit.booking;
 
-import com.G2T5203.wingit.entities.*;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
+import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.route.RouteNotFoundException;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingNotFoundException;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.UserNotFoundException;
 import com.G2T5203.wingit.user.UserRepository;
+import com.G2T5203.wingit.user.WingitUser;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -48,18 +52,15 @@ public class BookingService {
 
     // get username of booking's user using bookingId
     public String getBookingUserUsername(int bookingId) {
-        Optional<Booking> retrievedBooking = repo.findById(bookingId);
-        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Optional<Booking> optionalRetrievedBooking = repo.findById(bookingId);
+        if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Booking retrievedBooking = optionalRetrievedBooking.get();
+        if (isBookingExpired(retrievedBooking)) {
+            forceDeleteBooking(retrievedBooking);
+            throw new BookingExpiredException();
+        }
 
-        String username = retrievedBooking.get().getWingitUser().getUsername();
-        return  username;
-    }
-
-    public List<BookingSimpleJson> getAllBookings() {
-        List<Booking> bookings = repo.findAll();
-        return bookings.stream()
-                .map(BookingSimpleJson::new)
-                .collect(Collectors.toList());
+        return retrievedBooking.getWingitUser().getUsername();
     }
 
     // Get all the bookings under a user
@@ -82,7 +83,10 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    // Need to copy over this function from RouteListingService due to circular dependency error (bookingService uses routeListingService uses bookingService)
+    // Needed to copy over this function from RouteListingService due to circular dependency error
+    // (bookingService uses routeListingService uses bookingService)
+    // Also makes sense for this to be here since we are grabbing a lot of data from the bookings as well to calculate
+    // those currently booking.
     public int calculateRemainingSeatsForRouteListing(RouteListingPk routeListingPk) {
         List<SeatListing> availableSeats = seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(routeListingPk);
         List<Booking> activeBookingsForRouteListing = getActiveUnfinishedBookingsForRouteListing(routeListingPk);
@@ -96,7 +100,7 @@ public class BookingService {
     }
 
     @Transactional
-    public Booking createBooking(BookingSimpleJson bookingSimpleJson) {
+    public BookingSimpleJson createBooking(BookingSimpleJson bookingSimpleJson) {
         Optional<WingitUser> retrievedUser = userRepo.findByUsername(bookingSimpleJson.getUsername());
         if (retrievedUser.isEmpty()) throw new UserNotFoundException(bookingSimpleJson.getUsername());
 
@@ -120,6 +124,12 @@ public class BookingService {
         }
 
 
+        // When creating, always force isPaid to false and chargedPrice as -1 to indicate that they are not yet set.
+        bookingSimpleJson.setChargedPrice(-1.0);
+        bookingSimpleJson.setPaid(false);
+
+        // also always override startDateTime with server side LocalDateTime.
+        bookingSimpleJson.setStartBookingDatetime(LocalDateTime.now());
         Booking newBooking = new Booking(
                 retrievedUser.get(),
                 retrievedOutboundRouteListing.get(),
@@ -130,14 +140,20 @@ public class BookingService {
                 false
         );
 
-        return repo.save(newBooking);
+        repo.save(newBooking);
+
+        return new BookingSimpleJson(newBooking);
     }
 
     // PUT to update for inbound
     @Transactional
-    public Booking updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
+    public BookingSimpleJson updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
         Optional<Booking> retrievedBooking = repo.findById(bookingId);
         if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        if (isBookingExpired(retrievedBooking.get())) {
+            forceDeleteBooking(retrievedBooking.get());
+            throw new BookingExpiredException();
+        }
 
         // For inbound, get Plane, Route, and departureDatetime to form RouteListingPk
         // Afterwards use RouteListingPk to find RouteListing
@@ -159,7 +175,9 @@ public class BookingService {
         }
 
         retrievedBooking.get().setInboundRouteListing(retrievedInboundRouteListing.get());
-        return repo.save(retrievedBooking.get());
+        repo.save(retrievedBooking.get());
+
+        return new BookingSimpleJson(retrievedBooking.get());
     }
 
 
@@ -223,41 +241,46 @@ public class BookingService {
         return isPastExpiry && !booking.isPaid();
     }
 
+    private void throwIfSeatBookingsIncomplete(Booking booking) throws BookingBadRequestException {
+        // retrieve outbound & inbound routeListings
+        // count number of seatListing's routeListingPks that matches outboundRoutelistingPk
+        // count number of seatListing's routeListingPks that matches inboundRoutelistingPk
+        // check if count == count == booking's partySize
+        RouteListingPk outboundRouteListingPk = booking.getOutboundRouteListing().getRouteListingPk();
+        int outboundSeatListingCount = 0;
+        for (SeatListing seatListing : booking.getSeatListing()) {
+            if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, outboundRouteListingPk)) {
+                outboundSeatListingCount++;
+            }
+        }
+        if (outboundSeatListingCount != booking.getPartySize()) {
+            throw new BookingBadRequestException("Incorrect number of seats booked for partySize.");
+        }
+        if (booking.hasInboundRouteListing()) {
+            RouteListingPk inboundRouteListingPk = booking.getInboundRouteListing().getRouteListingPk();
+            int inboundSeatListingCount = 0;
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, inboundRouteListingPk)) {
+                    inboundSeatListingCount++;
+                }
+            }
+            if (outboundSeatListingCount != inboundSeatListingCount) {
+                throw new BookingBadRequestException("Number of outbound seatListings does not match number of inbound seatListings.");
+            }
+        }
+    }
+
     @Transactional
     public double calculateAndSaveChargedPrice(int bookingId) {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
-            // TODO: Check if we should be expecting empty or 0 charged price? Cause we shouldn't be calculating if already have...?
-
-            // TODO: ALSO need to check if the total number of seats is correct! If pax is 5, with both inbound and outbound, should expect 10 seats total.
-            // retrieve outbound & inbound routeListings
-            // count number of seatListing's routeListingPks that matches outboundRoutelistingPk
-            // count number of seatListing's routeListingPks that matches inboundRoutelistingPk
-            // check if count == count == booking's partySize
-            RouteListingPk outboundRouteListingPk = booking.getOutboundRouteListing().getRouteListingPk();
-            int outboundSeatListingCount = 0;
-            for (SeatListing seatListing : booking.getSeatListing()) {
-                if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, outboundRouteListingPk)) {
-                    outboundSeatListingCount++;
-                }
+            if (isBookingExpired(booking)) {
+                forceDeleteBooking(booking);
+                throw new BookingExpiredException();
             }
-            if (outboundSeatListingCount != booking.getPartySize()) {
-                throw new BookingBadRequestException("Incorrect number of seats booked for partySize.");
-            }
-            if (booking.hasInboundRouteListing()) {
-                RouteListingPk inboundRouteListingPk = booking.getInboundRouteListing().getRouteListingPk();
-                int inboundSeatListingCount = 0;
-                for (SeatListing seatListing : booking.getSeatListing()) {
-                    if (seatListing.getSeatListingPk().checkSeatBelongsToRouteListing(seatListing, inboundRouteListingPk)) {
-                        inboundSeatListingCount++;
-                    }
-                }
-                if (outboundSeatListingCount != inboundSeatListingCount) {
-                    throw new BookingBadRequestException("Number of outbound seatListings does not match number of inbound seatListings.");
-                }
-            }
-
+            // TODO: Shoule we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
+            throwIfSeatBookingsIncomplete(booking);
 
             double outboundPriceTotal = 0.0;
             double inboundPriceTotal = 0.0;
@@ -285,10 +308,13 @@ public class BookingService {
     public void markBookingAsPaid(int bookingId) {
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
-            Booking booking = bookingOptional.get();
-            // TODO: Maybe some logic checks here....? With stripe. Not sure how it works yet.
+            // Since payment might take time here... let's skip the expiry check...?
 
-            // TODO: ALSO!!! Need to check here that booking is fully booked. i.e. all seatlistings are filled correctly.
+            // TODO: Logic checks here... if we have time to integrate with stripe.
+            //       Not sure how it works yet. When it comes to it then we figure out. But likely some logic here.
+            Booking booking = bookingOptional.get();
+            throwIfSeatBookingsIncomplete(booking);
+
             booking.setPaid(true);
             repo.save(booking);
         } else {

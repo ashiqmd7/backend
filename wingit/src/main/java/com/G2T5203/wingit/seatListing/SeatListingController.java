@@ -2,11 +2,8 @@ package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.booking.BookingBadRequestException;
 import com.G2T5203.wingit.booking.BookingService;
-import com.G2T5203.wingit.entities.SeatListing;
-import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class SeatListingController {
@@ -50,26 +46,13 @@ public class SeatListingController {
         this.bookingService = bookingService;
     }
 
-    @GetMapping(path = "/seatListings")
-    public List<SeatListingSimpleJson> getAllSeatListings() { return service.getAllSeatListings(); }
-
     @GetMapping(path = "/seatListings/matchingRouteListing/{planeId}/{routeId}/{departureDatetimeStr}")
-    public List<SeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
+    public List<PrivacySeatListingSimpleJson> getAllSeatListings(@PathVariable String planeId, @PathVariable Integer routeId, @PathVariable String departureDatetimeStr) {
         try {
             LocalDateTime departureDatetime = DateUtils.handledParseDateTime(departureDatetimeStr);
             return service.getAllSeatListingsInRouteListing(planeId, routeId, departureDatetime);
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
-        }
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/seatListings/new")
-    public SeatListingSimpleJson createSeatListing(@Valid @RequestBody SeatListingSimpleJson newSeatListingJson) {
-        try {
-            return new SeatListingSimpleJson(service.createSeatListing(newSeatListingJson));
-        } catch (Exception e) {
-            throw new SeatListingBadRequestException(e);
         }
     }
 

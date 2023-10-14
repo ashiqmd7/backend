@@ -1,8 +1,6 @@
 package com.G2T5203.wingit.seatListing;
 
-import com.G2T5203.wingit.entities.RouteListingPk;
-import com.G2T5203.wingit.entities.SeatListing;
-import com.G2T5203.wingit.entities.SeatListingPk;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.route;
 
-import com.G2T5203.wingit.entities.Route;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
