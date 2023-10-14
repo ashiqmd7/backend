@@ -318,7 +318,7 @@ public class DatabaseInitializer {
                         richUser,
                         routeListing,
                         null,
-                        LocalDateTime.now(),
+                        LocalDateTime.now().minusSeconds(1L),
                         partySize,
                         -1,
                         false));
