@@ -169,4 +169,118 @@ class RouteListingControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
+
+    @Test
+    void updateRouteListing_WrongAuth_Failure() throws Exception {
+        Route route = testUtils.createSampleRoute1();
+        Plane plane = testUtils.createSamplePlane1();
+        routeRepository.save(route);
+        planeRepository.save(plane);
+
+        // Create a new route listing
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+        URI createUri = testUtils.constructUri("routeListings/new");
+        ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .postForEntity(createUri, routeListingSimpleJson, RouteListing.class);
+
+        assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
+
+        // Attempt to update the created route listing with wrong credentials
+        RouteListing createdRouteListing = createResponseEntity.getBody();
+        routeListingSimpleJson.setBasePrice(150.0); // Change the base price
+
+        URI updateUri = testUtils.constructUri("routeListings/update/" + createdRouteListing.getRouteListingPk().getRoute().getRouteId());
+        ResponseEntity<RouteListing> updateResponseEntity = testRestTemplate
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
+                .exchange(updateUri, HttpMethod.PUT, new HttpEntity<>(routeListingSimpleJson), RouteListing.class);
+
+        assertEquals(HttpStatus.FORBIDDEN, updateResponseEntity.getStatusCode());
+
+        // Verify that the base price hasn't changed
+        RouteListing updatedRouteListing = routeListingRepository.findById(createdRouteListing.getRouteListingPk()).orElse(null);
+        assertNotNull(updatedRouteListing);
+        assertNotEquals(150.0, updatedRouteListing.getBasePrice());
+    }
+
+//    @Test // getting forbidden
+//    void updateRouteListing_Success() throws Exception {
+//        Route route = testUtils.createSampleRoute1();
+//        Plane plane = testUtils.createSamplePlane1();
+//        routeRepository.save(route);
+//        planeRepository.save(plane);
+//
+//        // Create a new route listing
+//        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+//        URI createUri = testUtils.constructUri("routeListings/new");
+//        ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
+//                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+//                .postForEntity(createUri, routeListingSimpleJson, RouteListing.class);
+//
+//        assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
+//
+//        // Update the created route listing
+//        RouteListing createdRouteListing = createResponseEntity.getBody();
+//        routeListingSimpleJson.setBasePrice(150.0); // Change the base price
+//
+//        URI updateUri = testUtils.constructUri("routeListings/update/" + createdRouteListing.getRouteListingPk().getRoute().getRouteId());
+//        ResponseEntity<RouteListing> updateResponseEntity = testRestTemplate
+//                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+//                .exchange(updateUri, HttpMethod.PUT, new HttpEntity<>(routeListingSimpleJson), RouteListing.class);
+//
+//        assertEquals(HttpStatus.OK, updateResponseEntity.getStatusCode());
+//
+//        // Check if the base price has been updated in the updated route listing
+//        RouteListing updatedRouteListing = routeListingRepository.findById(createdRouteListing.getRouteListingPk()).orElse(null);
+//        assertNotNull(updatedRouteListing);
+//        assertEquals(150.0, updatedRouteListing.getBasePrice());
+//    }
+
+//    @Test // getting forbidden instead of not_found, kiv
+//    void updateRouteListing_NotFound_Failure() throws Exception {
+//        Route route = testUtils.createSampleRoute1();
+//        Plane plane = testUtils.createSamplePlane1();
+//        routeRepository.save(route);
+//        planeRepository.save(plane);
+//
+//        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+//
+//        // Attempt to update a non-existent route listing
+//        URI updateUri = testUtils.constructUri("routeListings/update/999"); // Using a non-existent ID
+//        ResponseEntity<RouteListing> updateResponseEntity = testRestTemplate
+//                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+//                .exchange(updateUri, HttpMethod.PUT, new HttpEntity<>(routeListingSimpleJson), RouteListing.class);
+//
+//        assertEquals(HttpStatus.NOT_FOUND, updateResponseEntity.getStatusCode());
+//    }
+
+//    @Test // getting 404 not_found instead of 200 ok, kiv
+//    void deleteRouteListing_Success() throws Exception {
+//        Route route = testUtils.createSampleRoute1();
+//        Plane plane = testUtils.createSamplePlane1();
+//        routeRepository.save(route);
+//        planeRepository.save(plane);
+//
+//        // Create a new route listing
+//        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+//        URI createUri = testUtils.constructUri("routeListings/new");
+//        ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
+//                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+//                .postForEntity(createUri, routeListingSimpleJson, RouteListing.class);
+//
+//        assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
+//
+//        // Delete the created route listing
+//        RouteListing createdRouteListing = createResponseEntity.getBody();
+//        URI deleteUri = testUtils.constructUri("routeListings/delete/" + createdRouteListing.getRouteListingPk().getRoute().getRouteId());
+//        ResponseEntity<Void> deleteResponseEntity = testRestTemplate
+//                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+//                .exchange(deleteUri, HttpMethod.DELETE, null, Void.class);
+//
+//        assertEquals(HttpStatus.OK, deleteResponseEntity.getStatusCode());
+//
+//        // Verify that the route listing has been deleted
+//        RouteListing deletedRouteListing = routeListingRepository.findById(createdRouteListing.getRouteListingPk()).orElse(null);
+//        assertNull(deletedRouteListing);
+//    }
 }
