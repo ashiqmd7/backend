@@ -131,4 +131,42 @@ class RouteListingControllerTest {
 
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
     }
+
+    @Test
+    void createRouteListing_WrongAuth_Failure() throws Exception {
+        Route route = testUtils.createSampleRoute1();
+        Plane plane = testUtils.createSamplePlane1();
+        routeRepository.save(route);
+        planeRepository.save(plane);
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+        URI uri = testUtils.constructUri("routeListings/new");
+
+        ResponseEntity<RouteListing> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
+                .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void createRouteListing_MissingRouteId_Failure() throws Exception {
+        Plane plane = testUtils.createSamplePlane1();
+        planeRepository.save(plane);
+
+        RouteListingSimpleJson routeListingSimpleJson = new RouteListingSimpleJson(
+                999, // This is a non-existent routeId
+                plane.getPlaneId(),
+                LocalDateTime.now(),
+                Duration.ofHours(3),
+                100.0,
+                5
+        );
+
+        URI uri = testUtils.constructUri("routeListings/new");
+        ResponseEntity<RouteListing> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
 }
