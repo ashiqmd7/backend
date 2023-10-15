@@ -2,6 +2,8 @@ package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.user.WingitUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -9,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TestUtils {
     private final int port;
@@ -89,5 +92,33 @@ public class TestUtils {
                 "Taiwan",
                 "Singapore",
                 Duration.ofHours(7).plusMinutes(10));
+    }
+
+    // Create sample RouteListingPks
+    public RouteListingPk createSampleRouteListingPk1() {
+        Plane samplePlane1 = createSamplePlane1();
+        Route sampleRoute1 = createSampleRoute1();
+        LocalDateTime sampleLocalDatetime1 = LocalDateTime.parse("2023-12-01T00:00:00");
+        return new RouteListingPk(samplePlane1, sampleRoute1, sampleLocalDatetime1);
+    }
+
+    public RouteListingPk createSampleRouteListingPk2() {
+        Plane samplePlane2 = createSamplePlane2();
+        Route sampleRoute2 = createSampleRoute2();
+        LocalDateTime sampleLocalDatetime2 = LocalDateTime.parse("2023-12-02T00:00:00");
+        return new RouteListingPk(samplePlane2, sampleRoute2, sampleLocalDatetime2);
+    }
+
+    // Create sample RouteListings
+    public RouteListing createSampleRouteListing1() {
+        RouteListingPk sampleRouteListingPk1 = createSampleRouteListingPk1();
+        double sampleBasePrice1 = 100.0;
+        return new RouteListing(sampleRouteListingPk1, sampleBasePrice1);
+    }
+
+    public RouteListing createSampleRouteListing2() {
+        RouteListingPk sampleRouteListingPk2 = createSampleRouteListingPk2();
+        double sampleBasePrice2 = 200.0;
+        return new RouteListing(sampleRouteListingPk2, sampleBasePrice2);
     }
 }
