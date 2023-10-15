@@ -43,19 +43,13 @@ public class SeatServiceTest {
 
         Plane plane = new Plane("Plane123", 5, "Plane Model");
         when(planeRepository.findById("Plane123")).thenReturn(Optional.of(plane));
-
-        // Create a new Seat with valid seatClass
+        // create a new Seat with valid seatClass
         Seat createdSeat = new Seat();
         createdSeat.setSeatClass("Economy"); // Set the seatClass
         createdSeat.setPriceFactor(1.0);
-
-        // Mock the save operation to return the createdSeat
+        // mock the save operation to return the createdSeat
         when(seatRepository.save(any(Seat.class))).thenReturn(createdSeat);
-
-        // Act
         createdSeat = seatService.createSeat(seatSimpleJson);
-
-        // Assert
         assertNotNull(createdSeat);
         assertEquals("Economy", createdSeat.getSeatClass()); // Check the seatClass
         assertEquals(1.0, createdSeat.getPriceFactor()); // Check the priceFactor
