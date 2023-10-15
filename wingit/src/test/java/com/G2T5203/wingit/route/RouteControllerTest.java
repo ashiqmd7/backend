@@ -34,7 +34,8 @@ class RouteControllerTest {
     TestUtils testUtils;
     @Autowired
     UserRepository userRepository;
-    @Autowired RouteRepository routeRepository;
+    @Autowired
+    RouteRepository routeRepository;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +43,7 @@ class RouteControllerTest {
         userRepository.save(testUtils.createAdminUser());
         userRepository.save(testUtils.createSampleUser1());
     }
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();

@@ -30,9 +30,9 @@ class PlaneControllerTest {
     TestRestTemplate testRestTemplate;
     TestUtils testUtils;
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
     @Autowired
-    private PlaneRepository planeRepository;
+    PlaneRepository planeRepository;
 
     @BeforeEach
     void setUp() {

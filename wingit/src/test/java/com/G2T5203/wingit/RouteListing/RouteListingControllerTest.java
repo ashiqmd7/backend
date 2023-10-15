@@ -37,16 +37,16 @@ class RouteListingControllerTest {
     @Autowired
     private BCryptPasswordEncoder encoder;
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    TestRestTemplate testRestTemplate;
     TestUtils testUtils;
     @Autowired
-    private RouteListingRepository routeListingRepository;
+    RouteListingRepository routeListingRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
-    private RouteRepository routeRepository;
+    RouteRepository routeRepository;
     @Autowired
-    private PlaneRepository planeRepository;
+    PlaneRepository planeRepository;
 
     @BeforeEach
     void setUp() {
@@ -64,16 +64,15 @@ class RouteListingControllerTest {
 
     @Test
     void getAllRouteListings_Success() {
-        Route route1 = new Route("Singapore", "Taiwan", Duration.ofHours(5).plusMinutes(20));
-        Route route2 = new Route("Taiwan", "Singapore", Duration.ofHours(7).plusMinutes(10));
+        Route route1 = testUtils.createSampleRoute1();
+        Route route2 = testUtils.createSampleRoute2();
         routeRepository.saveAll(List.of(route1, route2));
 
         Plane plane1 = testUtils.createSamplePlane1();
         Plane plane2 = testUtils.createSamplePlane2();
         planeRepository.saveAll(List.of(plane1, plane2));
-
-        RouteListingSimpleJson routeListing1 = new RouteListingSimpleJson(route1.getRouteId(), plane1.getPlaneId(), LocalDateTime.now(), Duration.ofHours(3), 100.0);
-        RouteListingSimpleJson routeListing2 = new RouteListingSimpleJson(route2.getRouteId(), plane2.getPlaneId(), LocalDateTime.now(), Duration.ofHours(4), 120.0);
+        RouteListingSimpleJson routeListing1 = new RouteListingSimpleJson(route1.getRouteId(), plane1.getPlaneId(), LocalDateTime.now(), Duration.ofHours(3), 100.0, 5);
+        RouteListingSimpleJson routeListing2 = new RouteListingSimpleJson(route2.getRouteId(), plane2.getPlaneId(), LocalDateTime.now(), Duration.ofHours(4), 120.0, 5);
 
         routeListingRepository.saveAll(List.of(
                 new RouteListing(new RouteListingPk(plane1, route1, routeListing1.getDepartureDatetime()), routeListing1.getBasePrice()),
@@ -91,8 +90,18 @@ class RouteListingControllerTest {
     }
 
     @Test
+    void getAllRouteListings_WrongAuth_Failure() throws Exception {
+        URI uri = testUtils.constructUri("routeListings");
+        ResponseEntity<RouteListing[]> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
+                .getForEntity(uri, RouteListing[].class);
+
+        assertEquals(403, responseEntity.getStatusCode().value());
+    }
+
+    @Test
     void createRouteListing_Success() throws Exception {
-        Route route = new Route("Singapore", "Taiwan", Duration.ofHours(5).plusMinutes(20));
+        Route route = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
         routeRepository.save(route);
         planeRepository.save(plane);
@@ -111,23 +120,15 @@ class RouteListingControllerTest {
 
     @Test
     void createRouteListing_Unauthorized() throws Exception {
-        // Create a sample route and plane
         Route route = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
         routeRepository.save(route);
         planeRepository.save(plane);
-
-        // Create a sample RouteListingSimpleJson
         RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
-
-        // Create URI for creating a new route listing
         URI uri = testUtils.constructUri("routeListings/new");
+        ResponseEntity<RouteListing> responseEntity = testRestTemplate
+                .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
 
-        // Send a POST request without authentication
-        ResponseEntity<Void> responseEntity = testRestTemplate
-                .postForEntity(uri, routeListingSimpleJson, Void.class);
-
-        // Verify that the response status code is 401 (Unauthorized)
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
     }
 }
