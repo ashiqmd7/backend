@@ -1,6 +1,6 @@
 package com.G2T5203.wingit.plane;
 
-import com.G2T5203.wingit.entities.Plane;
+import com.G2T5203.wingit.plane.Plane;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
