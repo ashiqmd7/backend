@@ -49,10 +49,8 @@ public class SeatServiceTest {
         assertEquals(1.0, createdSeat.getPriceFactor()); // Check the priceFactor
     }
 
-
-
     @Test
-    void createSeat_PlaneNotFound() {
+    void createSeat_PlaneNotFound_Failure() {
         SeatSimpleJson seatSimpleJson = new SeatSimpleJson("NonExistentPlane", "A1", "Economy", 1.0);
         when(planeRepository.findById("NonExistentPlane")).thenReturn(Optional.empty());
 
@@ -66,7 +64,7 @@ public class SeatServiceTest {
     }
 
     @Test
-    void createSeat_SeatAlreadyExists() {
+    void createSeat_SeatAlreadyExists_Failure() {
         SeatSimpleJson seatSimpleJson = new SeatSimpleJson("Plane123", "A1", "Economy", 1.0);
         Plane plane = new Plane("Plane123", 5, "Plane Model");
         when(planeRepository.findById("Plane123")).thenReturn(Optional.of(plane));
@@ -82,5 +80,8 @@ public class SeatServiceTest {
         verify(planeRepository).findById("Plane123");
         verify(seatRepository).existsById(seatPk);
     }
+
+
+    // TODO: getAllSeats_multipleSeats_Success()
 }
 

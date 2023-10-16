@@ -32,7 +32,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void getById_PlaneExists() {
+    void getById_PlaneExists_Success() {
         String planeId = "Plane123";
         Plane plane = new Plane(planeId, 5, "Plane Model");
         when(planeRepository.findById(planeId)).thenReturn(Optional.of(plane));
@@ -42,7 +42,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void getById_PlaneNotFound() {
+    void getById_PlaneNotFound_Failure() {
         String planeId = "NonExistentPlane";
         when(planeRepository.findById(planeId)).thenReturn(Optional.empty());
         Plane result = planeService.getById(planeId);
@@ -60,7 +60,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void createPlane_PlaneIdExists() {
+    void createPlane_PlaneIdExists_Failure() {
         Plane existingPlane = new Plane("ExistingPlane", 3, "Existing Model");
         when(planeRepository.existsById(existingPlane.getPlaneId())).thenReturn(true);
         PlaneBadRequestException exception = assertThrows(PlaneBadRequestException.class, () -> {
@@ -70,7 +70,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void deletePlaneById_PlaneExists() {
+    void deletePlaneById_PlaneExists_Success() {
         String planeId = "Plane123";
         when(planeRepository.existsById(planeId)).thenReturn(true);
         assertDoesNotThrow(() -> planeService.deletePlaneById(planeId));
@@ -78,7 +78,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void deletePlaneById_PlaneNotFound() {
+    void deletePlaneById_PlaneNotFound_Failure() {
         String planeId = "NonExistentPlane";
         when(planeRepository.existsById(planeId)).thenReturn(false);
         PlaneNotFoundException exception = assertThrows(PlaneNotFoundException.class, () -> {
@@ -88,7 +88,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void updatePlane_PlaneExists() {
+    void updatePlane_PlaneExists_Success() {
         Plane updatedPlane = new Plane("UpdatedPlane", 4, "Updated Model");
         when(planeRepository.existsById(updatedPlane.getPlaneId())).thenReturn(true);
         when(planeRepository.save(updatedPlane)).thenReturn(updatedPlane);
@@ -98,7 +98,7 @@ public class PlaneServiceTest {
     }
 
     @Test
-    void updatePlane_PlaneNotFound() {
+    void updatePlane_PlaneNotFound_Failure() {
         Plane nonExistentPlane = new Plane("NonExistentPlane", 3, "NonExistent Model");
         when(planeRepository.existsById(nonExistentPlane.getPlaneId())).thenReturn(false);
 

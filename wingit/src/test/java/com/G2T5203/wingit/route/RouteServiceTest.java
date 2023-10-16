@@ -42,7 +42,7 @@ public class RouteServiceTest {
     }
 
     @Test
-    void createRoute_RouteIdExists() {
+    void createRoute_DuplicateRouteId_Failure() {
         Route newRoute = new Route();
         newRoute.setRouteId(1);
         when(routeRepository.existsById(1)).thenReturn(true);
@@ -60,7 +60,7 @@ public class RouteServiceTest {
     }
 
     @Test
-    void deleteRoute_RouteNotFound() {
+    void deleteRoute_RouteNotFound_Failure() {
         when(routeRepository.existsById(1)).thenReturn(false);
         RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.deleteRoute(1));
         verify(routeRepository).existsById(1);
@@ -80,7 +80,7 @@ public class RouteServiceTest {
     }
 
     @Test
-    void updateRoute_RouteNotFound() {
+    void updateRoute_RouteNotFound_Failure() {
         Route updatedRoute = new Route();
         updatedRoute.setRouteId(1);
         when(routeRepository.existsById(1)).thenReturn(false);
@@ -98,6 +98,10 @@ public class RouteServiceTest {
         verify(routeRepository).findAll();
         assertEquals(routes, result);
     }
+
+
+    // TODO: getRouteById_Success
+    // TODO: getRouteById_routeNotExist_Failure
 }
 
 
