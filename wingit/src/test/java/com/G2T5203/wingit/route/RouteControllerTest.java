@@ -1,7 +1,6 @@
 package com.G2T5203.wingit.route;
 
 import com.G2T5203.wingit.TestUtils;
-import com.G2T5203.wingit.entities.Route;
 import com.G2T5203.wingit.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

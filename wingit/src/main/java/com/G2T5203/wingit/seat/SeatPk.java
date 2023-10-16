@@ -1,8 +1,12 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.seat;
 
+import com.G2T5203.wingit.plane.Plane;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,6 +16,7 @@ public class SeatPk implements Serializable {
     @ManyToOne
     @JoinColumn(name = "planeId")
     private Plane plane;
+    @NotEmpty @Size(min=3, max=3)
     private String seatNumber;
 
     public SeatPk(Plane plane, String seatNumber) {

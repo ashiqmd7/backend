@@ -1,7 +1,5 @@
 package com.G2T5203.wingit.routeListing;
 
-import com.G2T5203.wingit.entities.RouteListing;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 

@@ -1,6 +1,5 @@
 package com.G2T5203.wingit.booking;
 
-import com.G2T5203.wingit.entities.Booking;
 import com.G2T5203.wingit.user.UserBadRequestException;
 import com.G2T5203.wingit.utils.DateUtils;
 import jakarta.validation.Valid;
@@ -60,7 +59,7 @@ public class BookingController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "bookings/new")
-    public Booking createBooking(@Valid @RequestBody BookingSimpleJson newBookingSimpleJson) {
+    public BookingSimpleJson createBooking(@Valid @RequestBody BookingSimpleJson newBookingSimpleJson) {
         try {
             return service.createBooking(newBookingSimpleJson);
         } catch (Exception e) {
@@ -69,7 +68,7 @@ public class BookingController {
     }
 
     @PutMapping("bookings/updateInbound/{bookingId}")
-    public Booking updateInboundBooking(@PathVariable int bookingId, @RequestBody Map<String, Object> inboundRouteListingPk) {
+    public BookingSimpleJson updateInboundBooking(@PathVariable int bookingId, @RequestBody Map<String, Object> inboundRouteListingPk) {
         try {
             String inboundPlaneId = (String) inboundRouteListingPk.get("inboundPlaneId");
             int inboundRouteId = (Integer) inboundRouteListingPk.get("inboundRouteId");

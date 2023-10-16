@@ -1,8 +1,6 @@
 package com.G2T5203.wingit.seat;
 
-import com.G2T5203.wingit.entities.Plane;
-import com.G2T5203.wingit.entities.Seat;
-import com.G2T5203.wingit.entities.SeatPk;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import jakarta.transaction.Transactional;

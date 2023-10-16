@@ -1,5 +1,8 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.seatListing;
 
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
+import com.G2T5203.wingit.seat.Seat;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

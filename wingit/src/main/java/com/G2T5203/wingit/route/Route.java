@@ -1,4 +1,4 @@
-package com.G2T5203.wingit.entities;
+package com.G2T5203.wingit.route;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,7 +14,7 @@ public class Route {
     private String departureDest;
     @NotEmpty
     private String arrivalDest;
-    @DurationMin(hours = 1)
+    @DurationMin(hours = 1, message = "The minimum flight duration is 1h")
     private Duration flightDuration;
 
     public Route(Integer routeId, String departureDest, String arrivalDest, Duration flightDuration) {
