@@ -32,7 +32,7 @@ public class Booking {
             @JoinColumn(name = "inboundDepartureDatetime", referencedColumnName = "departureDatetime")
     })
     private RouteListing inboundRouteListing;
-    @Past
+    // @Past // Removing this as it has been giving a lot of errors!
     private LocalDateTime startBookingDatetime;
     @Min(value = 1, message = "Party size cannot be lower than 1")
     @Max(value = 10, message = "Party size cannot be more than 10")
