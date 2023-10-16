@@ -38,15 +38,11 @@ public class RouteListingServiceTest {
     @Mock
     private SeatListingRepository seatListingRepo;
     @Mock
-    private BookingRepository bookingRepo;
-    @Mock
     private RouteRepository routeRepo;
     @Mock
     private PlaneRepository planeRepo;
     @InjectMocks
     private RouteListingService routeListingService;
-    @InjectMocks
-    private SeatListingService seatListingService;
     @Mock
     private BookingService bookingService;
 
