@@ -1,9 +1,14 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
+import com.G2T5203.wingit.seat.Seat;
+import com.G2T5203.wingit.seat.SeatPk;
+import com.G2T5203.wingit.seatListing.SeatListing;
+import com.G2T5203.wingit.seatListing.SeatListingPk;
 import com.G2T5203.wingit.user.WingitUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -121,4 +126,90 @@ public class TestUtils {
         double sampleBasePrice2 = 200.0;
         return new RouteListing(sampleRouteListingPk2, sampleBasePrice2);
     }
+
+    // Create sample SeatPk
+    public SeatPk createSampleSeatPk1() {
+        Plane samplePlane1 = createSamplePlane1();
+        String sampleSeatNumber1 = "A1";
+        return new SeatPk(samplePlane1, sampleSeatNumber1);
+    }
+
+    public SeatPk createSampleSeatPk2() {
+        Plane samplePlane2 = createSamplePlane2();
+        String sampleSeatNumber1 = "A1";
+        return new SeatPk(samplePlane2, sampleSeatNumber1);
+    }
+
+    // Create sample Seat
+    public Seat createSampleSeat1() {
+        SeatPk sampleSeatPk1 = createSampleSeatPk1();
+        String sampleSeatClass = "Economy";
+        double samplePriceFactor = 1.0;
+        return new Seat(sampleSeatPk1, sampleSeatClass, samplePriceFactor);
+    }
+
+    public Seat createSampleSeat2() {
+        SeatPk sampleSeatPk2 = createSampleSeatPk2();
+        String sampleSeatClass = "Economy";
+        double samplePriceFactor = 1.0;
+        return new Seat(sampleSeatPk2, sampleSeatClass, samplePriceFactor);
+    }
+
+    // Create sample Booking
+    public Booking createSampleBooking1() {
+        int sampleBookingId1 = 1;
+        WingitUser sampleUser1 = createSampleUser1();
+        RouteListing sampleOutboundRouteListing = createSampleRouteListing1();
+        RouteListing sampleInboundRouteListing = null;
+        LocalDateTime sampleStartBookingDatetime = LocalDateTime.now();
+        int samplePartySize = 1;
+        double sampleChargedPrice = 100;
+        boolean isPaid = false;
+        return new Booking(sampleBookingId1, sampleUser1, sampleOutboundRouteListing,
+                sampleInboundRouteListing, sampleStartBookingDatetime, samplePartySize,
+                sampleChargedPrice, isPaid);
+    }
+
+    public Booking createSampleBooking2() {
+        int sampleBookingId2 = 2;
+        WingitUser sampleUser1 = createSampleUser1();
+        RouteListing sampleOutboundRouteListing = createSampleRouteListing1();
+        RouteListing sampleInboundRouteListing = createSampleRouteListing2();
+        LocalDateTime sampleStartBookingDatetime = LocalDateTime.now();
+        int samplePartySize = 1;
+        double sampleChargedPrice = 100;
+        boolean isPaid = false;
+        return new Booking(sampleBookingId2, sampleUser1, sampleOutboundRouteListing,
+                sampleInboundRouteListing, sampleStartBookingDatetime, samplePartySize,
+                sampleChargedPrice, isPaid);
+    }
+
+    // Create sample SeatListingPk
+    public SeatListingPk createSampleSeatListingPk1(){
+        RouteListing sampleRouteListing = createSampleRouteListing1();
+        Seat sampleSeat = createSampleSeat1();
+        return new SeatListingPk(sampleRouteListing, sampleSeat);
+    }
+
+    public SeatListingPk createSampleSeatListingPk2(){
+        RouteListing sampleRouteListing = createSampleRouteListing2();
+        Seat sampleSeat = createSampleSeat1();
+        return new SeatListingPk(sampleRouteListing, sampleSeat);
+    }
+
+    // Create sample SeatListing
+    public SeatListing createSampleSeatListing1() {
+        SeatListingPk sampleSeatListingPk1 = createSampleSeatListingPk1();
+        Booking sampleBooking1 = createSampleBooking1();
+        String sampleOccupantName = "Amy";
+        return new SeatListing(sampleSeatListingPk1, sampleBooking1, sampleOccupantName);
+    }
+
+    public SeatListing createSampleSeatListing2() {
+        SeatListingPk sampleSeatListingPk2 = createSampleSeatListingPk2();
+        Booking sampleBooking2 = createSampleBooking2();
+        String sampleOccupantName = "Amy";
+        return new SeatListing(sampleSeatListingPk2, sampleBooking2, sampleOccupantName);
+    }
+
 }
