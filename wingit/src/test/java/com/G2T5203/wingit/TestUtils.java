@@ -80,14 +80,14 @@ public class TestUtils {
 
     public Route createSampleRoute1() {
         return new Route(
-//                1, // NOTE: It can be overridden as this is generated value.
+                -1, // NOTE: It can be overridden as this is generated value.
                 "Singapore",
                 "Taiwan",
                 Duration.ofHours(5).plusMinutes(20));
     }
     public Route createSampleRoute2() {
         return new Route(
-//                2, // NOTE: It can be overridden as this is generated value.
+                -1, // NOTE: It can be overridden as this is generated value.
                 "Taiwan",
                 "Singapore",
                 Duration.ofHours(7).plusMinutes(10));
