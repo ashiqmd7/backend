@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,7 +83,13 @@ public class SeatServiceTest {
         verify(seatRepository).existsById(seatPk);
     }
 
+    @Test
+    void getAllSeats_multipleSeats_Success() {
+        List<Seat> expectedSeats = new ArrayList<>();
+        when(seatRepository.findAll()).thenReturn(expectedSeats);
+        List<SeatSimpleJson> result = seatService.getAllSeats();
+        verify(seatRepository).findAll();
+        assertEquals(expectedSeats, result);
+    }
 
-    // TODO: getAllSeats_multipleSeats_Success()
 }
-
