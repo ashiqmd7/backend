@@ -1,15 +1,11 @@
-package com.G2T5203.wingit.RouteListing;
+package com.G2T5203.wingit.routeListing;
 
 import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
-import com.G2T5203.wingit.routeListing.RouteListing;
-import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
-import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.routeListing.RouteListingSimpleJson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
