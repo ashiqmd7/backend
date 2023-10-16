@@ -99,10 +99,25 @@ public class RouteServiceTest {
         assertEquals(routes, result);
     }
 
+    @Test
+    void getRouteById_Success() {
+        RouteService routeService = new RouteService(routeRepository);
+        int routeId = 1;
+        Route expectedRoute = new Route();
+        expectedRoute.setRouteId(routeId);
+        when(routeRepository.findById(routeId)).thenReturn(Optional.of(expectedRoute));
+        Route result = routeService.getRoute(routeId);
+        verify(routeRepository).findById(routeId);
+        assertEquals(expectedRoute, result);
+    }
 
-    // TODO: getRouteById_Success
-    // TODO: getRouteById_routeNotExist_Failure
+    @Test
+    void getRouteById_RouteNotExist_Failure() {
+        RouteService routeService = new RouteService(routeRepository);
+        int routeId = 1;
+        when(routeRepository.findById(routeId)).thenReturn(Optional.empty());
+        RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.getRoute(routeId));
+        verify(routeRepository).findById(routeId);
+        assertEquals("Could not find route 1", exception.getMessage());
+    }
 }
-
-
-
