@@ -1,10 +1,10 @@
 package com.G2T5203.wingit.RouteListing;
 
 import com.G2T5203.wingit.TestUtils;
-import com.G2T5203.wingit.entities.Route;
-import com.G2T5203.wingit.entities.Plane;
-import com.G2T5203.wingit.entities.RouteListing;
-import com.G2T5203.wingit.entities.RouteListingPk;
+import com.G2T5203.wingit.plane.Plane;
+import com.G2T5203.wingit.route.Route;
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;

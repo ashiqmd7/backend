@@ -54,7 +54,7 @@ public class RouteListingServiceTest {
     @InjectMocks
     private SeatListingService seatListingService;
 
-    @InjectMocks
+    @Mock
     private BookingService bookingService;
 
     @LocalServerPort
@@ -98,28 +98,36 @@ public class RouteListingServiceTest {
         verify(routeListingRepo).findByRouteListingPkRouteDepartureDestAndRouteListingPkRouteArrivalDest(any(String.class), any(String.class));
     }
 
-//    @Test
-//    void calculateRemainingSeatsForRouteListing_WithActiveBookings_ReturnRemainingSeats() {
-//        // Create sample data for testing
-//        RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
-//        Booking sampleBooking1 = testUtils.createSampleBooking1();
+    @Test
+    void calculateRemainingSeatsForRouteListing_WithActiveBookings_ReturnRemainingSeats() {
+        // arrange
+        RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
+        Booking sampleBooking1 = testUtils.createSampleBooking1();
 //        Booking sampleBooking2 = testUtils.createSampleBooking2();
-//
-//        List<SeatListing> seatListings = new ArrayList<>();
-//        seatListings.add(testUtils.createSampleSeatListing1());
-//
-//        // Mock the behavior of dependencies
-//        when(seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(sampleRouteListingPk)).thenReturn(seatListings);
-//        when(bookingService.getActiveUnfinishedBookingsForRouteListing(sampleRouteListingPk)).thenReturn(List.of(sampleBooking1, sampleBooking2));
-//
-//        // Call the service method to calculate remaining seats
-//        int remainingSeats = routeListingService.calculateRemainingSeatsForRouteListing(sampleRouteListingPk);
-//
-//        verify(seatListingRepo).findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(sampleRouteListingPk);
-//        verify(bookingRepo).findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(sampleRouteListingPk);
-//        // Assertions
-//        //assertEquals(remainingSeats, 10 - sampleBooking1.getPartySize() - sampleBooking2.getPartySize() + sampleBooking1.getSeatListing().size() + sampleBooking2.getSeatListing().size());
-//    }
+
+        List<SeatListing> seatListings = new ArrayList<>();
+        seatListings.add(testUtils.createSampleSeatListing1());
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(sampleBooking1);
+//        bookings.add(sampleBooking2);
+        sampleBooking1.setSeatListing(seatListings);
+
+        // mock
+        when(seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(any(RouteListingPk.class))).thenReturn(seatListings);
+        when(bookingService.getActiveUnfinishedBookingsForRouteListing(any(RouteListingPk.class))).thenReturn(bookings);
+
+        // act
+        int remainingSeats = routeListingService.calculateRemainingSeatsForRouteListing(sampleRouteListingPk);
+
+        // assert
+        //assertEquals(remainingSeats, 10 - sampleBooking1.getPartySize() - sampleBooking2.getPartySize() + sampleBooking1.getSeatListing().size() + sampleBooking2.getSeatListing().size());
+        assertNotNull(remainingSeats);
+
+        // verify
+        verify(seatListingRepo).findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(sampleRouteListingPk);
+        verify(bookingService).getActiveUnfinishedBookingsForRouteListing(sampleRouteListingPk);
+    }
 
     @Test
     void createRouteListing_New_Success() {
