@@ -22,6 +22,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.Duration;
@@ -177,7 +178,6 @@ class RouteListingControllerTest {
         Route savedRoute = routeRepository.save(sampleRoute);
         planeRepository.save(plane);
 
-        // Create a new route listing
         RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
         URI createUri = testUtils.constructUri("routeListings/new");
         ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
@@ -186,7 +186,7 @@ class RouteListingControllerTest {
 
         assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
 
-        // Attempt to update the created route listing with wrong credentials
+        // attempt to update the created route listing with wrong credentials
         RouteListing createdRouteListing = createResponseEntity.getBody();
         routeListingSimpleJson.setBasePrice(150.0); // Change the base price
 
@@ -196,11 +196,52 @@ class RouteListingControllerTest {
                 .exchange(updateUri, HttpMethod.PUT, new HttpEntity<>(routeListingSimpleJson), RouteListing.class);
 
         assertEquals(HttpStatus.FORBIDDEN, updateResponseEntity.getStatusCode());
-
-        // Verify that the base price hasn't changed
+        // verify that the base price hasn't changed
         RouteListing updatedRouteListing = routeListingRepository.findById(createdRouteListing.getRouteListingPk()).orElse(null);
         assertNotNull(updatedRouteListing);
         assertNotEquals(150.0, updatedRouteListing.getBasePrice());
+    }
+
+    @Test
+    void searchRouteListingsByPlaneId_Success() throws Exception {
+        Route sampleRoute = testUtils.createSampleRoute1();
+        Plane plane = testUtils.createSamplePlane1();
+        Route savedRoute = routeRepository.save(sampleRoute);
+        planeRepository.save(plane);
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
+        URI createUri = testUtils.constructUri("routeListings/new");
+        ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .postForEntity(createUri, routeListingSimpleJson, RouteListing.class);
+
+        assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
+
+        // search for route listings by plane ID
+        String planeId = plane.getPlaneId();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/routeListings/search")
+                .queryParam("planeId", planeId);
+
+        ResponseEntity<RouteListing[]> searchResponseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .getForEntity(builder.toUriString(), RouteListing[].class);
+
+        assertEquals(HttpStatus.OK, searchResponseEntity.getStatusCode());
+        RouteListing[] routeListings = searchResponseEntity.getBody();
+        assertNotNull(routeListings);
+        assertEquals(1, routeListings.length);
+    }
+
+    @Test
+    void searchRouteListingsByPlaneId_PlaneNotFound_Failure() {
+        String nonExistentPlaneId = "NonExistentPlane123";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/routeListings/search")
+                .queryParam("planeId", nonExistentPlaneId);
+
+        ResponseEntity<RouteListing[]> searchResponseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .getForEntity(builder.toUriString(), RouteListing[].class);
+
+        assertEquals(HttpStatus.NOT_FOUND, searchResponseEntity.getStatusCode());
     }
 
 //    @Test // getting forbidden
