@@ -1,5 +1,9 @@
 package com.G2T5203.wingit.route;
 
+<<<<<<< HEAD
+=======
+import com.G2T5203.wingit.route.Route;
+>>>>>>> abff0c6463a63aeb6745b00a6f86d7b2dd90e005
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
