@@ -64,19 +64,19 @@ class RouteListingControllerTest {
 
     @Test
     void getAllRouteListings_Success() {
-        Route route1 = testUtils.createSampleRoute1();
-        Route route2 = testUtils.createSampleRoute2();
-        routeRepository.saveAll(List.of(route1, route2));
+        Route sampleRoute1 = testUtils.createSampleRoute1();
+        Route sampleRoute2 = testUtils.createSampleRoute2();
+        List<Route> savedRoutes = routeRepository.saveAll(List.of(sampleRoute1, sampleRoute2));
 
         Plane plane1 = testUtils.createSamplePlane1();
         Plane plane2 = testUtils.createSamplePlane2();
         planeRepository.saveAll(List.of(plane1, plane2));
-        RouteListingSimpleJson routeListing1 = new RouteListingSimpleJson(route1.getRouteId(), plane1.getPlaneId(), LocalDateTime.now(), Duration.ofHours(3), 100.0, 5);
-        RouteListingSimpleJson routeListing2 = new RouteListingSimpleJson(route2.getRouteId(), plane2.getPlaneId(), LocalDateTime.now(), Duration.ofHours(4), 120.0, 5);
+        RouteListingSimpleJson routeListing1 = new RouteListingSimpleJson(savedRoutes.get(0).getRouteId(), plane1.getPlaneId(), LocalDateTime.now(), Duration.ofHours(3), 100.0, 5);
+        RouteListingSimpleJson routeListing2 = new RouteListingSimpleJson(savedRoutes.get(1).getRouteId(), plane2.getPlaneId(), LocalDateTime.now(), Duration.ofHours(4), 120.0, 5);
 
         routeListingRepository.saveAll(List.of(
-                new RouteListing(new RouteListingPk(plane1, route1, routeListing1.getDepartureDatetime()), routeListing1.getBasePrice()),
-                new RouteListing(new RouteListingPk(plane2, route2, routeListing2.getDepartureDatetime()), routeListing2.getBasePrice())
+                new RouteListing(new RouteListingPk(plane1, savedRoutes.get(0), routeListing1.getDepartureDatetime()), routeListing1.getBasePrice()),
+                new RouteListing(new RouteListingPk(plane2, savedRoutes.get(1), routeListing2.getDepartureDatetime()), routeListing2.getBasePrice())
         ));
 
         ResponseEntity<RouteListing[]> responseEntity = testRestTemplate
@@ -101,12 +101,12 @@ class RouteListingControllerTest {
 
     @Test
     void createRouteListing_Success() throws Exception {
-        Route route = testUtils.createSampleRoute1();
+        Route sampleRoute1 = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
-        routeRepository.save(route);
+        Route savedRoute = routeRepository.save(sampleRoute1);
         planeRepository.save(plane);
 
-        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
 
         URI uri = testUtils.constructUri("routeListings/new");
         ResponseEntity<RouteListing> responseEntity = testRestTemplate
@@ -172,13 +172,13 @@ class RouteListingControllerTest {
 
     @Test
     void updateRouteListing_WrongAuth_Failure() throws Exception {
-        Route route = testUtils.createSampleRoute1();
+        Route sampleRoute = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
-        routeRepository.save(route);
+        Route savedRoute = routeRepository.save(sampleRoute);
         planeRepository.save(plane);
 
         // Create a new route listing
-        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(route, plane);
+        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
         URI createUri = testUtils.constructUri("routeListings/new");
         ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
