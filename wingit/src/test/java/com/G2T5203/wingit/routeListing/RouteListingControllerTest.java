@@ -6,6 +6,8 @@ import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.utils.DateUtils;
+import org.assertj.core.util.DateUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -199,24 +201,33 @@ class RouteListingControllerTest {
     }
 
     @Test
-    void searchRouteListingsByPlaneId_Success() throws Exception {
+    void searchRouteListingsByFullSearch_Success() throws Exception {
+        int year = 2023;
+        int month = 12;
+        int day = 17;
         Route sampleRoute = testUtils.createSampleRoute1();
-        Plane plane = testUtils.createSamplePlane1();
+        Plane samplePlane = testUtils.createSamplePlane1();
         Route savedRoute = routeRepository.save(sampleRoute);
-        planeRepository.save(plane);
-        RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
-        URI createUri = testUtils.constructUri("routeListings/new");
-        ResponseEntity<RouteListing> createResponseEntity = testRestTemplate
-                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
-                .postForEntity(createUri, routeListingSimpleJson, RouteListing.class);
+        Plane savedPlane = planeRepository.save(samplePlane);
+        RouteListing newRouteListing = new RouteListing(
+                new RouteListingPk(
+                        savedPlane,
+                        savedRoute,
+                        DateUtils.parseDateTime(String.format("%d-%d-%d 10:30:00", year, month, day))
+                        ),
+                100
+        );
+        routeListingRepository.save(newRouteListing);
 
-        assertEquals(HttpStatus.CREATED, createResponseEntity.getStatusCode());
 
-        // search for route listings by plane ID
-        String planeId = plane.getPlaneId();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/routeListings/search")
-                .queryParam("planeId", planeId);
-
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/routeListings/fullSearch/{departureDest}/{arrivalDest}/{year}/{month}/{day}");
+        builder.uriVariables(Map.of(
+                "departureDest", savedRoute.getDepartureDest(),
+                "arrivalDest", savedRoute.getArrivalDest(),
+                "year", year,
+                "month", month,
+                "day", day
+        ));
         ResponseEntity<RouteListing[]> searchResponseEntity = testRestTemplate
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .getForEntity(builder.toUriString(), RouteListing[].class);
@@ -227,18 +238,8 @@ class RouteListingControllerTest {
         assertEquals(1, routeListings.length);
     }
 
-    @Test
-    void searchRouteListingsByPlaneId_PlaneNotFound_Failure() {
-        String nonExistentPlaneId = "NonExistentPlane123";
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/routeListings/search")
-                .queryParam("planeId", nonExistentPlaneId);
 
-        ResponseEntity<RouteListing[]> searchResponseEntity = testRestTemplate
-                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
-                .getForEntity(builder.toUriString(), RouteListing[].class);
 
-        assertEquals(HttpStatus.NOT_FOUND, searchResponseEntity.getStatusCode());
-    }
 
 //    @Test // getting forbidden
 //    void updateRouteListing_Success() throws Exception {

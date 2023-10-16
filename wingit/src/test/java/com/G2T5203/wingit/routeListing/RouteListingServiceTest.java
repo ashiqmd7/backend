@@ -35,25 +35,18 @@ import static org.mockito.Mockito.when;
 public class RouteListingServiceTest {
     @Mock
     private RouteListingRepository routeListingRepo;
-
     @Mock
     private SeatListingRepository seatListingRepo;
-
     @Mock
     private BookingRepository bookingRepo;
-
     @Mock
     private RouteRepository routeRepo;
-
     @Mock
     private PlaneRepository planeRepo;
-
     @InjectMocks
     private RouteListingService routeListingService;
-
     @InjectMocks
     private SeatListingService seatListingService;
-
     @Mock
     private BookingService bookingService;
 
