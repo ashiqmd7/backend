@@ -34,6 +34,15 @@ public class SeatServiceTest {
     private PlaneRepository planeRepository;
 
     @Test
+    void getAllSeats_multipleSeats_Success() {
+        List<Seat> expectedSeats = new ArrayList<>();
+        when(seatRepository.findAll()).thenReturn(expectedSeats);
+        List<SeatSimpleJson> result = seatService.getAllSeats();
+        verify(seatRepository).findAll();
+        assertEquals(expectedSeats, result);
+    }
+
+    @Test
     void createSeat_Success() {
         SeatSimpleJson seatSimpleJson = new SeatSimpleJson("Plane123", "A1", "Economy", 1.0);
 
@@ -82,14 +91,4 @@ public class SeatServiceTest {
         verify(planeRepository).findById("Plane123");
         verify(seatRepository).existsById(seatPk);
     }
-
-    @Test
-    void getAllSeats_multipleSeats_Success() {
-        List<Seat> expectedSeats = new ArrayList<>();
-        when(seatRepository.findAll()).thenReturn(expectedSeats);
-        List<SeatSimpleJson> result = seatService.getAllSeats();
-        verify(seatRepository).findAll();
-        assertEquals(expectedSeats, result);
-    }
-
 }

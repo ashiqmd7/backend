@@ -30,6 +30,37 @@ public class RouteServiceTest {
     }
 
     @Test
+    void getAllRoutes_Success() {
+        List<Route> routes = Collections.singletonList(new Route());
+        when(routeRepository.findAll()).thenReturn(routes);
+        List<Route> result = routeService.getAllRoutes();
+        verify(routeRepository).findAll();
+        assertEquals(routes, result);
+    }
+
+    @Test
+    void getRouteById_Success() {
+        RouteService routeService = new RouteService(routeRepository);
+        int routeId = 1;
+        Route expectedRoute = new Route();
+        expectedRoute.setRouteId(routeId);
+        when(routeRepository.findById(routeId)).thenReturn(Optional.of(expectedRoute));
+        Route result = routeService.getRoute(routeId);
+        verify(routeRepository).findById(routeId);
+        assertEquals(expectedRoute, result);
+    }
+
+    @Test
+    void getRouteById_RouteNotExist_Failure() {
+        RouteService routeService = new RouteService(routeRepository);
+        int routeId = 1;
+        when(routeRepository.findById(routeId)).thenReturn(Optional.empty());
+        RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.getRoute(routeId));
+        verify(routeRepository).findById(routeId);
+        assertEquals("Could not find route 1", exception.getMessage());
+    }
+
+    @Test
     void createRoute_Success() {
         Route newRoute = new Route();
         newRoute.setRouteId(1);
@@ -86,38 +117,6 @@ public class RouteServiceTest {
         when(routeRepository.existsById(1)).thenReturn(false);
         RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.updateRoute(updatedRoute));
         verify(routeRepository).existsById(1);
-        assertEquals("Could not find route 1", exception.getMessage());
-    }
-
-
-    @Test
-    void getAllRoutes_Success() {
-        List<Route> routes = Collections.singletonList(new Route());
-        when(routeRepository.findAll()).thenReturn(routes);
-        List<Route> result = routeService.getAllRoutes();
-        verify(routeRepository).findAll();
-        assertEquals(routes, result);
-    }
-
-    @Test
-    void getRouteById_Success() {
-        RouteService routeService = new RouteService(routeRepository);
-        int routeId = 1;
-        Route expectedRoute = new Route();
-        expectedRoute.setRouteId(routeId);
-        when(routeRepository.findById(routeId)).thenReturn(Optional.of(expectedRoute));
-        Route result = routeService.getRoute(routeId);
-        verify(routeRepository).findById(routeId);
-        assertEquals(expectedRoute, result);
-    }
-
-    @Test
-    void getRouteById_RouteNotExist_Failure() {
-        RouteService routeService = new RouteService(routeRepository);
-        int routeId = 1;
-        when(routeRepository.findById(routeId)).thenReturn(Optional.empty());
-        RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.getRoute(routeId));
-        verify(routeRepository).findById(routeId);
         assertEquals("Could not find route 1", exception.getMessage());
     }
 }
