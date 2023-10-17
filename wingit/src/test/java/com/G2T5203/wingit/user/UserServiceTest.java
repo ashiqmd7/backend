@@ -166,5 +166,24 @@ public class UserServiceTest {
     }
 
 
+    @Test
+    void deleteUserById_UserExists_Success() {
+        String mockUsername = "MOCK_USERNAME";
+        when(userRepository.existsById(mockUsername)).thenReturn(true);
+        assertDoesNotThrow(() -> userService.deleteUserById(mockUsername));
+        verify(userRepository).existsById(mockUsername);
+        verify(userRepository).deleteById(mockUsername);
+    }
+
+    @Test
+    void deleteUserById_UserNotFound_Failure() {
+        String mockNonExistentUsername = "MOCK_NON_EXISTENT_USERNAME";
+        when(userRepository.existsById(mockNonExistentUsername)).thenReturn(false);
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+            userService.deleteUserById(mockNonExistentUsername);
+        });
+        assertEquals("Could not find user " + mockNonExistentUsername, exception.getMessage());
+    }
+
 }
 
