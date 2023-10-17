@@ -117,7 +117,53 @@ public class UserServiceTest {
         assertEquals("BAD REQUEST: Email already used for existing account.", exception.getMessage());
     }
 
-    // TODO: Create Admin Success & Fail case
+    @Test
+    void createAdminUser_Success() {
+        WingitUser newUser = testUtils.createAdminUser(false);
+        newUser.setAuthorityRole("ROLE_USER"); // We test that the authority is forced to ROLE_USER.
+
+        when(userRepository.existsById(any(String.class))).thenReturn(false);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(false);
+        when(userRepository.save(any(WingitUser.class))).thenAnswer((i) -> i.getArguments()[0] );
+        final String mockedHashedPassword = "MOCKED_HASED_PASSWORD";
+        when(encoder.encode(newUser.getPassword())).thenReturn(mockedHashedPassword);
+
+        WingitUser result = userService.createAdmin(newUser);
+        assertNotNull(result);
+        assertEquals("ROLE_ADMIN", result.getAuthorityRole());
+        assertEquals(mockedHashedPassword, result.getPassword());
+        verify(userRepository).existsById(any(String.class));
+        verify(userRepository).existsByEmail(any(String.class));
+        verify(userRepository).save(any(WingitUser.class));
+    }
+
+    @Test
+    void createAdminUser_UserIdExists_Failure() {
+        when(userRepository.existsById(any(String.class))).thenReturn(true);
+        WingitUser newUser = testUtils.createAdminUser(false);
+
+        UserBadRequestException exception = assertThrows(UserBadRequestException.class, () -> {
+            userService.createAdmin(newUser);
+        });
+
+        verify(userRepository).existsById(any(String.class));
+        assertEquals("BAD REQUEST: Username already exists", exception.getMessage());
+    }
+
+    @Test
+    void createAdminUser_EmailExists_Failure() {
+        when(userRepository.existsById(any(String.class))).thenReturn(false);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(true);
+        WingitUser newUser = testUtils.createAdminUser(false);
+
+        UserBadRequestException exception = assertThrows(UserBadRequestException.class, () -> {
+            userService.createAdmin(newUser);
+        });
+
+        verify(userRepository).existsById(any(String.class));
+        verify(userRepository).existsByEmail(any(String.class));
+        assertEquals("BAD REQUEST: Email already used for existing account.", exception.getMessage());
+    }
 
 
 }

@@ -41,10 +41,10 @@ public class TestUtils {
     }
     // Helper functions
     public WingitUser createSampleUser1() { return createSampleUser1(true); }
-    public WingitUser createSampleUser1(boolean encodedPassword) {
+    public WingitUser createSampleUser1(boolean encodePassword) {
         return new WingitUser(
                 SAMPLE_USERNAME_1,
-                encodedPassword ? encoder.encode(SAMPLE_PASSWORD_1) : SAMPLE_PASSWORD_1,
+                encodePassword ? encoder.encode(SAMPLE_PASSWORD_1) : SAMPLE_PASSWORD_1,
                 "ROLE_USER",
                 "Brandon",
                 "Choy",
@@ -53,10 +53,11 @@ public class TestUtils {
                 "+65 8746 3847",
                 "Mr");
     }
-    public WingitUser createSampleUser2() {
+    public WingitUser createSampleUser2() { return createSampleUser2(true); }
+    public WingitUser createSampleUser2(boolean encodePassword) {
         return new WingitUser(
                 SAMPLE_USERNAME_2,
-                encoder.encode(SAMPLE_PASSWORD_2),
+                encodePassword ? encoder.encode(SAMPLE_PASSWORD_2) : SAMPLE_PASSWORD_2,
                 "ROLE_USER",
                 "Jared",
                 "Hong",
@@ -65,10 +66,11 @@ public class TestUtils {
                 "+65 8455 0750",
                 "Mrs");
     }
-    public WingitUser createAdminUser() {
+    public WingitUser createAdminUser() { return createAdminUser(true); }
+    public WingitUser createAdminUser(boolean encodePassword) {
         return new WingitUser(
                 ADMIN_USERNAME,
-                encoder.encode(ADMIN_PASSWORD),
+                encodePassword ? encoder.encode(ADMIN_PASSWORD) : ADMIN_PASSWORD,
                 "ROLE_ADMIN",
                 "admin",
                 "admin",
