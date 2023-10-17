@@ -31,7 +31,7 @@ public class UserServiceTest {
     @Mock
     private BCryptPasswordEncoder encoder;
 
-    private TestUtils testUtils = new TestUtils(-1, encoder);
+    private final TestUtils testUtils = new TestUtils(-1, encoder);
 
     @Test
     void getAllUsers_Success() {
@@ -185,5 +185,36 @@ public class UserServiceTest {
         assertEquals("Could not find user " + mockNonExistentUsername, exception.getMessage());
     }
 
+    @Test
+    void updateUser_UserExists_Success() {
+        WingitUser originalUser = testUtils.createSampleUser2(false);
+        WingitUser updatedUser = testUtils.createSampleUser2(false);
+        updatedUser.setPhone("NEW_PHONE");
+        updatedUser.setPassword("SOMETHING ELSE");
+        updatedUser.setAuthorityRole("ROLE_ADMIN");
+
+        when(userRepository.findById(any(String.class))).thenReturn(Optional.of(originalUser));
+        when(userRepository.save(any(WingitUser.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        WingitUser result = userService.updateUser(updatedUser);
+        assertNotNull(result);
+        assertEquals("NEW_PHONE", result.getPhone());
+        assertEquals(originalUser.getPassword(), result.getPassword());
+        assertEquals("ROLE_USER", result.getAuthorityRole());
+        verify(userRepository).findById(updatedUser.getUsername());
+        verify(userRepository).save(any(WingitUser.class));
+    }
+
+    @Test
+    void updateUser_UserNotFound_Failure() {
+        WingitUser nonExistentUser = testUtils.createSampleUser1(false);
+        when(userRepository.findById(any(String.class))).thenReturn(Optional.empty());
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+            userService.updateUser(nonExistentUser);
+        });
+        assertEquals("Could not find user " + nonExistentUser.getUsername(), exception.getMessage());
+    }
+
+    // TODO: Tests for Updating Password
 }
 
