@@ -28,12 +28,15 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private TestUtils testUtils = new TestUtils(-1, new BCryptPasswordEncoder());
+    @Mock
+    private BCryptPasswordEncoder encoder;
+
+    private TestUtils testUtils = new TestUtils(-1, encoder);
 
     @Test
     void getAllUsers_Success() {
         List<WingitUser> users = new ArrayList<>();
-        users.add(testUtils.createSampleUser1());
+        users.add(testUtils.createSampleUser1(false));
 
         when(userRepository.findAll()).thenReturn(users);
 
@@ -45,7 +48,7 @@ public class UserServiceTest {
 
     @Test
     void getById_UserExists_Success() {
-        WingitUser user = testUtils.createSampleUser1();
+        WingitUser user = testUtils.createSampleUser1(false);
 
         when(userRepository.findById(any(String.class))).thenReturn(Optional.of(user));
 
@@ -65,6 +68,57 @@ public class UserServiceTest {
         assertNull(result);
         verify(userRepository).findById(nonExistentUsername);
     }
+
+    @Test
+    void createNormalUser_Success() {
+        WingitUser newUser = testUtils.createSampleUser1(false);
+        newUser.setAuthorityRole("ROLE_ADMIN"); // We test that the authority is forced to ROLE_USER.
+
+        when(userRepository.existsById(any(String.class))).thenReturn(false);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(false);
+        when(userRepository.save(any(WingitUser.class))).thenAnswer((i) -> i.getArguments()[0] );
+        final String mockedHashedPassword = "MOCKED_HASED_PASSWORD";
+        when(encoder.encode(newUser.getPassword())).thenReturn(mockedHashedPassword);
+
+        WingitUser result = userService.createUser(newUser);
+        assertNotNull(result);
+        assertEquals("ROLE_USER", result.getAuthorityRole());
+        assertEquals(mockedHashedPassword, result.getPassword());
+        verify(userRepository).existsById(any(String.class));
+        verify(userRepository).existsByEmail(any(String.class));
+        verify(userRepository).save(any(WingitUser.class));
+    }
+
+    @Test
+    void createNormalUser_UserIdExists_Failure() {
+        when(userRepository.existsById(any(String.class))).thenReturn(true);
+        WingitUser newUser = testUtils.createSampleUser1(false);
+
+        UserBadRequestException exception = assertThrows(UserBadRequestException.class, () -> {
+            userService.createUser(newUser);
+        });
+
+        verify(userRepository).existsById(any(String.class));
+        assertEquals("BAD REQUEST: Username already exists", exception.getMessage());
+    }
+
+    @Test
+    void createNormalUser_EmailExists_Failure() {
+        when(userRepository.existsById(any(String.class))).thenReturn(false);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(true);
+        WingitUser newUser = testUtils.createSampleUser1(false);
+
+        UserBadRequestException exception = assertThrows(UserBadRequestException.class, () -> {
+            userService.createUser(newUser);
+        });
+
+        verify(userRepository).existsById(any(String.class));
+        verify(userRepository).existsByEmail(any(String.class));
+        assertEquals("BAD REQUEST: Email already used for existing account.", exception.getMessage());
+    }
+
+    // TODO: Create Admin Success & Fail case
+
 
 }
 

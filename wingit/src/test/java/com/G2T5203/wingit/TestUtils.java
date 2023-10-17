@@ -40,10 +40,11 @@ public class TestUtils {
         return new URI(baseUrl + port + "/" + path);
     }
     // Helper functions
-    public WingitUser createSampleUser1() {
+    public WingitUser createSampleUser1() { return createSampleUser1(true); }
+    public WingitUser createSampleUser1(boolean encodedPassword) {
         return new WingitUser(
                 SAMPLE_USERNAME_1,
-                encoder.encode(SAMPLE_PASSWORD_1),
+                encodedPassword ? encoder.encode(SAMPLE_PASSWORD_1) : SAMPLE_PASSWORD_1,
                 "ROLE_USER",
                 "Brandon",
                 "Choy",
