@@ -130,7 +130,7 @@ public class RouteListingServiceTest {
         when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRoute));
         when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(samplePlane));
         when(routeListingRepo.existsById(any(RouteListingPk.class))).thenReturn(false);
-        when(routeListingRepo.save(any(RouteListing.class))).thenReturn(sampleRouteListing);
+        when(routeListingRepo.save(any(RouteListing.class))).thenAnswer(i -> i.getArguments()[0]);
 
         // act
         RouteListing savedRouteListing = routeListingService.createRouteListing(sampleRouteListingSimpleJson);
@@ -142,9 +142,7 @@ public class RouteListingServiceTest {
         verify(routeRepo).findById(sampleRoute.getRouteId());
         verify(planeRepo).findById(samplePlane.getPlaneId());
         verify(routeListingRepo).existsById(sampleRouteListing.getRouteListingPk());
-        // TODO: Get this verify fixed
-        //       .save() does not work, not called by mock
-        //verify(routeListingRepo).save(sampleRouteListing);
+        verify(routeListingRepo).save(any(RouteListing.class));
     }
 
 }
