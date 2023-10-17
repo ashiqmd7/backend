@@ -59,6 +59,7 @@ class RouteListingControllerTest {
         routeListingRepository.deleteAll();
         routeRepository.deleteAll();
         planeRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -113,7 +114,9 @@ class RouteListingControllerTest {
                 .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
 
         assertEquals(201, responseEntity.getStatusCode().value());
-        Optional<RouteListing> postedRouteListing = routeListingRepository.findById(responseEntity.getBody().getRouteListingPk());
+        RouteListing returnedRouteListing = responseEntity.getBody();
+        assertNotNull(returnedRouteListing);
+        Optional<RouteListing> postedRouteListing = routeListingRepository.findById(returnedRouteListing.getRouteListingPk());
         assertTrue(postedRouteListing.isPresent());
     }
 
