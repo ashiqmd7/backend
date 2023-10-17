@@ -67,19 +67,6 @@ public class BookingController {
         }
     }
 
-    @PutMapping("bookings/updateInbound/{bookingId}")
-    public BookingSimpleJson updateInboundBooking(@PathVariable int bookingId, @RequestBody Map<String, Object> inboundRouteListingPk) {
-        try {
-            String inboundPlaneId = (String) inboundRouteListingPk.get("inboundPlaneId");
-            int inboundRouteId = (Integer) inboundRouteListingPk.get("inboundRouteId");
-            LocalDateTime inboundDepartureDatetime = DateUtils.handledParseDateTime((String) inboundRouteListingPk.get("inboundDepartureDatetime"));
-
-            return service.updateInboundBooking(bookingId, inboundPlaneId, inboundRouteId, inboundDepartureDatetime);
-        } catch (Exception e) {
-            throw new BookingBadRequestException(e);
-        }
-    }
-
     @DeleteMapping("bookings/delete/{bookingId}")
     public void deleteBooking(@PathVariable int bookingId) {
         try {

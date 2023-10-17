@@ -118,9 +118,50 @@ public class BookingService {
 
         // Check if routeListing has enough seatListings for Booking's partySize
         int bookingPax = bookingSimpleJson.getPartySize();
-        int remainingSeatsForRouteListing = calculateRemainingSeatsForRouteListing(thisOutboundRouteListingPk);
-        if (remainingSeatsForRouteListing < bookingPax) {
-            throw new BookingBadRequestException("Routelisting has insufficient seats for selected pax");
+        int remainingSeatsForOutboundRouteListing = calculateRemainingSeatsForRouteListing(thisOutboundRouteListingPk);
+        if (remainingSeatsForOutboundRouteListing < bookingPax) {
+            throw new BookingBadRequestException("Outbound Routelisting has insufficient seats for selected pax");
+        }
+
+
+        // For inbound, get Plane, Route, and departureDatetime to form RouteListingPk
+        // Afterwards use RouteListingPk to find RouteListing
+        boolean hasInbound = bookingSimpleJson.getInboundDepartureDatetime() != null;
+        Optional<Plane> retrievedInboundPlane = Optional.empty();
+        Optional<Route> retrievedInboundRoute = Optional.empty();
+        Optional<RouteListing> retrievedInboundRouteListing = Optional.empty();
+        if (hasInbound) {
+            retrievedInboundPlane = planeRepo.findById(bookingSimpleJson.getInboundPlaneId());
+            if (retrievedInboundPlane.isEmpty()) throw new PlaneNotFoundException(bookingSimpleJson.getInboundPlaneId());
+
+            retrievedInboundRoute = routeRepo.findById(bookingSimpleJson.getInboundRouteId());
+            if (retrievedInboundRoute.isEmpty()) throw new RouteNotFoundException(bookingSimpleJson.getInboundRouteId());
+
+            RouteListingPk thisInboundRouteListingPk = new RouteListingPk(
+                    retrievedInboundPlane.get(),
+                    retrievedInboundRoute.get(),
+                    bookingSimpleJson.getInboundDepartureDatetime());
+            retrievedInboundRouteListing = routeListingRepo.findById(thisInboundRouteListingPk);
+            if (retrievedInboundRouteListing.isEmpty())
+                throw new RouteListingNotFoundException(thisInboundRouteListingPk);
+
+            // Check date of InboundRouteListing. If it is before OutboundRouteListing, throw exception
+            // Do this by retrieving the outboundRouteListing's departureDatetime & compare with the inboundRouteListing departureDatetime
+            LocalDateTime outboundDatetime = retrievedOutboundRouteListing.get().getRouteListingPk().getDepartureDatetime();
+            LocalDateTime inboundDatetime = retrievedInboundRouteListing.get().getRouteListingPk().getDepartureDatetime();
+            if (inboundDatetime.isBefore(outboundDatetime)) {
+                throw new BookingBadRequestException("Inbound flight departure datetime is before outbound");
+            }
+
+
+            // TODO: We need to also check that the route destination and the return is flipped of inbound/outbound.
+
+
+            // Check if routeListing has enough seatListings for Booking's partySize
+            int remainingSeatsForInboundRouteListing = calculateRemainingSeatsForRouteListing(thisInboundRouteListingPk);
+            if (remainingSeatsForInboundRouteListing < bookingPax) {
+                throw new BookingBadRequestException("Inbound Routelisting has insufficient seats for selected pax");
+            }
         }
 
 
@@ -133,7 +174,7 @@ public class BookingService {
         Booking newBooking = new Booking(
                 retrievedUser.get(),
                 retrievedOutboundRouteListing.get(),
-                null,
+                retrievedInboundRouteListing.orElse(null),
                 bookingSimpleJson.getStartBookingDatetime(),
                 bookingSimpleJson.getPartySize(),
                 bookingSimpleJson.getChargedPrice(),
@@ -144,42 +185,6 @@ public class BookingService {
 
         return new BookingSimpleJson(newBooking);
     }
-
-    // PUT to update for inbound
-    @Transactional
-    public BookingSimpleJson updateInboundBooking(int bookingId, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime) {
-        Optional<Booking> retrievedBooking = repo.findById(bookingId);
-        if (retrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
-        if (isBookingExpired(retrievedBooking.get())) {
-            forceDeleteBooking(retrievedBooking.get());
-            throw new BookingExpiredException();
-        }
-
-        // For inbound, get Plane, Route, and departureDatetime to form RouteListingPk
-        // Afterwards use RouteListingPk to find RouteListing
-        Optional<Plane> retrievedInboundPlane = planeRepo.findById(inboundPlaneId);
-        if (retrievedInboundPlane.isEmpty()) throw new PlaneNotFoundException(inboundPlaneId);
-
-        Optional<Route> retrievedInboundRoute = routeRepo.findById(inboundRouteId);
-        if (retrievedInboundRoute.isEmpty()) throw new RouteNotFoundException(inboundRouteId);
-
-        RouteListingPk thisInboundRouteListingPk = new RouteListingPk(retrievedInboundPlane.get(), retrievedInboundRoute.get(), inboundDepartureDatetime);
-        Optional<RouteListing> retrievedInboundRouteListing = routeListingRepo.findById(thisInboundRouteListingPk);
-        if (retrievedInboundRouteListing.isEmpty()) throw new RouteListingNotFoundException(thisInboundRouteListingPk);
-
-        // Check date of InboundRouteListing. If it is before OutboundRouteListing, throw exception
-        // Do this by retrieving the outboundRouteListing's departureDatetime & compare with the inboundRouteListing departureDatetime
-        LocalDateTime outboundDatetime = retrievedBooking.get().getOutboundRouteListing().getRouteListingPk().getDepartureDatetime();
-        if (inboundDepartureDatetime.isBefore(outboundDatetime)) {
-            throw new BookingBadRequestException("Inbound flight departure datetime is before outbound");
-        }
-
-        retrievedBooking.get().setInboundRouteListing(retrievedInboundRouteListing.get());
-        repo.save(retrievedBooking.get());
-
-        return new BookingSimpleJson(retrievedBooking.get());
-    }
-
 
     @Transactional
     public void deleteBookingById(int bookingId) {
