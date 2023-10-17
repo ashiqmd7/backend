@@ -190,6 +190,7 @@ public class UserServiceTest {
         WingitUser originalUser = testUtils.createSampleUser2(false);
         WingitUser updatedUser = testUtils.createSampleUser2(false);
         updatedUser.setPhone("NEW_PHONE");
+        // Making sure that the password and authority role forced to not be changed.
         updatedUser.setPassword("SOMETHING ELSE");
         updatedUser.setAuthorityRole("ROLE_ADMIN");
 
@@ -215,6 +216,30 @@ public class UserServiceTest {
         assertEquals("Could not find user " + nonExistentUser.getUsername(), exception.getMessage());
     }
 
-    // TODO: Tests for Updating Password
+    @Test
+    void updatePassword_UserExists_Success() {
+        WingitUser originalUser = testUtils.createSampleUser2(false);
+        final String newPassword = "NEW_PASSWORD";
+        final String newHashedPassword = "NEW_HASHED_PASSWORD";
+        when(userRepository.findById(any(String.class))).thenReturn(Optional.of(originalUser));
+        when(encoder.encode(newPassword)).thenReturn(newHashedPassword);
+        when(userRepository.save(any(WingitUser.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        WingitUser result = userService.updatePassword(originalUser.getUsername(), newPassword);
+        assertNotNull(result);
+        assertEquals(newHashedPassword, result.getPassword());
+        verify(userRepository).findById(originalUser.getUsername());
+        verify(userRepository).save(any(WingitUser.class));
+    }
+
+    @Test
+    void updatePassword_UserNotFound_Failure() {
+        WingitUser nonExistentUser = testUtils.createSampleUser1(false);
+        when(userRepository.findById(any(String.class))).thenReturn(Optional.empty());
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+            userService.updatePassword(nonExistentUser.getUsername(), "NEW_PASSWORD");
+        });
+        assertEquals("Could not find user " + nonExistentUser.getUsername(), exception.getMessage());
+    }
 }
 

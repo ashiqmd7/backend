@@ -67,7 +67,7 @@ public class UserService {
     @Transactional
     public WingitUser updatePassword(String username, String newPassword) {
         Optional<WingitUser> retrievedUser = repo.findById(username);
-        if (retrievedUser.isEmpty()) throw new UsernameNotFoundException(username);
+        if (retrievedUser.isEmpty()) throw new UserNotFoundException(username);
 
         String newHashedPassword = encoder.encode(newPassword);
         retrievedUser.get().setPassword(newHashedPassword);
