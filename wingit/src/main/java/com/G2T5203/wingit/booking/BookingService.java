@@ -154,7 +154,17 @@ public class BookingService {
             }
 
 
-            // TODO: We need to also check that the route destination and the return is flipped of inbound/outbound.
+            // Also check that the outbound departure == inbound arrival and outbound arrival = inbound departure.
+            boolean correctInboundOutboundDestinations =
+                    retrievedOutboundRouteListing.get().getRouteListingPk().getRoute().getArrivalDest().equals(
+                        retrievedInboundRouteListing.get().getRouteListingPk().getRoute().getDepartureDest())
+                    &&
+                    retrievedOutboundRouteListing.get().getRouteListingPk().getRoute().getDepartureDest().equals(
+                        retrievedInboundRouteListing.get().getRouteListingPk().getRoute().getArrivalDest());
+            if (!correctInboundOutboundDestinations) {
+                throw new BookingBadRequestException("Outbound destinations don't match flipped version of inbound destinations");
+            }
+
 
 
             // Check if routeListing has enough seatListings for Booking's partySize
