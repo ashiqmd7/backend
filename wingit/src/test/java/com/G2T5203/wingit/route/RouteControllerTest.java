@@ -33,7 +33,8 @@ class RouteControllerTest {
     TestUtils testUtils;
     @Autowired
     UserRepository userRepository;
-    @Autowired RouteRepository routeRepository;
+    @Autowired
+    RouteRepository routeRepository;
 
     @BeforeEach
     void setUp() {
@@ -41,6 +42,7 @@ class RouteControllerTest {
         userRepository.save(testUtils.createAdminUser());
         userRepository.save(testUtils.createSampleUser1());
     }
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
@@ -151,8 +153,10 @@ class RouteControllerTest {
                 .postForEntity(uri, sampleRoute, Route.class);
 
         assertEquals(201, responseEntity.getStatusCode().value());
-        Optional<Route> postedRoute = routeRepository.findById(sampleRoute.getRouteId());
-        assertTrue(postedRoute.isPresent());
+        Route returnedSavedRoute = responseEntity.getBody();
+        assertNotNull(returnedSavedRoute);
+        Optional<Route> retrievedRoute = routeRepository.findById(returnedSavedRoute.getRouteId());
+        assertTrue(retrievedRoute.isPresent());
     }
 
     @Test
@@ -283,7 +287,10 @@ class RouteControllerTest {
     @Test
     void updateRoute_NotFound_Failure() throws Exception {
         URI uri = testUtils.constructUri("routes/update/1");
-        HttpEntity<Route> payloadEntity = new HttpEntity<>(testUtils.createSampleRoute1());
+        Route sampleRoute1 = testUtils.createSampleRoute1();
+        sampleRoute1.setRouteId(1);
+
+        HttpEntity<Route> payloadEntity = new HttpEntity<>(sampleRoute1);
         ResponseEntity<Void> responseEntity = testRestTemplate
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .exchange(uri, HttpMethod.PUT, payloadEntity, Void.class);
