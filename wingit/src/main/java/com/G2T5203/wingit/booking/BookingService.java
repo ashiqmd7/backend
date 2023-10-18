@@ -191,9 +191,9 @@ public class BookingService {
                 false
         );
 
-        repo.save(newBooking);
+        Booking savedBooking = repo.save(newBooking);
 
-        return new BookingSimpleJson(newBooking);
+        return new BookingSimpleJson(savedBooking);
     }
 
     @Transactional

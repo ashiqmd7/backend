@@ -1,14 +1,15 @@
 package com.G2T5203.wingit.booking;
 
 import com.G2T5203.wingit.TestUtils;
+import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneRepository;
+import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.route.RouteRepository;
-import com.G2T5203.wingit.routeListing.RouteListingPk;
-import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.routeListing.*;
 import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.seatListing.SeatListingService;
+import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.user.WingitUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,8 @@ public class BookingServiceTest {
     @Mock
     private PlaneRepository planeRepo;
     @Mock
+    private UserRepository userRepo;
+    @Mock
     private RouteListingService routeListingService;
     @Mock
     private SeatListingService seatListingService;
@@ -61,7 +64,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getBookingUserUsername_Return_Name() {
+    void getBookingUserUsername_Success_Return() {
         // arrange
         Booking sampleBooking = testUtils.createSampleBooking1();
 
@@ -79,7 +82,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getAllBookingsByUser_Return_Bookings() {
+    void getAllBookingsByUser_Success_Return() {
         // arrange
         WingitUser sampleUser = testUtils.createSampleUser1();
         Booking sampleBooking1 = testUtils.createSampleBooking1();
@@ -102,7 +105,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void calculateRemainingSeatsForRouteListing_Return() {
+    void calculateRemainingSeatsForRouteListing_Success_Return() {
         // arrange
         RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
         SeatListing sampleSeatListing1 = testUtils.createSampleSeatListing1();
@@ -122,5 +125,52 @@ public class BookingServiceTest {
 
         // verify
         verify(seatListingRepo).findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(sampleRouteListingPk);
+    }
+
+    @Test
+    void createBooking_Success_Return() {
+        // arrange
+        WingitUser sampleUser = testUtils.createSampleUser1();
+        Plane samplePlane = testUtils.createSamplePlane1();
+        Route sampleRoute = testUtils.createSampleRoute1();
+        RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
+        Booking sampleBooking = testUtils.createSampleBooking1();
+        BookingSimpleJson sampleBookingSimpleJson = testUtils.createSampleBookingSimpleJson1();
+
+        SeatListing sampleSeatListing1 = testUtils.createSampleSeatListing1();
+        SeatListing sampleSeatListing2 = testUtils.createSampleSeatListing2();
+        List<SeatListing> sampleSeatListings = new ArrayList<>();
+        sampleSeatListings.add(sampleSeatListing1);
+        sampleSeatListings.add(sampleSeatListing2);
+
+        // mock
+        when(userRepo.findByUsername(any(String.class))).thenReturn(Optional.of(sampleUser));
+        when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(samplePlane));
+        when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRoute));
+        when(routeListingRepo.findById(any(RouteListingPk.class))).thenReturn(Optional.of(sampleRouteListing));
+
+        when(seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(any(RouteListingPk.class))).thenReturn(sampleSeatListings);
+
+        when(bookingRepo.save(any(Booking.class))).thenAnswer((i) -> {
+            // hardcode mocking the save function, because bookingId is generated
+            Booking newBooking = (Booking) i.getArguments()[0];
+            newBooking.setBookingId(1);
+            return newBooking;
+        });
+
+        // act
+        BookingSimpleJson createdBookingSimpleJson = bookingService.createBooking(sampleBookingSimpleJson);
+
+        // assert
+        assertEquals(sampleBookingSimpleJson.getBookingId(), createdBookingSimpleJson.getBookingId());
+
+        // verify
+        verify(userRepo).findByUsername(sampleUser.getUsername());
+        verify(planeRepo).findById(samplePlane.getPlaneId());
+        verify(routeRepo).findById(sampleRoute.getRouteId());
+        verify(routeListingRepo).findById(any(RouteListingPk.class));
+        verify(bookingRepo).save(any(Booking.class));
+
+
     }
 }

@@ -1,6 +1,7 @@
 package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.booking.Booking;
+import com.G2T5203.wingit.booking.BookingSimpleJson;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.routeListing.RouteListing;
@@ -185,6 +186,10 @@ public class TestUtils {
         return new Booking(sampleBookingId2, sampleUser1, sampleOutboundRouteListing,
                 sampleInboundRouteListing, sampleStartBookingDatetime, samplePartySize,
                 sampleChargedPrice, isPaid);
+    }
+
+    public BookingSimpleJson createSampleBookingSimpleJson1() {
+        return new BookingSimpleJson(createSampleBooking1());
     }
 
     // Create sample SeatListingPk
