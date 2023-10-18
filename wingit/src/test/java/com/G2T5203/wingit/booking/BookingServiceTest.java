@@ -20,7 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.swing.text.html.Option;
 import java.awt.print.Book;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -187,5 +189,71 @@ public class BookingServiceTest {
         verify(bookingRepo).deleteById(1);
     }
 
-    
+//    @Test
+//    void forceDeleteBooking_Success() {
+//        // arrange
+//        RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
+//        SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
+//        Booking sampleBooking = testUtils.createSampleBooking1();
+//
+//        // mock
+//        when(seatListingService.cancelSeatListingBooking(any(String.class),
+//                any(Integer.class),
+//                any(LocalDateTime.class),
+//                any(String.class))).thenReturn(null);
+//
+//        // act
+//        //bookingService.forceDeleteBooking(sampleBooking);
+//    }
+
+    @Test
+    void getActiveUnfinishedBookingsForRouteListing_Success_Return() {
+        // arrange
+        Booking sampleBooking1 = testUtils.createSampleBooking1();
+        Booking sampleBooking2 = testUtils.createSampleBooking2();
+        List<Booking> bookingList = new ArrayList<>();
+        bookingList.add(sampleBooking1);
+        bookingList.add(sampleBooking2);
+
+        RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
+
+        // mock
+        when(bookingRepo.findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(any(RouteListingPk.class)))
+                .thenReturn(bookingList);
+
+        // act
+        List<Booking> bookings = bookingService.getActiveUnfinishedBookingsForRouteListing(sampleRouteListingPk);
+
+        // assert
+        assertNotNull(bookings);
+
+        // verify
+        verify(bookingRepo).findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(any(RouteListingPk.class));
+    }
+
+    @Test
+    void calculateAndSaveChargedPrice_Success_Return() {
+        // arrange
+        Booking sampleBooking = testUtils.createSampleBooking1();
+
+        SeatListing sampleSeatListing1 = testUtils.createSampleSeatListing1();
+        SeatListing sampleSeatListing2 = testUtils.createSampleSeatListing2();
+        List<SeatListing> sampleSeatListings = new ArrayList<>();
+        sampleSeatListings.add(sampleSeatListing1);
+        sampleSeatListings.add(sampleSeatListing2);
+
+        sampleBooking.setSeatListing(sampleSeatListings);
+
+        // mock
+        when(bookingRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleBooking));
+
+        // act
+        double price = bookingService.calculateAndSaveChargedPrice(sampleBooking.getBookingId());
+
+        // assert
+        assertEquals(sampleBooking.getChargedPrice(), price);
+
+        // verify
+        verify(bookingRepo).findById(sampleBooking.getBookingId());
+    }
 }
