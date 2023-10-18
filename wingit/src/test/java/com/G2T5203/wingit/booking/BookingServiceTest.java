@@ -17,6 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.awt.print.Book;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,4 +75,29 @@ public class BookingServiceTest {
         // verify
         verify(bookingRepo).findById(sampleBooking.getBookingId());
     }
+
+    @Test
+    void getAllBookingsByUser_Return_Bookings() {
+        // arrange
+        WingitUser sampleUser = testUtils.createSampleUser1();
+        Booking sampleBooking1 = testUtils.createSampleBooking1();
+        Booking sampleBooking2 = testUtils.createSampleBooking2();
+        List<Booking> sampleBookings = new ArrayList<>();
+        sampleBookings.add(sampleBooking1);
+        sampleBookings.add(sampleBooking2);
+
+        // mock
+        when(bookingRepo.findAllByWingitUserUsername(any(String.class))).thenReturn(sampleBookings);
+
+        // act
+        List<BookingSimpleJson> bookings = bookingService.getAllBookingsByUser(sampleUser.getUsername());
+
+        // assert
+        assertEquals(2, bookings.size());
+
+        // verify
+        verify(bookingRepo).findAllByWingitUserUsername(sampleUser.getUsername());
+    }
+
+    
 }
