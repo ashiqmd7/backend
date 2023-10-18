@@ -3,8 +3,10 @@ package com.G2T5203.wingit.booking;
 import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
 import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.seatListing.SeatListingService;
 import com.G2T5203.wingit.user.WingitUser;
@@ -99,5 +101,26 @@ public class BookingServiceTest {
         verify(bookingRepo).findAllByWingitUserUsername(sampleUser.getUsername());
     }
 
-    
+    @Test
+    void calculateRemainingSeatsForRouteListing_Return() {
+        // arrange
+        RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
+        SeatListing sampleSeatListing1 = testUtils.createSampleSeatListing1();
+        SeatListing sampleSeatListing2 = testUtils.createSampleSeatListing2();
+        List<SeatListing> sampleSeatListings = new ArrayList<>();
+        sampleSeatListings.add(sampleSeatListing1);
+        sampleSeatListings.add(sampleSeatListing2);
+
+        // mock
+        when(seatListingRepo.findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(any(RouteListingPk.class))).thenReturn(sampleSeatListings);
+
+        // act
+        int remainingSeats = bookingService.calculateRemainingSeatsForRouteListing(sampleRouteListingPk);
+
+        // assert
+        assertEquals(2, remainingSeats);
+
+        // verify
+        verify(seatListingRepo).findBySeatListingPkRouteListingRouteListingPkAndBookingIsNull(sampleRouteListingPk);
+    }
 }
