@@ -27,8 +27,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -170,7 +169,23 @@ public class BookingServiceTest {
         verify(routeRepo).findById(sampleRoute.getRouteId());
         verify(routeListingRepo).findById(any(RouteListingPk.class));
         verify(bookingRepo).save(any(Booking.class));
-
-
     }
+
+    @Test
+    void deleteBookingById_Success() {
+        // arrange
+        Booking sampleBooking = testUtils.createSampleBooking1();
+
+        // mock
+        when(bookingRepo.existsById(any(Integer.class))).thenReturn(true);
+
+        // act
+        bookingService.deleteBookingById(sampleBooking.getBookingId());
+
+        // verify
+        verify(bookingRepo).existsById(1);
+        verify(bookingRepo).deleteById(1);
+    }
+
+    
 }
