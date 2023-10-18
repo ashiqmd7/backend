@@ -8,6 +8,7 @@ import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.seat.Seat;
 import com.G2T5203.wingit.seat.SeatPk;
+import com.G2T5203.wingit.seatListing.PrivacySeatListingSimpleJson;
 import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingPk;
 import com.G2T5203.wingit.user.WingitUser;
@@ -218,6 +219,12 @@ public class TestUtils {
         Booking sampleBooking2 = createSampleBooking2();
         String sampleOccupantName = "Amy";
         return new SeatListing(sampleSeatListingPk2, sampleBooking2, sampleOccupantName);
+    }
+
+    // Create sample PrivacySeatListingSimpleJson
+    public PrivacySeatListingSimpleJson createPrivacySeatListingSimpleJson() {
+        SeatListing sampleSeatListing = createSampleSeatListing1();
+        return new PrivacySeatListingSimpleJson(sampleSeatListing);
     }
 
     public RouteListingSimpleJson createSampleRouteListingSimpleJson(Route route, Plane plane) {
