@@ -256,4 +256,29 @@ public class BookingServiceTest {
         // verify
         verify(bookingRepo).findById(sampleBooking.getBookingId());
     }
+
+    @Test
+    void markBookingAsPaid_Success() {
+        // arrange
+        Booking sampleBooking = testUtils.createSampleBooking1();
+
+        SeatListing sampleSeatListing1 = testUtils.createSampleSeatListing1();
+        SeatListing sampleSeatListing2 = testUtils.createSampleSeatListing2();
+        List<SeatListing> sampleSeatListings = new ArrayList<>();
+        sampleSeatListings.add(sampleSeatListing1);
+        sampleSeatListings.add(sampleSeatListing2);
+
+        sampleBooking.setSeatListing(sampleSeatListings);
+
+        // mock
+        when(bookingRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleBooking));
+        when(bookingRepo.save(any(Booking.class))).thenReturn(sampleBooking);
+
+        // act
+        bookingService.markBookingAsPaid(sampleBooking.getBookingId());
+
+        // verify
+        verify(bookingRepo).findById(sampleBooking.getBookingId());
+        verify(bookingRepo).save(sampleBooking);
+    }
 }
