@@ -152,6 +152,7 @@ public class SeatListingServiceTest {
 
         when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
         when(seatListingRepo.findById(any(SeatListingPk.class))).thenReturn(Optional.of(sampleSeatListing));
+        when(seatListingRepo.save(sampleSeatListing)).thenReturn(sampleSeatListing);
 
         // act
         SeatListing seatListing = seatListingService.reserveSeatListing(sampleRouteListing.getRouteListingPk().getPlane().getPlaneId(),
@@ -167,10 +168,98 @@ public class SeatListingServiceTest {
         verify(planeRepo, times(2)).findById(any(String.class));
         verify(routeRepo, times(2)).findById(any(Integer.class));
         verify(routeListingRepo, times(2)).findById(any(RouteListingPk.class));
+        verify(seatRepo).findById(any(SeatPk.class));
+        verify(seatListingRepo).findById(any(SeatListingPk.class));
         verify(bookingRepo, times(2)).findById(any(Integer.class));
+        verify(seatListingRepo).save(any(SeatListing.class));
     }
 
+    @Test
+    void setOccupantForSeatListing_Success_Return() {
+        // arrange
+        RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
+        SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
+        Booking sampleBooking = testUtils.createSampleBooking1();
+        Seat sampleSeat = testUtils.createSampleSeat1();
 
+        List<SeatListing> seatListingList = new ArrayList<>();
+        seatListingList.add(sampleSeatListing);
 
+        sampleBooking.setSeatListing(seatListingList);
 
+        // mock
+        when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getPlane()));
+        when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getRoute()));
+        when(routeListingRepo.findById(any(RouteListingPk.class))).thenReturn(Optional.of(sampleRouteListing));
+
+        when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
+        when(seatListingRepo.findById(any(SeatListingPk.class))).thenReturn(Optional.of(sampleSeatListing));
+        when(bookingRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleBooking));
+        when(seatListingRepo.save(sampleSeatListing)).thenReturn(sampleSeatListing);
+
+        // act
+        // act
+        SeatListing seatListing = seatListingService.setOccupantForSeatListing(sampleRouteListing.getRouteListingPk().getPlane().getPlaneId(),
+                sampleRouteListing.getRouteListingPk().getRoute().getRouteId(),
+                sampleRouteListing.getRouteListingPk().getDepartureDatetime(),
+                sampleSeatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                sampleBooking.getBookingId(), "SampleUserTest");
+
+        // assert
+        assertNotNull(seatListing);
+        assertEquals("SampleUserTest", seatListing.getOccupantName());
+
+        // verify
+        verify(planeRepo).findById(any(String.class));
+        verify(routeRepo).findById(any(Integer.class));
+        verify(routeListingRepo).findById(any(RouteListingPk.class));
+        verify(seatRepo).findById(any(SeatPk.class));
+        verify(seatListingRepo).findById(any(SeatListingPk.class));
+        verify(bookingRepo).findById(any(Integer.class));
+        verify(seatListingRepo).save(any(SeatListing.class));
+    }
+
+    @Test
+    void cancelSeatListingBooking_Success_Return() {
+        // arrange
+        RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
+        SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
+        Booking sampleBooking = testUtils.createSampleBooking1();
+        Seat sampleSeat = testUtils.createSampleSeat1();
+
+        List<SeatListing> seatListingList = new ArrayList<>();
+        seatListingList.add(sampleSeatListing);
+
+        sampleBooking.setSeatListing(seatListingList);
+
+        // mock
+        when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getPlane()));
+        when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getRoute()));
+        when(routeListingRepo.findById(any(RouteListingPk.class))).thenReturn(Optional.of(sampleRouteListing));
+
+        when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
+        when(seatListingRepo.findById(any(SeatListingPk.class))).thenReturn(Optional.of(sampleSeatListing));
+
+        when(seatListingRepo.save(any(SeatListing.class))).thenReturn(sampleSeatListing);
+
+        // act
+        SeatListing seatListing = seatListingService.cancelSeatListingBooking(sampleRouteListing.getRouteListingPk().getPlane().getPlaneId(),
+                sampleRouteListing.getRouteListingPk().getRoute().getRouteId(),
+                sampleRouteListing.getRouteListingPk().getDepartureDatetime(),
+                sampleSeatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
+
+        // assert
+        assertNotNull(seatListing);
+        assertEquals(null, seatListing.getOccupantName());
+        assertEquals(null, seatListing.getBooking());
+
+        // verify
+        verify(planeRepo).findById(any(String.class));
+        verify(routeRepo).findById(any(Integer.class));
+        verify(routeListingRepo).findById(any(RouteListingPk.class));
+        verify(seatRepo).findById(any(SeatPk.class));
+        verify(seatListingRepo).findById(any(SeatListingPk.class));
+
+        verify(seatListingRepo).save(any(SeatListing.class));
+    }
 }
