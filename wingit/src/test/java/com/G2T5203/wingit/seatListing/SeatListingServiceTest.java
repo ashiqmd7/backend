@@ -1,6 +1,7 @@
 package com.G2T5203.wingit.seatListing;
 
 import com.G2T5203.wingit.TestUtils;
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingRepository;
 import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.plane.PlaneRepository;
@@ -30,8 +31,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SeatListingServiceTest {
@@ -104,7 +104,6 @@ public class SeatListingServiceTest {
     void createSeatListing_Success_Return() {
         // arrange
         RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
-        //RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
         Seat sampleSeat = testUtils.createSampleSeat1();
         SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
         SeatListingSimpleJson sampleSeatListingSimpleJson = testUtils.createSeatListingSimpleJson();
@@ -130,9 +129,45 @@ public class SeatListingServiceTest {
         verify(seatRepo).findById(any(SeatPk.class));
         verify(seatListingRepo).existsById(any(SeatListingPk.class));
         verify(seatListingRepo).save(any(SeatListing.class));
+    }
 
+    @Test
+    void reserveSeatListing_Success_Return() {
+        // arrange
+        RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
+        SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
+        Booking sampleBooking = testUtils.createSampleBooking1();
+        Seat sampleSeat = testUtils.createSampleSeat1();
 
+        List<SeatListing> seatListingList = new ArrayList<>();
+        seatListingList.add(sampleSeatListing);
 
+        sampleBooking.setSeatListing(seatListingList);
+
+        // mock
+        when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getPlane()));
+        when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getRoute()));
+        when(routeListingRepo.findById(any(RouteListingPk.class))).thenReturn(Optional.of(sampleRouteListing));
+        when(bookingRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleBooking));
+
+        when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
+        when(seatListingRepo.findById(any(SeatListingPk.class))).thenReturn(Optional.of(sampleSeatListing));
+
+        // act
+        SeatListing seatListing = seatListingService.reserveSeatListing(sampleRouteListing.getRouteListingPk().getPlane().getPlaneId(),
+                sampleRouteListing.getRouteListingPk().getRoute().getRouteId(),
+                sampleRouteListing.getRouteListingPk().getDepartureDatetime(),
+                sampleSeatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                sampleBooking.getBookingId());
+
+        // assert
+        assertNotNull(seatListing);
+
+        // verify
+        verify(planeRepo, times(2)).findById(any(String.class));
+        verify(routeRepo, times(2)).findById(any(Integer.class));
+        verify(routeListingRepo, times(2)).findById(any(RouteListingPk.class));
+        verify(bookingRepo, times(2)).findById(any(Integer.class));
     }
 
 
