@@ -5,9 +5,13 @@ import com.G2T5203.wingit.booking.BookingRepository;
 import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
+import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
 import com.G2T5203.wingit.routeListing.RouteListingService;
+import com.G2T5203.wingit.seat.Seat;
+import com.G2T5203.wingit.seat.SeatPk;
+import com.G2T5203.wingit.seat.SeatRepository;
 import com.G2T5203.wingit.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +45,8 @@ public class SeatListingServiceTest {
     private RouteRepository routeRepo;
     @Mock
     private PlaneRepository planeRepo;
+    @Mock
+    private SeatRepository seatRepo;
     @Mock
     private UserRepository userRepo;
     @Mock
@@ -92,6 +98,41 @@ public class SeatListingServiceTest {
         verify(planeRepo).findById(sampleRouteListingPk.getPlane().getPlaneId());
         verify(routeRepo).findById(sampleRouteListingPk.getRoute().getRouteId());
         verify(seatListingRepo).findBySeatListingPkRouteListingRouteListingPk(any(RouteListingPk.class));
+    }
+
+    @Test
+    void createSeatListing_Success_Return() {
+        // arrange
+        RouteListing sampleRouteListing = testUtils.createSampleRouteListing1();
+        //RouteListingPk sampleRouteListingPk = testUtils.createSampleRouteListingPk1();
+        Seat sampleSeat = testUtils.createSampleSeat1();
+        SeatListing sampleSeatListing = testUtils.createSampleSeatListing1();
+        SeatListingSimpleJson sampleSeatListingSimpleJson = testUtils.createSeatListingSimpleJson();
+
+        // mock
+        when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getPlane()));
+        when(routeRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getRoute()));
+        when(routeListingRepo.findById(any(RouteListingPk.class))).thenReturn(Optional.of(sampleRouteListing));
+        when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
+        when(seatListingRepo.existsById(any(SeatListingPk.class))).thenReturn(false);
+        when(seatListingRepo.save(any(SeatListing.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        // act
+        SeatListing seatListing = seatListingService.createSeatListing(sampleSeatListingSimpleJson);
+
+        // assert
+        assertNotNull(seatListing);
+
+        // verify
+        verify(planeRepo).findById(any(String.class));
+        verify(routeRepo).findById(any(Integer.class));
+        verify(routeListingRepo).findById(any(RouteListingPk.class));
+        verify(seatRepo).findById(any(SeatPk.class));
+        verify(seatListingRepo).existsById(any(SeatListingPk.class));
+        verify(seatListingRepo).save(any(SeatListing.class));
+
+
+
     }
 
 

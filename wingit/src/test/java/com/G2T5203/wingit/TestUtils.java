@@ -11,6 +11,7 @@ import com.G2T5203.wingit.seat.SeatPk;
 import com.G2T5203.wingit.seatListing.PrivacySeatListingSimpleJson;
 import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingPk;
+import com.G2T5203.wingit.seatListing.SeatListingSimpleJson;
 import com.G2T5203.wingit.user.WingitUser;
 import com.G2T5203.wingit.routeListing.RouteListingSimpleJson;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -225,6 +226,12 @@ public class TestUtils {
     public PrivacySeatListingSimpleJson createPrivacySeatListingSimpleJson() {
         SeatListing sampleSeatListing = createSampleSeatListing1();
         return new PrivacySeatListingSimpleJson(sampleSeatListing);
+    }
+
+    // Create sample SeatListingSimpleJson
+    public SeatListingSimpleJson createSeatListingSimpleJson() {
+        SeatListing sampleSeatListing = createSampleSeatListing1();
+        return new SeatListingSimpleJson(sampleSeatListing);
     }
 
     public RouteListingSimpleJson createSampleRouteListingSimpleJson(Route route, Plane plane) {
