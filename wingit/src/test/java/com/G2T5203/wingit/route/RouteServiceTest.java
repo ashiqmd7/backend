@@ -58,7 +58,6 @@ public class RouteServiceTest {
         assertEquals(expectedRoute, result);
     }
 
-    // Test for retrieving a route that doesn't exist
     @Test
     void getRouteById_RouteNotExist_Failure() {
         // arrange
@@ -145,12 +144,12 @@ public class RouteServiceTest {
     @Test
     void updateRoute_RouteNotFound_Failure() {
         // arrange
-        Route updatedRoute = new Route();
-        updatedRoute.setRouteId(1);
+        Route nonExistentRoute = new Route();
+        nonExistentRoute.setRouteId(1);
         when(routeRepository.existsById(1)).thenReturn(false);
 
         // act and verify
-        RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.updateRoute(updatedRoute));
+        RouteNotFoundException exception = assertThrows(RouteNotFoundException.class, () -> routeService.updateRoute(nonExistentRoute));
         verify(routeRepository).existsById(1);
         assertEquals("Could not find route 1", exception.getMessage());
     }

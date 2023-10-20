@@ -33,6 +33,7 @@ public class PlaneServiceTest {
 
         // verify
         assertEquals(planes, result);
+        verify(planeRepository).findAll();
     }
 
     @Test
@@ -48,6 +49,7 @@ public class PlaneServiceTest {
         // verify
         assertNotNull(result);
         assertEquals(planeId, result.getPlaneId());
+        verify(planeRepository).findById(planeId);
     }
 
     @Test
@@ -61,6 +63,7 @@ public class PlaneServiceTest {
 
         // verify
         assertNull(result);
+        verify(planeRepository).findById(planeId);
     }
 
     @Test
@@ -76,6 +79,8 @@ public class PlaneServiceTest {
         // verify
         assertNotNull(result);
         assertEquals(newPlane.getPlaneId(), result.getPlaneId());
+        verify(planeRepository).existsById(newPlane.getPlaneId());
+        verify(planeRepository).save(newPlane);
     }
 
     @Test
@@ -89,6 +94,7 @@ public class PlaneServiceTest {
             planeService.createPlane(existingPlane);
         });
         assertEquals("BAD REQUEST: PlaneId already exists.", exception.getMessage());
+        verify(planeRepository).existsById(existingPlane.getPlaneId());
     }
 
     @Test
@@ -100,6 +106,7 @@ public class PlaneServiceTest {
         // act and verify
         assertDoesNotThrow(() -> planeService.deletePlaneById(planeId));
         verify(planeRepository).deleteById(planeId);
+        verify(planeRepository).existsById(planeId);
     }
 
     @Test
@@ -113,6 +120,7 @@ public class PlaneServiceTest {
             planeService.deletePlaneById(planeId);
         });
         assertEquals("Could not find plane " + planeId, exception.getMessage());
+        verify(planeRepository).existsById(planeId);
     }
 
     @Test
@@ -128,6 +136,8 @@ public class PlaneServiceTest {
         // verify
         assertNotNull(result);
         assertEquals(updatedPlane.getPlaneId(), result.getPlaneId());
+        verify(planeRepository).existsById(updatedPlane.getPlaneId());
+        verify(planeRepository).save(updatedPlane);
     }
 
     @Test
@@ -141,6 +151,6 @@ public class PlaneServiceTest {
             planeService.updatePlane(nonExistentPlane);
         });
         assertEquals("Could not find plane " + nonExistentPlane.getPlaneId(), exception.getMessage());
+        verify(planeRepository).existsById(nonExistentPlane.getPlaneId());
     }
 }
-

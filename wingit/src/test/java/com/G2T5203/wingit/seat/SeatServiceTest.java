@@ -66,6 +66,7 @@ public class SeatServiceTest {
         assertNotNull(createdSeat);
         assertEquals("Economy", createdSeat.getSeatClass()); // Check the seatClass
         assertEquals(1.0, createdSeat.getPriceFactor()); // Check the priceFactor
+        verify(seatRepository).save(any(Seat.class));
     }
 
     @Test
