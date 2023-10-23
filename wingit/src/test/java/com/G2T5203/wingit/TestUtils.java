@@ -1,14 +1,17 @@
 package com.G2T5203.wingit;
 
 import com.G2T5203.wingit.booking.Booking;
+import com.G2T5203.wingit.booking.BookingSimpleJson;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.seat.Seat;
 import com.G2T5203.wingit.seat.SeatPk;
+import com.G2T5203.wingit.seatListing.PrivacySeatListingSimpleJson;
 import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.seatListing.SeatListingPk;
+import com.G2T5203.wingit.seatListing.SeatListingSimpleJson;
 import com.G2T5203.wingit.user.WingitUser;
 import com.G2T5203.wingit.routeListing.RouteListingSimpleJson;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -187,6 +190,10 @@ public class TestUtils {
                 sampleChargedPrice, isPaid);
     }
 
+    public BookingSimpleJson createSampleBookingSimpleJson1() {
+        return new BookingSimpleJson(createSampleBooking1());
+    }
+
     // Create sample SeatListingPk
     public SeatListingPk createSampleSeatListingPk1(){
         RouteListing sampleRouteListing = createSampleRouteListing1();
@@ -213,6 +220,18 @@ public class TestUtils {
         Booking sampleBooking2 = createSampleBooking2();
         String sampleOccupantName = "Amy";
         return new SeatListing(sampleSeatListingPk2, sampleBooking2, sampleOccupantName);
+    }
+
+    // Create sample PrivacySeatListingSimpleJson
+    public PrivacySeatListingSimpleJson createPrivacySeatListingSimpleJson() {
+        SeatListing sampleSeatListing = createSampleSeatListing1();
+        return new PrivacySeatListingSimpleJson(sampleSeatListing);
+    }
+
+    // Create sample SeatListingSimpleJson
+    public SeatListingSimpleJson createSeatListingSimpleJson() {
+        SeatListing sampleSeatListing = createSampleSeatListing1();
+        return new SeatListingSimpleJson(sampleSeatListing);
     }
 
     public RouteListingSimpleJson createSampleRouteListingSimpleJson(Route route, Plane plane) {

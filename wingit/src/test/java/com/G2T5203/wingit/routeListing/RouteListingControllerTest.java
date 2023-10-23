@@ -113,10 +113,17 @@ class RouteListingControllerTest {
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
 
-        assertEquals(201, responseEntity.getStatusCode().value());
+        assertEquals(HttpStatus.CREATED.value(), responseEntity.getStatusCodeValue());
         RouteListing returnedRouteListing = responseEntity.getBody();
         assertNotNull(returnedRouteListing);
         Optional<RouteListing> postedRouteListing = routeListingRepository.findById(returnedRouteListing.getRouteListingPk());
+
+//        // verify the saved route listing by fetching it from the repository
+//        RouteListing savedRouteListing = routeListingRepository.findById(returnedRouteListing.getRouteListingPk()).orElse(null);
+//        assertNotNull(savedRouteListing);
+//
+//        // assert specific attributes of the saved route listing
+//        assertEquals(routeListingSimpleJson.getBasePrice(), savedRouteListing.getBasePrice());
 
         // TODO: Fix this. Locally this runs fine but CI/CD actions show this as throwing error. Need to investigate.
         //       See build #31 in dev for log details.
