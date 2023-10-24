@@ -1,7 +1,9 @@
 package com.G2T5203.wingit.booking;
 
+import com.G2T5203.wingit.seatListing.SeatListing;
+
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BookingSimpleJson {
@@ -25,10 +27,10 @@ public class BookingSimpleJson {
     private boolean isPaid;
 
     // SeatListing, just a Json list of the seat numbers for each route listing
-    private List<String> outboundSeatNumbers;
-    private List<String> inboundSeatNumbers;
+    private Map<String, String> outboundSeatNumbers;
+    private Map<String, String> inboundSeatNumbers;
 
-    public BookingSimpleJson(Integer bookingId, String username, String outboundPlaneId, int outboundRouteId, LocalDateTime outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime, LocalDateTime startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, List<String> outboundSeatNumbers, List<String> inboundSeatNumbers) {
+    public BookingSimpleJson(Integer bookingId, String username, String outboundPlaneId, int outboundRouteId, LocalDateTime outboundDepartureDatetime, String inboundPlaneId, int inboundRouteId, LocalDateTime inboundDepartureDatetime, LocalDateTime startBookingDatetime, int partySize, double chargedPrice, boolean isPaid, Map<String, String> outboundSeatNumbers, Map<String, String> inboundSeatNumbers) {
         this.bookingId = bookingId;
         this.username = username;
 
@@ -73,13 +75,17 @@ public class BookingSimpleJson {
                 booking.getSeatListing() != null ?
                 booking.getSeatListing().stream()
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getOutboundRouteListing().getRouteListingPk()))
-                        .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())
-                        .collect(Collectors.toList()) : null,
+                        .collect(Collectors.toMap(
+                                seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                                seatListing -> seatListing.getOccupantName() == null ? "UNSPECIFIED" : seatListing.getOccupantName()
+                        )) : null,
                 booking.hasInboundRouteListing() && booking.getSeatListing() != null ?
                 booking.getSeatListing().stream()
                         .filter(s -> s.getSeatListingPk().checkSeatBelongsToRouteListing(s, booking.getInboundRouteListing().getRouteListingPk()))
-                        .map(seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber())
-                        .collect(Collectors.toList()) : null
+                        .collect(Collectors.toMap(
+                                seatListing -> seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                                seatListing -> seatListing.getOccupantName() == null ? "UNSPECIFIED" : seatListing.getOccupantName()
+                        )) : null
         );
     }
 
@@ -179,19 +185,19 @@ public class BookingSimpleJson {
         isPaid = paid;
     }
 
-    public List<String> getOutboundSeatNumbers() {
+    public Map<String, String> getOutboundSeatNumbers() {
         return outboundSeatNumbers;
     }
 
-    public void setOutboundSeatNumbers(List<String> outboundSeatNumbers) {
+    public void setOutboundSeatNumbers(Map<String, String> outboundSeatNumbers) {
         this.outboundSeatNumbers = outboundSeatNumbers;
     }
 
-    public List<String> getInboundSeatNumbers() {
+    public Map<String, String> getInboundSeatNumbers() {
         return inboundSeatNumbers;
     }
 
-    public void setInboundSeatNumbers(List<String> inboundSeatNumbers) {
+    public void setInboundSeatNumbers(Map<String, String> inboundSeatNumbers) {
         this.inboundSeatNumbers = inboundSeatNumbers;
     }
 }
