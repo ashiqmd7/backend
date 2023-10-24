@@ -170,7 +170,7 @@ public class SeatListingServiceTest {
         verify(routeListingRepo, times(2)).findById(any(RouteListingPk.class));
         verify(seatRepo).findById(any(SeatPk.class));
         verify(seatListingRepo).findById(any(SeatListingPk.class));
-        verify(bookingRepo, times(2)).findById(any(Integer.class));
+        verify(bookingRepo, times(3)).findById(any(Integer.class));
         verify(seatListingRepo).save(any(SeatListing.class));
     }
 
@@ -215,7 +215,7 @@ public class SeatListingServiceTest {
         verify(routeListingRepo).findById(any(RouteListingPk.class));
         verify(seatRepo).findById(any(SeatPk.class));
         verify(seatListingRepo).findById(any(SeatListingPk.class));
-        verify(bookingRepo).findById(any(Integer.class));
+        verify(bookingRepo, times(2)).findById(any(Integer.class));
         verify(seatListingRepo).save(any(SeatListing.class));
     }
 
@@ -231,6 +231,7 @@ public class SeatListingServiceTest {
         seatListingList.add(sampleSeatListing);
 
         sampleBooking.setSeatListing(seatListingList);
+        sampleBooking.setPaid(false);
 
         // mock
         when(planeRepo.findById(any(String.class))).thenReturn(Optional.of(sampleRouteListing.getRouteListingPk().getPlane()));
@@ -239,7 +240,7 @@ public class SeatListingServiceTest {
 
         when(seatRepo.findById(any(SeatPk.class))).thenReturn(Optional.of(sampleSeat));
         when(seatListingRepo.findById(any(SeatListingPk.class))).thenReturn(Optional.of(sampleSeatListing));
-
+        when(bookingRepo.findById(any(Integer.class))).thenReturn(Optional.of(sampleBooking));
         when(seatListingRepo.save(any(SeatListing.class))).thenReturn(sampleSeatListing);
 
         // act

@@ -63,6 +63,18 @@ public class BookingService {
         return retrievedBooking.getWingitUser().getUsername();
     }
 
+    public boolean checkIsBookingFinalized(int bookingId) {
+        Optional<Booking> optionalRetrievedBooking = repo.findById(bookingId);
+        if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Booking retrievedBooking = optionalRetrievedBooking.get();
+        if (isBookingExpired(retrievedBooking)) {
+            forceDeleteBooking(retrievedBooking);
+            throw new BookingExpiredException();
+        }
+
+        return retrievedBooking.isPaid();
+    }
+
     // Get all the bookings under a user
     public List<BookingSimpleJson> getAllBookingsByUser(String username) {
         List<Booking> bookings = repo.findAllByWingitUserUsername(username);
@@ -287,6 +299,8 @@ public class BookingService {
 
     @Transactional
     public double calculateAndSaveChargedPrice(int bookingId) {
+        if (checkIsBookingFinalized(bookingId)) throw new BookingBadRequestException("Trying to change price after booking is finalised");
+
         Optional<Booking> bookingOptional = repo.findById(bookingId);
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
