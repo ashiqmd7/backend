@@ -308,7 +308,7 @@ public class BookingService {
                 forceDeleteBooking(booking);
                 throw new BookingExpiredException();
             }
-            // TODO: Shoule we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
+            // TODO: Should we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
             throwIfSeatBookingsIncomplete(booking);
 
             double outboundPriceTotal = 0.0;
@@ -331,6 +331,49 @@ public class BookingService {
         } else {
             throw new BookingNotFoundException(bookingId);
         }
+    }
+
+    @Transactional
+    public Map<String, Object> calculateCostBreakdownForBooking(int bookingId) {
+        Optional<Booking> bookingOptional = repo.findById(bookingId);
+        if (bookingOptional.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Booking booking = bookingOptional.get();
+        if (isBookingExpired(booking)) {
+            forceDeleteBooking(booking);
+            throw new BookingExpiredException();
+        }
+        throwIfSeatBookingsIncomplete(booking);
+
+
+
+        Map<String, Object> costSummary = new HashMap<>();
+        final double outboundBasePrice = booking.getOutboundRouteListing().getBasePrice();
+        costSummary.put("outboundBasePrice", outboundBasePrice);
+        final double inboundBasePrice = booking.hasInboundRouteListing() ? booking.getInboundRouteListing().getBasePrice() : 0.0;
+        if (inboundBasePrice > 0.0) costSummary.put("inboundBasePrice", inboundBasePrice);
+        for (SeatListing seatListing : booking.getSeatListing()) {
+            boolean isOutboundRouteListing = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk() == booking.getOutboundRouteListing().getRouteListingPk();
+            Map<String, Object> seatBreakdown = new HashMap<>();
+            seatBreakdown.put("SeatNumber", seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
+            seatBreakdown.put("SeatClass", seatListing.getSeatListingPk().getSeat().getSeatClass());
+            seatBreakdown.put("PriceFactor", seatListing.getSeatListingPk().getSeat().getPriceFactor());
+            if (isOutboundRouteListing) {
+                double outboundSeatPrice = seatListing.getSeatListingPk().getSeat().getPriceFactor() * outboundBasePrice;
+                seatBreakdown.put("SeatPrice", outboundSeatPrice);
+                costSummary.put(
+                        "OUTBOUND-" + seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                        seatBreakdown);
+            } else {
+                double inboundSeatPrice = seatListing.getSeatListingPk().getSeat().getPriceFactor() * inboundBasePrice;
+                seatBreakdown.put("SeatPrice", inboundSeatPrice);
+                costSummary.put(
+                        "INBOUND-" + seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
+                        seatBreakdown);
+            }
+        }
+        costSummary.put("totalChargedPrice", booking.getChargedPrice());
+
+        return costSummary;
     }
 
     @Transactional

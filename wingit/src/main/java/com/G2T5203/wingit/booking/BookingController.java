@@ -110,9 +110,16 @@ public class BookingController {
     }
 
     @GetMapping("bookings/getPriceBreakdown/{bookingId}")
-    public Map<String, Object> getPriceBreakdown(@PathVariable int bookingId) {
-        // TODO: Check and verify is same user or admin
-        // TODO: TO BE IMPLEMENTED
-        return null;
+    public Map<String, Object> getPriceBreakdown(@PathVariable int bookingId,
+                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                 @AuthenticationPrincipal Jwt jwt) {
+        checkIfNotUserNorAdmin(service.getBookingUserUsername(bookingId), userDetails, jwt);
+        try {
+            return service.calculateCostBreakdownForBooking(bookingId);
+        } catch (BookingNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
     }
 }
