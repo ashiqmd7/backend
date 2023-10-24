@@ -176,6 +176,8 @@ public class SeatListingService {
             if (seatListing.getBooking() != null && // If it's null, means we are setting the bookingID value.
                     !seatListing.getBooking().getBookingId().equals(bookingId)) {
                 throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
+            } else if (seatListing.getBooking() == null && occupantName != null) { // If bookingId is null BUT occupant name is given (setOccupantName called wrongly) must reserve before setting name.
+                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
             }
 
             // Another check: Ensure that this seatListing's routeListingPk matches either the
@@ -190,11 +192,8 @@ public class SeatListingService {
 
             seatListing.setBooking(retrievedBooking.get());
 
-        } else {
-            // If bookingId is null BUT occupant name is given (setOccupantName called wrongly), means wrong endpoint called
-            if (occupantName != null) {
-                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
-            }
+        } else { // bookingId was set to null so caller is trying to cancel booking.
+            if (seatListing.getBooking() == null) throw new SeatListingBadRequestException("Trying to cancel seatListing when it wasn't set to a booking previously");
             seatListing.setBooking(null);
         }
 
