@@ -254,7 +254,7 @@ public class BookingServiceTest {
         assertEquals(sampleBooking.getChargedPrice(), price);
 
         // verify
-        verify(bookingRepo).findById(sampleBooking.getBookingId());
+        verify(bookingRepo, times(2)).findById(sampleBooking.getBookingId());
     }
 
     @Test
@@ -281,4 +281,6 @@ public class BookingServiceTest {
         verify(bookingRepo).findById(sampleBooking.getBookingId());
         verify(bookingRepo).save(sampleBooking);
     }
+
+    // TODO: Write tests for getPriceBreakdown
 }

@@ -1,8 +1,6 @@
 package com.G2T5203.wingit.seatListing;
 
-import com.G2T5203.wingit.booking.Booking;
-import com.G2T5203.wingit.booking.BookingNotFoundException;
-import com.G2T5203.wingit.booking.BookingRepository;
+import com.G2T5203.wingit.booking.*;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.plane.PlaneNotFoundException;
 import com.G2T5203.wingit.plane.PlaneRepository;
@@ -34,6 +32,8 @@ public class SeatListingService {
     private final SeatRepository seatRepo;
     private final BookingRepository bookingRepo;
 
+    // NOTE: We cannot include booking service as it would introduce cyclic dependency
+
 
     public SeatListingService(SeatListingRepository repo, PlaneRepository planeRepo, RouteRepository routeRepo, RouteListingRepository routeListingRepo, SeatRepository seatRepo, BookingRepository bookingRepo) {
         this.repo = repo;
@@ -44,11 +44,12 @@ public class SeatListingService {
         this.bookingRepo = bookingRepo;
     }
 
-    public List<SeatListingSimpleJson> getAllSeatListings() {
-        List<SeatListing> seatListings = repo.findAll();
-        return seatListings.stream()
-                .map(SeatListingSimpleJson::new)
-                .collect(Collectors.toList());
+    public boolean checkIsBookingFinalized(int bookingId) {
+        Optional<Booking> optionalRetrievedBooking = bookingRepo.findById(bookingId);
+        if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
+        Booking retrievedBooking = optionalRetrievedBooking.get();
+
+        return retrievedBooking.isPaid();
     }
 
     public List<PrivacySeatListingSimpleJson> getAllSeatListingsInRouteListing(String planeId, int routeId, LocalDateTime departureDateTime) {
@@ -147,6 +148,9 @@ public class SeatListingService {
     }
     @Transactional
     private SeatListing setSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
+        if (bookingId != null && checkIsBookingFinalized(bookingId))
+            throw new SeatListingBadRequestException("Trying to change seat listing reservation after booking finalization.");
+
         Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
         if (retrievedPlane.isEmpty()) throw new PlaneNotFoundException(planeId);
 
@@ -176,6 +180,8 @@ public class SeatListingService {
             if (seatListing.getBooking() != null && // If it's null, means we are setting the bookingID value.
                     !seatListing.getBooking().getBookingId().equals(bookingId)) {
                 throw new SeatListingBadRequestException("Invalid booking ID, booking ID does not match");
+            } else if (seatListing.getBooking() == null && occupantName != null) { // If bookingId is null BUT occupant name is given (setOccupantName called wrongly) must reserve before setting name.
+                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
             }
 
             // Another check: Ensure that this seatListing's routeListingPk matches either the
@@ -190,11 +196,11 @@ public class SeatListingService {
 
             seatListing.setBooking(retrievedBooking.get());
 
-        } else {
-            // If bookingId is null BUT occupant name is given (setOccupantName called wrongly), means wrong endpoint called
-            if (occupantName != null) {
-                throw new SeatListingBadRequestException("No booking made yet, set a booking first.");
-            }
+        } else { // bookingId was set to null so caller is trying to cancel booking.
+            if (seatListing.getBooking() == null)
+                throw new SeatListingBadRequestException("Trying to cancel seat listing when it wasn't set to a booking previously");
+            else if (checkIsBookingFinalized(seatListing.getBooking().getBookingId()))
+                throw new SeatListingBadRequestException("Trying to cancel seat listing when booking is already finalized.");
             seatListing.setBooking(null);
         }
 

@@ -68,7 +68,10 @@ public class BookingController {
     }
 
     @DeleteMapping("bookings/delete/{bookingId}")
-    public void deleteBooking(@PathVariable int bookingId) {
+    public void deleteBooking(@PathVariable int bookingId,
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              @AuthenticationPrincipal Jwt jwt) {
+        checkIfNotUserNorAdmin(service.getBookingUserUsername(bookingId), userDetails, jwt);
         try {
             service.deleteBookingById(bookingId);
         } catch (BookingNotFoundException e) {
@@ -93,9 +96,26 @@ public class BookingController {
     }
 
     @PutMapping("bookings/markAsPaid/{bookingId}")
-    public void markBookingAsPaid(@PathVariable int bookingId) {
+    public void markBookingAsPaid(@PathVariable int bookingId,
+                                  @AuthenticationPrincipal UserDetails userDetails,
+                                  @AuthenticationPrincipal Jwt jwt) {
+        checkIfNotUserNorAdmin(service.getBookingUserUsername(bookingId), userDetails, jwt);
         try {
             service.markBookingAsPaid(bookingId);
+        } catch (BookingNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
+    }
+
+    @GetMapping("bookings/getPriceBreakdown/{bookingId}")
+    public Map<String, Object> getPriceBreakdown(@PathVariable int bookingId,
+                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                 @AuthenticationPrincipal Jwt jwt) {
+        checkIfNotUserNorAdmin(service.getBookingUserUsername(bookingId), userDetails, jwt);
+        try {
+            return service.calculateCostBreakdownForBooking(bookingId);
         } catch (BookingNotFoundException e) {
             throw e;
         } catch (Exception e) {
