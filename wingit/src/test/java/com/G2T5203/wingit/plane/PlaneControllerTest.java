@@ -1,6 +1,9 @@
 package com.G2T5203.wingit.plane;
 
 import com.G2T5203.wingit.TestUtils;
+import com.G2T5203.wingit.seat.SeatRepository;
+import com.G2T5203.wingit.seat.SeatService;
+import com.G2T5203.wingit.seat.SeatSimpleJson;
 import com.G2T5203.wingit.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +36,10 @@ class PlaneControllerTest {
     UserRepository userRepository;
     @Autowired
     PlaneRepository planeRepository;
+    @Autowired
+    SeatRepository seatRepository;
+    @Autowired
+    SeatService seatService;
 
     @BeforeEach
     void setUp() {
@@ -43,6 +51,7 @@ class PlaneControllerTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        seatRepository.deleteAll();
         planeRepository.deleteAll();
     }
 
@@ -153,6 +162,21 @@ class PlaneControllerTest {
         assertEquals(403, responseEntity.getStatusCode().value());
     }
 
+
+    @Test
+    void createPlaneNewWithSeats_Success() throws Exception {
+        Plane samplePlane = testUtils.createSamplePlane1();
+        URI uri = testUtils.constructUri("planes/newWithSeats");
+        ResponseEntity<Plane> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .postForEntity(uri, samplePlane, Plane.class);
+
+        assertEquals(201, responseEntity.getStatusCode().value());
+        Optional<Plane> postedPlane = planeRepository.findById(samplePlane.getPlaneId());
+        assertTrue(postedPlane.isPresent());
+        List<SeatSimpleJson> createdSeats = seatService.getAllSeatsForPlane(postedPlane.get().getPlaneId());
+        assertEquals(postedPlane.get().getCapacity(), createdSeats.size());
+    }
     @Test
     void deletePlane_Success() throws Exception {
         Plane planeToBeDeleted = testUtils.createSamplePlane1();

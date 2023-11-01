@@ -81,6 +81,7 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/planes")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/planes/*")).authenticated()
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/planes/new")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/planes/newWithSeats")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/planes/delete/*")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/planes/update/*")).hasRole("ADMIN")
 
