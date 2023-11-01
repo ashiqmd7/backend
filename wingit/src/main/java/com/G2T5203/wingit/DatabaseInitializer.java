@@ -261,6 +261,8 @@ public class DatabaseInitializer {
         // Book maybe half of the tickets... So seeded Randomization of what tickets to book.
         // Book it all under this one mega user
 
+        int counter = 0;
+
         final long RANDOM_SEED = 777L;
         WingitUser richUser = userList.get(3);
         Random outerRandom = new Random(RANDOM_SEED);
@@ -312,6 +314,10 @@ public class DatabaseInitializer {
                 bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
                 bookingService.markBookingAsPaid(newBooking.getBookingId());
             }
+
+            counter++;
+            if (counter % 25 == 0 || counter == routeListingList.size())
+                Log(String.format("[Bookings progress... %d/%d", counter, routeListingList.size()));
         }
     }
 
