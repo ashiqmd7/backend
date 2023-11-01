@@ -21,14 +21,17 @@ public class SeatService {
         this.planeRepo = planeRepo;
     }
 
-    public List<SeatSimpleJson> getAllSeatsForPlane(String planeId) {
-        if (!planeRepo.existsById(planeId)) throw new PlaneNotFoundException(planeId);
-
-        List<Seat> seats = repo.findAllBySeatPkPlanePlaneId(planeId);
-        return seats.stream()
+    public List<SeatSimpleJson> getAllSeatsForPlaneAsSimpleJson(String planeId) {
+        return getAllSeatsForPlane(planeId).stream()
                 .map(SeatSimpleJson::new)
                 .collect(Collectors.toList());
     }
+
+    public List<Seat> getAllSeatsForPlane(String planeId) {
+        if (!planeRepo.existsById(planeId)) throw new PlaneNotFoundException(planeId);
+        return repo.findAllBySeatPkPlanePlaneId(planeId);
+    }
+
 
     @Transactional
     public Seat createSeat(SeatSimpleJson newSeatSimpleJson) {

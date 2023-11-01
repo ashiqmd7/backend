@@ -15,7 +15,7 @@ public class SeatController {
     @GetMapping(path = "/seats/{planeId}")
     public List<SeatSimpleJson> getAllSeatsForPlane(@PathVariable String planeId) {
         try {
-            return service.getAllSeatsForPlane(planeId);
+            return service.getAllSeatsForPlaneAsSimpleJson(planeId);
         } catch (Exception e) {
             throw new SeatBadRequestException(e);
         }

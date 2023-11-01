@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class SeatListingService {
     private final RouteListingRepository routeListingRepo;
     private final SeatRepository seatRepo;
     private final BookingRepository bookingRepo;
+
 
     // NOTE: We cannot include booking service as it would introduce cyclic dependency
 
@@ -105,6 +107,29 @@ public class SeatListingService {
                 null,
                 null);
         return repo.save(newSeatListing);
+    }
+
+    @Transactional
+    public void createSeatListingsForNewRouteListing(RouteListing newRouteListing) {
+        if (repo.existsBySeatListingPkRouteListingRouteListingPk(newRouteListing.getRouteListingPk()))
+            throw new SeatListingBadRequestException("SeatListings for newRouteListing already exists");
+
+        // We assume route, plane, etc. exists because we are passing in a proper RouteListing.
+        Plane plane = newRouteListing.getRouteListingPk().getPlane();
+        List<Seat> seats = seatRepo.findAllBySeatPkPlanePlaneId(plane.getPlaneId());
+
+        int numSeats = seats.size();
+        List<SeatListing> seatListingsToBeCreated = new ArrayList<>(numSeats);
+        for (int i = 0; i < numSeats; i++) {
+            Seat currentSeat = seats.get(i);
+            seatListingsToBeCreated.add(new SeatListing(
+                    new SeatListingPk(newRouteListing, currentSeat),
+                    null,
+                    null
+            ));
+        }
+
+        repo.saveAll(seatListingsToBeCreated);
     }
 
     @Transactional

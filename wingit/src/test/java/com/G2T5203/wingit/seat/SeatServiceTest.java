@@ -40,7 +40,7 @@ public class SeatServiceTest {
         when(planeRepository.existsById(dummyPlaneId)).thenReturn(true);
 
         // act
-        List<SeatSimpleJson> result = seatService.getAllSeatsForPlane("DUMMY_PLANE_ID");
+        List<SeatSimpleJson> result = seatService.getAllSeatsForPlaneAsSimpleJson("DUMMY_PLANE_ID");
 
         // verify
         verify(seatRepository).findAllBySeatPkPlanePlaneId(dummyPlaneId);

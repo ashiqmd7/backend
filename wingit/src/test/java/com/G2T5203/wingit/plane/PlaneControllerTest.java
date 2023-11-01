@@ -174,7 +174,7 @@ class PlaneControllerTest {
         assertEquals(201, responseEntity.getStatusCode().value());
         Optional<Plane> postedPlane = planeRepository.findById(samplePlane.getPlaneId());
         assertTrue(postedPlane.isPresent());
-        List<SeatSimpleJson> createdSeats = seatService.getAllSeatsForPlane(postedPlane.get().getPlaneId());
+        List<SeatSimpleJson> createdSeats = seatService.getAllSeatsForPlaneAsSimpleJson(postedPlane.get().getPlaneId());
         assertEquals(postedPlane.get().getCapacity(), createdSeats.size());
     }
     @Test

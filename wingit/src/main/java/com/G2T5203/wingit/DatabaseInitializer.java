@@ -246,18 +246,10 @@ public class DatabaseInitializer {
             }
         }
     }
-    private static void initialiseSampleSeatListings(List<SeatListing> list, SeatListingRepository repo, List<RouteListing> routeListingList, SeatRepository seatRepo) {
+    private static void initialiseSampleSeatListings(SeatListingService seatListingService, List<RouteListing> routeListingList) {
         long counter = 0;
         for (RouteListing routeListing : routeListingList) {
-            Plane plane = routeListing.getRouteListingPk().getPlane();
-            List<Seat> seats = seatRepo.findAllBySeatPkPlanePlaneId(plane.getPlaneId());
-            for (Seat seat : seats) {
-                list.add(repo.save(new SeatListing(
-                        new SeatListingPk(routeListing, seat),
-                        null,
-                        null
-                )));
-            }
+            seatListingService.createSeatListingsForNewRouteListing(routeListing);
             counter++;
             if (counter % 100 == 0 || counter == routeListingList.size())
                 Log(String.format("[SeatListing progress... %d/%d", counter, routeListingList.size()));
@@ -367,15 +359,12 @@ public class DatabaseInitializer {
 
 
         // Initialise SeatListings
-        SeatListingRepository seatListingRepository = context.getBean(SeatListingRepository.class);
-        List<SeatListing> seatListingList = new ArrayList<>();
-        initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatRepository);
-//        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListing); }
+        SeatListingService seatListingService = context.getBean(SeatListingService.class);
+        initialiseSampleSeatListings(seatListingService, routeListingList);
         Log("[Added sample SeatListing]");
 
         // Initialise Bookings
         BookingRepository bookingRepository = context.getBean(BookingRepository.class);
-        SeatListingService seatListingService = context.getBean(SeatListingService.class);
         BookingService bookingService = context.getBean(BookingService.class);
         List<Booking> bookingList = new ArrayList<>();
         initialiseSampleBookings(bookingList, bookingRepository, wingitUserList, routeListingList, seatListingService, bookingService);
