@@ -10,9 +10,7 @@ import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.seat.Seat;
-import com.G2T5203.wingit.seat.SeatPk;
-import com.G2T5203.wingit.seat.SeatRepository;
+import com.G2T5203.wingit.seat.*;
 import com.G2T5203.wingit.seatListing.*;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.user.WingitUser;
@@ -123,43 +121,9 @@ public class DatabaseInitializer {
         list.add(repo.save(new Plane( "SQ350", 42, "B777")));
         list.add(repo.save(new Plane( "SQ777", 30, "A350")));
     }
-    private static void initialiseSampleSeats(List<Seat> list, SeatRepository repo, List<Plane> planeList) {
+    private static void initialiseSampleSeats(List<Plane> planeList, SeatService seatService) {
         for (Plane plane : planeList) {
-            int numNonEconomySeats = 0;
-
-            // First class (row 1 to 3) 3 rows, 2 seats per row, 6 seats
-            for (int row = 1; row <= 3; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 2; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "First", 10.0)));
-                    numNonEconomySeats++;
-                }
-            }
-
-            // Business class (row 4 to 6) 3 rows, 4 seats per row, 12 seats
-            for (int row = 4; row <= 6; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 4; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "Business", 3.0)));
-                    numNonEconomySeats++;
-                }
-            }
-
-            // Economy class (row 7 onwards), 6 seats per row.
-            int numEconomyRows = (plane.getCapacity() - numNonEconomySeats) / 6;
-            int numEconomySeats = 0;
-            for (int row = 7; row <= 7 + numEconomyRows; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 6; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "Economy", 1.0)));
-                    numEconomySeats++;
-                }
-            }
-
-            assert(plane.getCapacity() == (numNonEconomySeats + numEconomySeats));
+            seatService.createSeatsForNewPlane(plane);
         }
     }
     private static void initialiseSampleRoutes(List<Route> list, RouteRepository repo) {
@@ -282,11 +246,11 @@ public class DatabaseInitializer {
             }
         }
     }
-    private static void initialiseSampleSeatListings(List<SeatListing> list, SeatListingRepository repo, List<RouteListing> routeListingList, List<Seat> seatList) {
+    private static void initialiseSampleSeatListings(List<SeatListing> list, SeatListingRepository repo, List<RouteListing> routeListingList, SeatRepository seatRepo) {
         long counter = 0;
         for (RouteListing routeListing : routeListingList) {
             Plane plane = routeListing.getRouteListingPk().getPlane();
-            List<Seat> seats = seatList.stream().filter(seat -> seat.getSeatPk().getPlane().getPlaneId().equals(plane.getPlaneId())).toList();
+            List<Seat> seats = seatRepo.findAllBySeatPkPlanePlaneId(plane.getPlaneId());
             for (Seat seat : seats) {
                 list.add(repo.save(new SeatListing(
                         new SeatListingPk(routeListing, seat),
@@ -381,9 +345,8 @@ public class DatabaseInitializer {
 
         // Initialise Seats
         SeatRepository seatRepository = context.getBean(SeatRepository.class);
-        List<Seat> seatList = new ArrayList<>();
-        initialiseSampleSeats(seatList, seatRepository, planeList);
-//        for (Seat seat : seatList) { Log("[Add Seat]: " + seat); }
+        SeatService seatService = context.getBean(SeatService.class);
+        initialiseSampleSeats(planeList, seatService);
         Log("[Added sample Seats]");
 
 
@@ -406,7 +369,7 @@ public class DatabaseInitializer {
         // Initialise SeatListings
         SeatListingRepository seatListingRepository = context.getBean(SeatListingRepository.class);
         List<SeatListing> seatListingList = new ArrayList<>();
-        initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatList);
+        initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatRepository);
 //        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListing); }
         Log("[Added sample SeatListing]");
 
