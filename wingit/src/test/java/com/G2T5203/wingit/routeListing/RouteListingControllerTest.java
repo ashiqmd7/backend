@@ -3,6 +3,11 @@ package com.G2T5203.wingit.routeListing;
 import com.G2T5203.wingit.TestUtils;
 import com.G2T5203.wingit.plane.Plane;
 import com.G2T5203.wingit.route.Route;
+import com.G2T5203.wingit.seat.Seat;
+import com.G2T5203.wingit.seat.SeatPk;
+import com.G2T5203.wingit.seat.SeatRepository;
+import com.G2T5203.wingit.seatListing.SeatListing;
+import com.G2T5203.wingit.seatListing.SeatListingRepository;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
@@ -19,6 +24,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -46,6 +52,10 @@ class RouteListingControllerTest {
     RouteRepository routeRepository;
     @Autowired
     PlaneRepository planeRepository;
+    @Autowired
+    SeatRepository seatRepository;
+    @Autowired
+    SeatListingRepository seatListingRepository;
 
     @BeforeEach
     void setUp() {
@@ -56,8 +66,10 @@ class RouteListingControllerTest {
 
     @AfterEach
     void tearDown() {
+        seatListingRepository.deleteAll();
         routeListingRepository.deleteAll();
         routeRepository.deleteAll();
+        seatRepository.deleteAll();
         planeRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -104,7 +116,15 @@ class RouteListingControllerTest {
         Route sampleRoute1 = testUtils.createSampleRoute1();
         Plane plane = testUtils.createSamplePlane1();
         Route savedRoute = routeRepository.save(sampleRoute1);
-        planeRepository.save(plane);
+        Plane savedPlane = planeRepository.save(plane);
+        final int NUM_SEATS = 5;
+        for (int i = 0; i < NUM_SEATS; i++) {
+            seatRepository.save(
+                new Seat(
+                    new SeatPk(savedPlane, "A0" + (i + 1)),
+                        "Economy",
+                        1.0));
+        }
 
         RouteListingSimpleJson routeListingSimpleJson = testUtils.createSampleRouteListingSimpleJson(savedRoute, plane);
 
@@ -113,21 +133,13 @@ class RouteListingControllerTest {
                 .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
                 .postForEntity(uri, routeListingSimpleJson, RouteListing.class);
 
-        assertEquals(HttpStatus.CREATED.value(), responseEntity.getStatusCodeValue());
+        assertEquals(HttpStatus.CREATED.value(), responseEntity.getStatusCode().value());
         RouteListing returnedRouteListing = responseEntity.getBody();
         assertNotNull(returnedRouteListing);
-        Optional<RouteListing> postedRouteListing = routeListingRepository.findById(returnedRouteListing.getRouteListingPk());
+        assertTrue(routeListingRepository.existsById(returnedRouteListing.getRouteListingPk()));
 
-//        // verify the saved route listing by fetching it from the repository
-//        RouteListing savedRouteListing = routeListingRepository.findById(returnedRouteListing.getRouteListingPk()).orElse(null);
-//        assertNotNull(savedRouteListing);
-//
-//        // assert specific attributes of the saved route listing
-//        assertEquals(routeListingSimpleJson.getBasePrice(), savedRouteListing.getBasePrice());
-
-        // TODO: Fix this. Locally this runs fine but CI/CD actions show this as throwing error. Need to investigate.
-        //       See build #31 in dev for log details.
-        // assertTrue(postedRouteListing.isPresent());
+        List<SeatListing> seatListings = seatListingRepository.findBySeatListingPkRouteListingRouteListingPk(returnedRouteListing.getRouteListingPk());
+        assertEquals(NUM_SEATS, seatListings.size());
     }
 
     @Test
