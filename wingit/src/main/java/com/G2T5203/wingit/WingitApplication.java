@@ -37,19 +37,16 @@ public class WingitApplication {
 					"+65 8888 9999",
 					"Master"));
 		}
-		DatabaseInitializer.init(context);
 
-//		try {
-//			org.springframework.core.io.Resource resource = new ClassPathResource("application.properties");
-//			Properties props = PropertiesLoaderUtils.loadProperties(resource);
-//			String activeProfile = props.getProperty("spring.profiles.active");
-//			boolean notProdProfile = !activeProfile.equals("prod");
-//			if (notProdProfile) {
-//			} else {
-//			}
-//		} catch (IOException e) {
-//			System.out.println("ERROR: " + e.getLocalizedMessage());
-//		}
+		try {
+			org.springframework.core.io.Resource resource = new ClassPathResource("application.properties");
+			Properties props = PropertiesLoaderUtils.loadProperties(resource);
+			String activeProfile = props.getProperty("spring.profiles.active");
+			boolean isProduction = activeProfile.equals("prod");
+			DatabaseInitializer.init(context, isProduction);
+		} catch (IOException e) {
+			System.out.println("ERROR: " + e.getLocalizedMessage());
+		}
 	}
 
 	// create a CORS mapping

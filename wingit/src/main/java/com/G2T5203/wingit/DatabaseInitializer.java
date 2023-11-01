@@ -31,7 +31,7 @@ import java.util.Random;
 
 public class DatabaseInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
-    private static void Log(String msg) { logger.debug(msg); }
+    private static void Log(String msg) { logger.info(msg); }
 
     private static void initialiseSampleUsers(List<WingitUser> list, UserRepository repo, BCryptPasswordEncoder encoder) {
         list.add(repo.save(new WingitUser(
@@ -212,7 +212,7 @@ public class DatabaseInitializer {
                 "China",
                 Duration.ofHours(12).plusMinutes(45) )));
     }
-    private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
+    private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList, boolean isProduction) {
         for (int year = 2023; year <= 2023; year++) {
             for (int month = 12; month <= 12; month++) {
                 int daysInMonth;
@@ -222,6 +222,12 @@ public class DatabaseInitializer {
                 for (int day = 1; day <= daysInMonth; day++) {
                     // NOTE: We have equal double number of planes and routes. Two planes serves each route for sample database.
                     // NOTE: 40 planes, 20 routes. Each Route has two planes flying that route per day.
+                    if (isProduction) {
+                        // In production we skip everything that is not a multiple of 5 and also everything that is not 2023 Dec.
+                        if (year != 2023 || month != 12) continue;
+                        if (day % 5 != 0) continue;
+                    }
+
                     for (int planeOffset = 0; planeOffset < 2; planeOffset++) {
                         for (int i = 0; i < routeList.size(); i++) {
                             int hour = i % 2 == 0 ? 7 : 13;
@@ -321,7 +327,7 @@ public class DatabaseInitializer {
         }
     }
 
-    public static void init(ApplicationContext context) {
+    public static void init(ApplicationContext context, boolean isProduction) {
         // Get encoder
         BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
 
@@ -359,7 +365,7 @@ public class DatabaseInitializer {
         // Initialise RouteListings
         RouteListingRepository routeListingRepository = context.getBean(RouteListingRepository.class);
         List<RouteListing> routeListingList = new ArrayList<>();
-        initialiseSampleRouteListings(routeListingList, routeListingRepository, planeList, routeList);
+        initialiseSampleRouteListings(routeListingList, routeListingRepository, planeList, routeList, isProduction);
 //        for (RouteListing routeListing : routeListingList) { Log("[Add RouteListing]: " + routeListing); }
         Log("[Added sample RouteListings]");
 
