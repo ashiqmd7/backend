@@ -10,9 +10,7 @@ import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.seat.Seat;
-import com.G2T5203.wingit.seat.SeatPk;
-import com.G2T5203.wingit.seat.SeatRepository;
+import com.G2T5203.wingit.seat.*;
 import com.G2T5203.wingit.seatListing.*;
 import com.G2T5203.wingit.user.UserRepository;
 import com.G2T5203.wingit.user.WingitUser;
@@ -33,7 +31,7 @@ import java.util.Random;
 
 public class DatabaseInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
-    private static void Log(String msg) { logger.debug(msg); }
+    private static void Log(String msg) { logger.info(msg); }
 
     private static void initialiseSampleUsers(List<WingitUser> list, UserRepository repo, BCryptPasswordEncoder encoder) {
         list.add(repo.save(new WingitUser(
@@ -123,43 +121,9 @@ public class DatabaseInitializer {
         list.add(repo.save(new Plane( "SQ350", 42, "B777")));
         list.add(repo.save(new Plane( "SQ777", 30, "A350")));
     }
-    private static void initialiseSampleSeats(List<Seat> list, SeatRepository repo, List<Plane> planeList) {
+    private static void initialiseSampleSeats(List<Plane> planeList, SeatService seatService) {
         for (Plane plane : planeList) {
-            int numNonEconomySeats = 0;
-
-            // First class (row 1 to 3) 3 rows, 2 seats per row, 6 seats
-            for (int row = 1; row <= 3; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 2; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "First", 10.0)));
-                    numNonEconomySeats++;
-                }
-            }
-
-            // Business class (row 4 to 6) 3 rows, 4 seats per row, 12 seats
-            for (int row = 4; row <= 6; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 4; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "Business", 3.0)));
-                    numNonEconomySeats++;
-                }
-            }
-
-            // Economy class (row 7 onwards), 6 seats per row.
-            int numEconomyRows = (plane.getCapacity() - numNonEconomySeats) / 6;
-            int numEconomySeats = 0;
-            for (int row = 7; row <= 7 + numEconomyRows; row++) {
-                for (int seatAlphabet = 0; seatAlphabet < 6; seatAlphabet++) {
-                    Character seatChar = (char) ('A' + seatAlphabet);
-                    String seatNumber = seatChar + String.format("%02d", row);
-                    list.add(repo.save(new Seat(new SeatPk(plane, seatNumber), "Economy", 1.0)));
-                    numEconomySeats++;
-                }
-            }
-
-            assert(plane.getCapacity() == (numNonEconomySeats + numEconomySeats));
+            seatService.createSeatsForNewPlane(plane);
         }
     }
     private static void initialiseSampleRoutes(List<Route> list, RouteRepository repo) {
@@ -248,7 +212,7 @@ public class DatabaseInitializer {
                 "China",
                 Duration.ofHours(12).plusMinutes(45) )));
     }
-    private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList) {
+    private static void initialiseSampleRouteListings(List<RouteListing> list, RouteListingRepository repo, List<Plane> planeList, List<Route> routeList, boolean isProduction) {
         for (int year = 2023; year <= 2023; year++) {
             for (int month = 12; month <= 12; month++) {
                 int daysInMonth;
@@ -258,6 +222,12 @@ public class DatabaseInitializer {
                 for (int day = 1; day <= daysInMonth; day++) {
                     // NOTE: We have equal double number of planes and routes. Two planes serves each route for sample database.
                     // NOTE: 40 planes, 20 routes. Each Route has two planes flying that route per day.
+                    if (isProduction) {
+                        // In production we skip everything that is not a multiple of 5 and also everything that is not 2023 Dec.
+                        if (year != 2023 || month != 12) continue;
+                        if (day % 5 != 0) continue;
+                    }
+
                     for (int planeOffset = 0; planeOffset < 2; planeOffset++) {
                         for (int i = 0; i < routeList.size(); i++) {
                             int hour = i % 2 == 0 ? 7 : 13;
@@ -282,18 +252,10 @@ public class DatabaseInitializer {
             }
         }
     }
-    private static void initialiseSampleSeatListings(List<SeatListing> list, SeatListingRepository repo, List<RouteListing> routeListingList, List<Seat> seatList) {
+    private static void initialiseSampleSeatListings(SeatListingService seatListingService, List<RouteListing> routeListingList) {
         long counter = 0;
         for (RouteListing routeListing : routeListingList) {
-            Plane plane = routeListing.getRouteListingPk().getPlane();
-            List<Seat> seats = seatList.stream().filter(seat -> seat.getSeatPk().getPlane().getPlaneId().equals(plane.getPlaneId())).toList();
-            for (Seat seat : seats) {
-                list.add(repo.save(new SeatListing(
-                        new SeatListingPk(routeListing, seat),
-                        null,
-                        null
-                )));
-            }
+            seatListingService.createSeatListingsForNewRouteListing(routeListing);
             counter++;
             if (counter % 100 == 0 || counter == routeListingList.size())
                 Log(String.format("[SeatListing progress... %d/%d", counter, routeListingList.size()));
@@ -304,6 +266,8 @@ public class DatabaseInitializer {
         // Go through each and every routeListing
         // Book maybe half of the tickets... So seeded Randomization of what tickets to book.
         // Book it all under this one mega user
+
+        int counter = 0;
 
         final long RANDOM_SEED = 777L;
         WingitUser richUser = userList.get(3);
@@ -356,10 +320,14 @@ public class DatabaseInitializer {
                 bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
                 bookingService.markBookingAsPaid(newBooking.getBookingId());
             }
+
+            counter++;
+            if (counter % 25 == 0 || counter == routeListingList.size())
+                Log(String.format("[Bookings progress... %d/%d", counter, routeListingList.size()));
         }
     }
 
-    public static void init(ApplicationContext context) {
+    public static void init(ApplicationContext context, boolean isProduction) {
         // Get encoder
         BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
 
@@ -381,9 +349,8 @@ public class DatabaseInitializer {
 
         // Initialise Seats
         SeatRepository seatRepository = context.getBean(SeatRepository.class);
-        List<Seat> seatList = new ArrayList<>();
-        initialiseSampleSeats(seatList, seatRepository, planeList);
-//        for (Seat seat : seatList) { Log("[Add Seat]: " + seat); }
+        SeatService seatService = context.getBean(SeatService.class);
+        initialiseSampleSeats(planeList, seatService);
         Log("[Added sample Seats]");
 
 
@@ -398,21 +365,18 @@ public class DatabaseInitializer {
         // Initialise RouteListings
         RouteListingRepository routeListingRepository = context.getBean(RouteListingRepository.class);
         List<RouteListing> routeListingList = new ArrayList<>();
-        initialiseSampleRouteListings(routeListingList, routeListingRepository, planeList, routeList);
+        initialiseSampleRouteListings(routeListingList, routeListingRepository, planeList, routeList, isProduction);
 //        for (RouteListing routeListing : routeListingList) { Log("[Add RouteListing]: " + routeListing); }
         Log("[Added sample RouteListings]");
 
 
         // Initialise SeatListings
-        SeatListingRepository seatListingRepository = context.getBean(SeatListingRepository.class);
-        List<SeatListing> seatListingList = new ArrayList<>();
-        initialiseSampleSeatListings(seatListingList, seatListingRepository, routeListingList, seatList);
-//        for (SeatListing seatListing : seatListingList) { Log("[Add SeatListing]: " + seatListing); }
+        SeatListingService seatListingService = context.getBean(SeatListingService.class);
+        initialiseSampleSeatListings(seatListingService, routeListingList);
         Log("[Added sample SeatListing]");
 
         // Initialise Bookings
         BookingRepository bookingRepository = context.getBean(BookingRepository.class);
-        SeatListingService seatListingService = context.getBean(SeatListingService.class);
         BookingService bookingService = context.getBean(BookingService.class);
         List<Booking> bookingList = new ArrayList<>();
         initialiseSampleBookings(bookingList, bookingRepository, wingitUserList, routeListingList, seatListingService, bookingService);

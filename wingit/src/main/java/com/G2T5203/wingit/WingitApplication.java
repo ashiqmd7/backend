@@ -22,30 +22,28 @@ public class WingitApplication {
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(WingitApplication.class, args);
 
+		UserRepository userRepo = context.getBean(UserRepository.class);
+		BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
+		if (userRepo.findAll().isEmpty()) {
+			// Create the default admin user.
+			userRepo.save(new WingitUser(
+					"admin",
+					encoder.encode("P@SSw0rd"),
+					"ROLE_ADMIN",
+					"Admin",
+					"Admin",
+					LocalDate.parse("2000-01-01"),
+					"admin@wingit.world",
+					"+65 8888 9999",
+					"Master"));
+		}
+
 		try {
 			org.springframework.core.io.Resource resource = new ClassPathResource("application.properties");
 			Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			String activeProfile = props.getProperty("spring.profiles.active");
-			boolean notProdProfile = !activeProfile.equals("prod");
-			if (notProdProfile) {
-				DatabaseInitializer.init(context);
-			} else {
-				UserRepository userRepo = context.getBean(UserRepository.class);
-				BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
-				if (userRepo.findAll().isEmpty()) {
-					// Create the default admin user.
-					userRepo.save(new WingitUser(
-							"admin",
-							encoder.encode("P@SSw0rd"),
-							"ROLE_ADMIN",
-							"Admin",
-							"Admin",
-							LocalDate.parse("2000-01-01"),
-							"admin@wingit.world",
-							"+65 8888 9999",
-							"Master"));
-				}
-			}
+			boolean isProduction = activeProfile.equals("prod");
+			DatabaseInitializer.init(context, isProduction);
 		} catch (IOException e) {
 			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}

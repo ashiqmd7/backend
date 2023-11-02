@@ -34,15 +34,18 @@ public class SeatServiceTest {
     @Test
     void getAllSeats_multipleSeats_Success() {
         // arrange
+        final String dummyPlaneId = "DUMMY_PLANE_ID";
         List<Seat> expectedSeats = new ArrayList<>();
-        when(seatRepository.findAll()).thenReturn(expectedSeats);
+        when(seatRepository.findAllBySeatPkPlanePlaneId(dummyPlaneId)).thenReturn(expectedSeats);
+        when(planeRepository.existsById(dummyPlaneId)).thenReturn(true);
 
         // act
-        List<SeatSimpleJson> result = seatService.getAllSeats();
+        List<SeatSimpleJson> result = seatService.getAllSeatsForPlaneAsSimpleJson("DUMMY_PLANE_ID");
 
         // verify
-        verify(seatRepository).findAll();
-        assertEquals(expectedSeats, result);
+        verify(seatRepository).findAllBySeatPkPlanePlaneId(dummyPlaneId);
+        verify(planeRepository).existsById(dummyPlaneId);
+        assertEquals(expectedSeats.size(), result.size());
     }
 
     @Test
