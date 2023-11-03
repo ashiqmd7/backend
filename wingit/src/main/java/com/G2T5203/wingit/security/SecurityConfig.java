@@ -34,7 +34,7 @@ public class SecurityConfig {
 
     @Value("${jwt.key}")
     private String jwtKey;
-    
+
     @Bean
     @Order(1)
     SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -109,9 +109,9 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/seatListings/**")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/seatListings/**")).authenticated()
 
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/rest/api/generate-calendar")).permitAll()
+
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/*")).permitAll()
-
-
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/authTest/*")).authenticated()
                             .anyRequest().hasAuthority("SCOPE_READ");
