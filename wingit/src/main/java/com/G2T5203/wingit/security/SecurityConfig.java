@@ -34,8 +34,7 @@ public class SecurityConfig {
 
     @Value("${jwt.key}")
     private String jwtKey;
-
-
+    
     @Bean
     @Order(1)
     SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -129,8 +128,6 @@ public class SecurityConfig {
                 .build();
     }
 
-
-
     @Bean
     JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(jwtKey.getBytes()));
@@ -149,11 +146,6 @@ public class SecurityConfig {
         SecretKeySpec originalKey = new SecretKeySpec(bytes, 0, bytes.length,"RSA");
         return NimbusJwtDecoder.withSecretKey(originalKey).macAlgorithm(MacAlgorithm.HS512).build();
     }
-
-
-
-
-
 
     private UserDetailsService userDetailsService;
 
