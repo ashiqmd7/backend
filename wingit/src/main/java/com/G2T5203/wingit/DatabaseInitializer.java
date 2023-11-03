@@ -10,6 +10,7 @@ import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
+import com.G2T5203.wingit.routeListing.RouteListingService;
 import com.G2T5203.wingit.seat.*;
 import com.G2T5203.wingit.seatListing.*;
 import com.G2T5203.wingit.user.UserRepository;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 // Class is used only in DEV profile to pre-populate it with data for testing purposes.
@@ -120,6 +122,8 @@ public class DatabaseInitializer {
         list.add(repo.save(new Plane( "SQ343", 30, "A350")));
         list.add(repo.save(new Plane( "SQ350", 42, "B777")));
         list.add(repo.save(new Plane( "SQ777", 30, "A350")));
+
+        list.add(repo.save(new Plane("SQ288", 30, "A350")));
     }
     private static void initialiseSampleSeats(List<Plane> planeList, SeatService seatService) {
         for (Plane plane : planeList) {
@@ -327,6 +331,75 @@ public class DatabaseInitializer {
         }
     }
 
+    private static void createAlmostFullFlight(
+            BookingRepository bookingRepo,
+            RouteListingRepository routeListingRepository,
+            PlaneRepository planeRepo,
+            RouteRepository routeRepository,
+            SeatListingService seatListingService,
+            List<WingitUser> userList,
+            BookingService bookingService) {
+        Optional<Plane> optionalPlane = planeRepo.findById("SQ288");
+        Optional<Route> optionalRoute = routeRepository.findById(5);
+        if (optionalPlane.isEmpty() || optionalRoute.isEmpty()) {
+            Log("ERROR: Unable to create almost full flight");
+            return;
+        }
+
+        Plane plane = optionalPlane.get();
+        Route route = optionalRoute.get();
+
+        String datetimeStr = String.format("%d-%02d-%02d %02d:%02d:00", 2023, 12, 17, 13, 10);
+        RouteListing newRouteListing = routeListingRepository.save(new RouteListing(
+                new RouteListingPk(plane, route, DateUtils.handledParseDateTime(datetimeStr)),
+                777.77));
+        seatListingService.createSeatListingsForNewRouteListing(newRouteListing);
+
+
+
+        // Create 27 bookings to leave 3 seatListings left.
+        WingitUser richUser = userList.get(3);
+
+        final int PAX_SIZE = 27;
+        for (int iBooking = 0; (iBooking * 10) < PAX_SIZE; iBooking++) { // 0, 10, 20,
+            Booking newBooking = bookingRepo.save(new Booking(
+                    richUser,
+                    newRouteListing,
+                    null,
+                    LocalDateTime.now().minusSeconds(1L),
+                    Math.min(10, PAX_SIZE - (iBooking * 10)), // 10, 10, 7
+                    -1,
+                    false));
+            List<PrivacySeatListingSimpleJson> seatListings = seatListingService.getAllSeatListingsInRouteListing(
+                    newRouteListing.getRouteListingPk().getPlane().getPlaneId(),
+                    newRouteListing.getRouteListingPk().getRoute().getRouteId(),
+                    newRouteListing.getRouteListingPk().getDepartureDatetime());
+
+            for (int i = (iBooking * 10); // 0, 10, 20
+                 i < Math.min(PAX_SIZE, ((iBooking + 1) * 10)); // 10, 20, 27
+                 i++) {
+                PrivacySeatListingSimpleJson seatChosen = seatListings.get(i);
+                seatListingService.reserveSeatListing(
+                        seatChosen.getPlaneId(),
+                        seatChosen.getRouteId(),
+                        seatChosen.getDepartureDatetime(),
+                        seatChosen.getSeatNumber(),
+                        newBooking.getBookingId());
+                seatListingService.setOccupantForSeatListing(
+                        seatChosen.getPlaneId(),
+                        seatChosen.getRouteId(),
+                        seatChosen.getDepartureDatetime(),
+                        seatChosen.getSeatNumber(),
+                        newBooking.getBookingId(),
+                        richUser.getFirstName() + "_" + i);
+            }
+
+            bookingService.calculateAndSaveChargedPrice(newBooking.getBookingId());
+            bookingService.markBookingAsPaid(newBooking.getBookingId());
+        }
+        Log("[Created almost full booking!]");
+    }
+
     public static void init(ApplicationContext context, boolean isProduction) {
         // Get encoder
         BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
@@ -382,6 +455,15 @@ public class DatabaseInitializer {
         initialiseSampleBookings(bookingList, bookingRepository, wingitUserList, routeListingList, seatListingService, bookingService);
 //        for (Booking booking : bookingList) { Log("[Add Booking]: " + booking); }
         Log("[Added sample Bookings]");
+
+        createAlmostFullFlight(
+                bookingRepository,
+                routeListingRepository,
+                planeRepository,
+                routeRepository,
+                seatListingService,
+                wingitUserList,
+                bookingService);
 
         Log("[Finished Initialising Sample Database Data]");
     }
