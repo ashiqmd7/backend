@@ -8,14 +8,17 @@ public class PrivacySeatListingSimpleJson {
     public LocalDateTime departureDatetime;
     public String seatNumber;
     public String seatClass;
+    public double seatPrice;
     public boolean isBooked;
 
-    public PrivacySeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, String seatClass, boolean isBooked) {
+
+    public PrivacySeatListingSimpleJson(String planeId, int routeId, LocalDateTime departureDatetime, String seatNumber, String seatClass, double seatPrice, boolean isBooked) {
         this.planeId = planeId;
         this.routeId = routeId;
         this.departureDatetime = departureDatetime;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
+        this.seatPrice = seatPrice;
         this.isBooked = isBooked;
     }
 
@@ -26,6 +29,7 @@ public class PrivacySeatListingSimpleJson {
                 seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().getDepartureDatetime(),
                 seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber(),
                 seatListing.getSeatListingPk().getSeat().getSeatClass(),
+                seatListing.getSeatListingPk().getRouteListing().getBasePrice() * seatListing.getSeatListingPk().getSeat().getPriceFactor(), // Can't be computed from seatListing itself.
                 seatListing.getBooking() != null);
     }
 
@@ -64,6 +68,10 @@ public class PrivacySeatListingSimpleJson {
     public String getSeatClass() { return seatClass; }
 
     public void setSeatClass(String seatClass) { this.seatClass = seatClass; }
+
+    public double getSeatPrice() { return seatPrice; }
+
+    public void setSeatPrice(double seatPrice) { this.seatPrice = seatPrice; }
 
     public boolean getIsBooked() { return isBooked; }
 
