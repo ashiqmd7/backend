@@ -8,4 +8,5 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByWingitUserUsername(String username);
     List<Booking> findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(RouteListingPk routeListingPk);
+    List<Booking> findAllByInboundRouteListingRouteListingPkAndIsPaidFalse(RouteListingPk routeListingPk);
 }

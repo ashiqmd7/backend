@@ -105,7 +105,9 @@ public class BookingService {
         int numRemainingSeats = availableSeats.size();
         for (Booking booking : activeBookingsForRouteListing) {
             numRemainingSeats -= booking.getPartySize(); // Remove reserved number of seats for active booking
+            // must do below because if unfinished booking reserves a seat, numRemainingSeats will be one less and double counted by party pax.
             numRemainingSeats += booking.getSeatListing().size(); // Add back to tally those they already booked to undo doublecount.
+
         }
 
         return numRemainingSeats;
@@ -248,8 +250,15 @@ public class BookingService {
     @Transactional
     public List<Booking> getActiveUnfinishedBookingsForRouteListing(RouteListingPk routeListingPk) {
         List<Booking> matchingUnfinishedOutboundRouteListing = repo.findAllByOutboundRouteListingRouteListingPkAndIsPaidFalse(routeListingPk);
+        List<Booking> matchingUnfinishedInboundRouteListing = repo.findAllByInboundRouteListingRouteListingPkAndIsPaidFalse(routeListingPk);
+
+        List<Booking> matchingBookings = new ArrayList<>(matchingUnfinishedOutboundRouteListing.size() + matchingUnfinishedInboundRouteListing.size());
+        matchingBookings.addAll(matchingUnfinishedOutboundRouteListing);
+        matchingBookings.addAll(matchingUnfinishedInboundRouteListing);
+
         List<Booking> activeUnfinishedBookings = new ArrayList<>();
-        for (Booking booking : matchingUnfinishedOutboundRouteListing) {
+
+        for (Booking booking : matchingBookings) {
             if (isBookingExpired(booking)) {
                 forceDeleteBooking(booking);
             } else {
