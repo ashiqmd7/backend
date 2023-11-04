@@ -1,5 +1,6 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.adminUtils.DatabaseInitializer;
 import com.G2T5203.wingit.user.WingitUser;
 import com.G2T5203.wingit.user.UserRepository;
 import org.springframework.boot.SpringApplication;
