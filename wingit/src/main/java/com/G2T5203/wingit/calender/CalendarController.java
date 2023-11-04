@@ -137,16 +137,18 @@ public class CalendarController {
     private VEvent createICalEvent(RouteListing routeListing, String eventSummary, String userEmail) {
         if (routeListing != null) {
             LocalDateTime departureDatetime = routeListing.getRouteListingPk().getDepartureDatetime();
-            long flightDurationMinutes = routeListing.getRouteListingPk().getRoute().getFlightDuration().toMinutes();
-            LocalDateTime arrivalDatetime = departureDatetime.plusMinutes(flightDurationMinutes);
+            Duration flightDuration = routeListing.getRouteListingPk().getRoute().getFlightDuration();
 
             // convert LocalDateTime to ZonedDateTime in the default system time zone
             ZoneId systemDefaultZone = ZoneId.systemDefault();
-            ZonedDateTime zonedDateTime = arrivalDatetime.atZone(systemDefaultZone);
+            ZonedDateTime zonedDateTime = departureDatetime.atZone(systemDefaultZone);
 
             // convert ZonedDateTime to milliseconds
             Long startDateTimeInMillis = zonedDateTime.toInstant().toEpochMilli();
-            Long endDateTimeInMillis = zonedDateTime.plusHours(1).toInstant().toEpochMilli(); // Assuming the event duration is 1 hour
+            Long endDateTimeInMillis = zonedDateTime
+                    .plusHours(flightDuration.toHoursPart())
+                    .plusMinutes(flightDuration.toMinutesPart())
+                    .toInstant().toEpochMilli(); // Assuming the event duration is 1 hour
 
             java.util.Calendar calendarStartTime = new GregorianCalendar();
             calendarStartTime.setTimeInMillis(startDateTimeInMillis);
