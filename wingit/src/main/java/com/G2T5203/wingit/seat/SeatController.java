@@ -20,14 +20,4 @@ public class SeatController {
             throw new SeatBadRequestException(e);
         }
     }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path = "/seats/new")
-    public Seat createSeat(@Valid @RequestBody SeatSimpleJson newSeatSimpleJson) {
-        try {
-            return service.createSeat(newSeatSimpleJson);
-        } catch (Exception e) {
-            throw new SeatBadRequestException(e);
-        }
-    }
 }

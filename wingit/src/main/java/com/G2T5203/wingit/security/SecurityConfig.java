@@ -63,6 +63,9 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/adminToken")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/checkJwt")).hasRole("ADMIN")
 
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/adminUtils/resetPlanesAndRoutesDB")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/adminUtils/restartSpringBoot")).hasRole("ADMIN")
+
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seats/*")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routeListings/new")).hasRole("ADMIN")

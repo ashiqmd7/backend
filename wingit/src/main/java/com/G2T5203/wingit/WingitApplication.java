@@ -1,5 +1,6 @@
 package com.G2T5203.wingit;
 
+import com.G2T5203.wingit.adminUtils.DatabaseInitializer;
 import com.G2T5203.wingit.user.WingitUser;
 import com.G2T5203.wingit.user.UserRepository;
 import org.springframework.boot.SpringApplication;
@@ -43,7 +44,8 @@ public class WingitApplication {
 			Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			String activeProfile = props.getProperty("spring.profiles.active");
 			boolean isProduction = activeProfile.equals("prod");
-			DatabaseInitializer.init(context, isProduction);
+			DatabaseInitializer.initNonAdminUsersData(context);
+			DatabaseInitializer.initPlanesAndRoutesData(context, isProduction);
 		} catch (IOException e) {
 			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}

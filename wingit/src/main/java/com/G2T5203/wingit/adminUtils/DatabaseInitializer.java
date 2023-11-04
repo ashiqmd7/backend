@@ -1,4 +1,4 @@
-package com.G2T5203.wingit;
+package com.G2T5203.wingit.adminUtils;
 
 import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingRepository;
@@ -10,7 +10,6 @@ import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.routeListing.RouteListingPk;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
-import com.G2T5203.wingit.routeListing.RouteListingService;
 import com.G2T5203.wingit.seat.*;
 import com.G2T5203.wingit.seatListing.*;
 import com.G2T5203.wingit.user.UserRepository;
@@ -56,16 +55,6 @@ public class DatabaseInitializer {
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs")));
-        list.add(repo.save(new WingitUser(
-                "admin",
-                encoder.encode("pass"),
-                "ROLE_ADMIN",
-                "admin",
-                "admin",
-                LocalDate.parse("2000-01-01"),
-                "admin@admin.com",
-                "+65 6475 3846",
-                "Master")));
         list.add(repo.save(new WingitUser(
                 "richman",
                 encoder.encode("iamrich"),
@@ -130,7 +119,7 @@ public class DatabaseInitializer {
             seatService.createSeatsForNewPlane(plane);
         }
     }
-    private static void initialiseSampleRoutes(List<Route> list, RouteRepository repo) {
+    private static void initialiseSampleRoutes(List<Route> list, RouteRepository repo, boolean isProduction) {
         list.add(repo.save(new Route(
                 "Singapore",
                 "Taiwan",
@@ -152,6 +141,9 @@ public class DatabaseInitializer {
                 "Taiwan",
                 "Singapore",
                 Duration.ofHours(4).plusMinutes(50) )));
+
+        if (isProduction) return;
+
         list.add(repo.save(new Route(
                 "Taiwan",
                 "Japan",
@@ -266,7 +258,7 @@ public class DatabaseInitializer {
         }
     }
 
-    private static void initialiseSampleBookings(List<Booking> list, BookingRepository repo, List<WingitUser> userList, List<RouteListing> routeListingList, SeatListingService seatListingService, BookingService bookingService) {
+    private static void initialiseSampleBookings(List<Booking> list, BookingRepository repo, WingitUser richUser, List<RouteListing> routeListingList, SeatListingService seatListingService, BookingService bookingService) {
         // Go through each and every routeListing
         // Book maybe half of the tickets... So seeded Randomization of what tickets to book.
         // Book it all under this one mega user
@@ -274,7 +266,6 @@ public class DatabaseInitializer {
         int counter = 0;
 
         final long RANDOM_SEED = 777L;
-        WingitUser richUser = userList.get(3);
         Random outerRandom = new Random(RANDOM_SEED);
         for (RouteListing routeListing : routeListingList) {
             final int NUM_BOOKINGS_PER_ROUTELISTING = 5;
@@ -337,17 +328,17 @@ public class DatabaseInitializer {
             PlaneRepository planeRepo,
             RouteRepository routeRepository,
             SeatListingService seatListingService,
-            List<WingitUser> userList,
+            WingitUser richUser,
             BookingService bookingService) {
         Optional<Plane> optionalPlane = planeRepo.findById("SQ288");
-        Optional<Route> optionalRoute = routeRepository.findById(5);
-        if (optionalPlane.isEmpty() || optionalRoute.isEmpty()) {
+        List<Route> matchingRoutes = routeRepository.findAllByDepartureDestAndArrivalDest("Taiwan", "Singapore");
+        if (optionalPlane.isEmpty() || matchingRoutes.isEmpty()) {
             Log("ERROR: Unable to create almost full flight");
             return;
         }
 
         Plane plane = optionalPlane.get();
-        Route route = optionalRoute.get();
+        Route route = matchingRoutes.get(0);
 
         String datetimeStr = String.format("%d-%02d-%02d %02d:%02d:00", 2023, 12, 17, 13, 10);
         RouteListing newRouteListing = routeListingRepository.save(new RouteListing(
@@ -358,8 +349,6 @@ public class DatabaseInitializer {
 
 
         // Create 27 bookings to leave 3 seatListings left.
-        WingitUser richUser = userList.get(3);
-
         final int PAX_SIZE = 27;
         for (int iBooking = 0; (iBooking * 10) < PAX_SIZE; iBooking++) { // 0, 10, 20,
             Booking newBooking = bookingRepo.save(new Booking(
@@ -400,7 +389,7 @@ public class DatabaseInitializer {
         Log("[Created almost full booking!]");
     }
 
-    public static void init(ApplicationContext context, boolean isProduction) {
+    public static void initNonAdminUsersData(ApplicationContext context) {
         // Get encoder
         BCryptPasswordEncoder encoder = context.getBean(BCryptPasswordEncoder.class);
 
@@ -410,8 +399,8 @@ public class DatabaseInitializer {
         initialiseSampleUsers(wingitUserList, userRepository, encoder);
 //        for (WingitUser wingitUser : wingitUserList) { Log("[Add WingitUser]: " + wingitUser); }
         Log("[Added sample WingitUsers]");
-
-
+    }
+    public static void initPlanesAndRoutesData(ApplicationContext context, boolean isProduction) {
         // Initialise Planes
         PlaneRepository planeRepository = context.getBean(PlaneRepository.class);
         List<Plane> planeList = new ArrayList<>();
@@ -430,7 +419,7 @@ public class DatabaseInitializer {
         // Initialise Routes
         RouteRepository routeRepository = context.getBean(RouteRepository.class);
         List<Route> routeList = new ArrayList<>();
-        initialiseSampleRoutes(routeList, routeRepository);
+        initialiseSampleRoutes(routeList, routeRepository, isProduction);
 //        for (Route route : routeList) { Log("[Add Route]: " + route); }
         Log("[Added sample Routes]");
 
@@ -452,7 +441,14 @@ public class DatabaseInitializer {
         BookingRepository bookingRepository = context.getBean(BookingRepository.class);
         BookingService bookingService = context.getBean(BookingService.class);
         List<Booking> bookingList = new ArrayList<>();
-        initialiseSampleBookings(bookingList, bookingRepository, wingitUserList, routeListingList, seatListingService, bookingService);
+        UserRepository userRepository = context.getBean(UserRepository.class);
+        Optional<WingitUser> optionalRichUser = userRepository.findByUsername("richman");
+        if (optionalRichUser.isEmpty()) {
+            Log("ERROR: Unable to locate rich user for dummy data.");
+            return;
+        }
+        WingitUser richUser = optionalRichUser.get();
+        initialiseSampleBookings(bookingList, bookingRepository, richUser, routeListingList, seatListingService, bookingService);
 //        for (Booking booking : bookingList) { Log("[Add Booking]: " + booking); }
         Log("[Added sample Bookings]");
 
@@ -462,7 +458,7 @@ public class DatabaseInitializer {
                 planeRepository,
                 routeRepository,
                 seatListingService,
-                wingitUserList,
+                richUser,
                 bookingService);
 
         Log("[Finished Initialising Sample Database Data]");
