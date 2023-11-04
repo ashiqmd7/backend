@@ -6,14 +6,20 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingController;
 import com.G2T5203.wingit.booking.BookingService;
+import com.G2T5203.wingit.booking.BookingSimpleJson;
 import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.seatListing.SeatListing;
 import com.G2T5203.wingit.user.*;
 import net.fortuna.ical4j.model.property.*;
+import org.slf4j.event.KeyValuePair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -93,13 +99,16 @@ public class CalendarController {
 
             String userEmail = getUserEmail(bookingUsername);
 
+            // Convinience parse using BookingSimpleJson
+            BookingSimpleJson bookingSimpleJson = new BookingSimpleJson(booking);
+
             // create the Outbound Flight event
-            VEvent outboundEvent = createICalEvent(booking.getOutboundRouteListing(), eventSummary, userEmail);
+            VEvent outboundEvent = createICalEvent(booking.getOutboundRouteListing(), bookingSimpleJson.getOutboundSeatNumbers(), eventSummary, userEmail);
             icsCalendar.add(outboundEvent);
 
             // if there is a inbound flight event, create it
             if (booking.getInboundRouteListing() != null) {
-                VEvent inboundEvent = createICalEvent(booking.getInboundRouteListing(), eventSummary, userEmail);
+                VEvent inboundEvent = createICalEvent(booking.getInboundRouteListing(), bookingSimpleJson.getInboundSeatNumbers(), eventSummary, userEmail);
                 icsCalendar.add(inboundEvent);
             }
 
@@ -131,7 +140,7 @@ public class CalendarController {
         }
     }
 
-    private VEvent createICalEvent(RouteListing routeListing, String eventSummary, String userEmail) {
+    private VEvent createICalEvent(RouteListing routeListing, Map<String, String> seatMap, String eventSummary, String userEmail) {
         if (routeListing != null) {
             LocalDateTime departureDatetime = routeListing.getRouteListingPk().getDepartureDatetime();
             Duration flightDuration = routeListing.getRouteListingPk().getRoute().getFlightDuration();
@@ -178,7 +187,18 @@ public class CalendarController {
             event.add(location);
 
             Description description = new Description();
-            description.setValue(routeListing.getRouteListingPk().getPlane().getPlaneId());
+            String planeId = routeListing.getRouteListingPk().getPlane().getPlaneId();
+            StringBuilder descStrBuilder = new StringBuilder();
+            descStrBuilder.append(planeId);
+            descStrBuilder.append('\n');
+            for (Map.Entry<String, String> kvp : seatMap.entrySet()) {
+                descStrBuilder.append(kvp.getValue());
+                descStrBuilder.append(" (");
+                descStrBuilder.append(kvp.getKey());
+                descStrBuilder.append(")\n");
+            }
+
+            description.setValue(descStrBuilder.toString());
             event.add(description);
 
             return event;
