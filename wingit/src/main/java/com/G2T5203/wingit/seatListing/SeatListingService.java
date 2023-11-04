@@ -171,9 +171,14 @@ public class SeatListingService {
     public SeatListing setOccupantForSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
         return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, occupantName);
     }
-    @Transactional
     private SeatListing setSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName) {
-        if (bookingId != null && checkIsBookingFinalized(bookingId))
+        return setSeatListing(planeId, routeId, departureDateTime, seatNumber, bookingId, occupantName, false);
+    }
+
+    @Transactional
+    private SeatListing setSeatListing(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber, Integer bookingId, String occupantName, boolean forced) {
+        if (!forced &&
+                bookingId != null && checkIsBookingFinalized(bookingId))
             throw new SeatListingBadRequestException("Trying to change seat listing reservation after booking finalization.");
 
         Optional<Plane> retrievedPlane = planeRepo.findById(planeId);
@@ -222,10 +227,12 @@ public class SeatListingService {
             seatListing.setBooking(retrievedBooking.get());
 
         } else { // bookingId was set to null so caller is trying to cancel booking.
-            if (seatListing.getBooking() == null)
-                throw new SeatListingBadRequestException("Trying to cancel seat listing when it wasn't set to a booking previously");
-            else if (checkIsBookingFinalized(seatListing.getBooking().getBookingId()))
-                throw new SeatListingBadRequestException("Trying to cancel seat listing when booking is already finalized.");
+            if (!forced) {
+                if (seatListing.getBooking() == null)
+                    throw new SeatListingBadRequestException("Trying to cancel seat listing when it wasn't set to a booking previously");
+                else if (checkIsBookingFinalized(seatListing.getBooking().getBookingId()))
+                    throw new SeatListingBadRequestException("Trying to cancel seat listing when booking is already finalized.");
+            }
             seatListing.setBooking(null);
         }
 
@@ -238,5 +245,11 @@ public class SeatListingService {
     @Transactional
     public SeatListing cancelSeatListingBooking(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber) {
         return setSeatListing(planeId, routeId, departureDateTime, seatNumber, null, null);
+    }
+
+
+    @Transactional
+    public SeatListing forceCancelSeatListingBooking(String planeId, int routeId, LocalDateTime departureDateTime, String seatNumber) {
+        return setSeatListing(planeId, routeId, departureDateTime, seatNumber, null, null, true);
     }
 }

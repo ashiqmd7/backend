@@ -122,45 +122,7 @@ class PlaneControllerTest {
         assertEquals(new Plane().toString(), retrievedPlane.toString());
     }
 
-    @Test
-    void createPlane_Success() throws Exception {
-        Plane samplePlane = testUtils.createSamplePlane1();
-        URI uri = testUtils.constructUri("planes/new");
-        ResponseEntity<Plane> responseEntity = testRestTemplate
-                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
-                .postForEntity(uri, samplePlane, Plane.class);
 
-        assertEquals(201, responseEntity.getStatusCode().value());
-        Optional<Plane> postedPlane = planeRepository.findById(samplePlane.getPlaneId());
-        assertTrue(postedPlane.isPresent());
-    }
-
-    @Test
-    void createPlane_ExistingPlaneId_Failure() throws Exception {
-        Plane samplePlaneAdded = testUtils.createSamplePlane1();
-        planeRepository.save(samplePlaneAdded);
-        Plane duplicatePlane = testUtils.createSamplePlane2();
-        duplicatePlane.setPlaneId(samplePlaneAdded.getPlaneId());
-
-        URI uri = testUtils.constructUri("planes/new");
-        ResponseEntity<Plane> responseEntity = testRestTemplate
-                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
-                .postForEntity(uri, duplicatePlane, Plane.class);
-
-        assertEquals(400, responseEntity.getStatusCode().value());
-        // TODO: Asset that the message is also "PlaneId already exists."
-    }
-
-    @Test
-    void createPlane_WrongAuth_Failure() throws Exception {
-        Plane samplePlane = testUtils.createSamplePlane1();
-        URI uri = testUtils.constructUri("planes/new");
-        ResponseEntity<Plane> responseEntity = testRestTemplate
-                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
-                .postForEntity(uri, samplePlane, Plane.class);
-
-        assertEquals(403, responseEntity.getStatusCode().value());
-    }
 
 
     @Test
@@ -177,6 +139,34 @@ class PlaneControllerTest {
         List<SeatSimpleJson> createdSeats = seatService.getAllSeatsForPlaneAsSimpleJson(postedPlane.get().getPlaneId());
         assertEquals(postedPlane.get().getCapacity(), createdSeats.size());
     }
+
+    @Test
+    void createPlane_ExistingPlaneId_Failure() throws Exception {
+        Plane samplePlaneAdded = testUtils.createSamplePlane1();
+        planeRepository.save(samplePlaneAdded);
+        Plane duplicatePlane = testUtils.createSamplePlane2();
+        duplicatePlane.setPlaneId(samplePlaneAdded.getPlaneId());
+
+        URI uri = testUtils.constructUri("planes/newWithSeats");
+        ResponseEntity<Plane> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.ADMIN_USERNAME, testUtils.ADMIN_PASSWORD)
+                .postForEntity(uri, duplicatePlane, Plane.class);
+
+        assertEquals(400, responseEntity.getStatusCode().value());
+        // TODO: Asset that the message is also "PlaneId already exists."
+    }
+
+    @Test
+    void createPlane_WrongAuth_Failure() throws Exception {
+        Plane samplePlane = testUtils.createSamplePlane1();
+        URI uri = testUtils.constructUri("planes/newWithSeats");
+        ResponseEntity<Plane> responseEntity = testRestTemplate
+                .withBasicAuth(testUtils.SAMPLE_USERNAME_1, testUtils.SAMPLE_PASSWORD_1)
+                .postForEntity(uri, samplePlane, Plane.class);
+
+        assertEquals(403, responseEntity.getStatusCode().value());
+    }
+
     @Test
     void deletePlane_Success() throws Exception {
         Plane planeToBeDeleted = testUtils.createSamplePlane1();
