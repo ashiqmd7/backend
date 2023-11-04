@@ -75,9 +75,9 @@ public class CalendarController {
     }
 
     @GetMapping(path = "/generate-calendar/{bookingId}")
-    public ResponseEntity<Resource> generateCalendarFile(@PathVariable int bookingId) {
-//                                                         @AuthenticationPrincipal UserDetails userDetails,
-//                                                         @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Resource> generateCalendarFile(@PathVariable int bookingId,
+                                                         @AuthenticationPrincipal UserDetails userDetails,
+                                                         @AuthenticationPrincipal Jwt jwt) {
         try {
             logger.info("Entering generateCalendarFile");
 
@@ -86,7 +86,7 @@ public class CalendarController {
 
             Booking booking = bookingService.getBookingById(bookingId);
 
-//            checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
+            checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
 
             // create a new iCalendar
             Calendar icsCalendar = new Calendar();
