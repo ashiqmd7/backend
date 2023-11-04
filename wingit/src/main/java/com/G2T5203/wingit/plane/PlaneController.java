@@ -28,18 +28,6 @@ public class PlaneController {
         return plane;
     }
 
-    // POST to add a new plane
-    // TODO: Deprecate this once createPlaneWithSeats is done
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/planes/new")
-    public Plane createPlane(@Valid @RequestBody Plane newPlane) {
-        try {
-            return service.createPlane(newPlane);
-        } catch (Exception e) {
-            throw new PlaneBadRequestException(e);
-        }
-    }
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/planes/newWithSeats")
     public Plane createPlaneWithSeats(@Valid @RequestBody Plane newPlane) {
