@@ -44,7 +44,8 @@ public class WingitApplication {
 			Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			String activeProfile = props.getProperty("spring.profiles.active");
 			boolean isProduction = activeProfile.equals("prod");
-			DatabaseInitializer.init(context, isProduction);
+			DatabaseInitializer.initNonAdminUsersData(context);
+			DatabaseInitializer.initPlanesAndRoutesData(context, isProduction);
 		} catch (IOException e) {
 			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}
