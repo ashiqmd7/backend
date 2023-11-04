@@ -33,9 +33,12 @@ import java.util.Random;
 public class DatabaseInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
     private static void Log(String msg) { logger.info(msg); }
+    private static List<WingitUser> sampleUserList = new ArrayList<>(3);
+    public static List<WingitUser> getSampleUserList() { return sampleUserList; }
 
-    private static void initialiseSampleUsers(List<WingitUser> list, UserRepository repo, BCryptPasswordEncoder encoder) {
-        list.add(repo.save(new WingitUser(
+    private static void initialiseSampleUsers(UserRepository repo, BCryptPasswordEncoder encoder) {
+        sampleUserList.clear();
+        sampleUserList.add(repo.save(new WingitUser(
                 "brandonDaddy",
                 encoder.encode("goodpassword"),
                 "ROLE_USER",
@@ -45,7 +48,7 @@ public class DatabaseInitializer {
                 "brandon.choy.2037@scis.smu.edu.sg",
                 "+65 8746 3847",
                 "Mr")));
-        list.add(repo.save(new WingitUser(
+        sampleUserList.add(repo.save(new WingitUser(
                 "DaddyChoy",
                 encoder.encode("password"),
                 "ROLE_USER",
@@ -55,7 +58,7 @@ public class DatabaseInitializer {
                 "jared.hong.2034@scis.smu.edu.sg",
                 "+65 8455 0750",
                 "Mrs")));
-        list.add(repo.save(new WingitUser(
+        sampleUserList.add(repo.save(new WingitUser(
                 "richman",
                 encoder.encode("iamrich"),
                 "ROLE_USER",
@@ -395,8 +398,7 @@ public class DatabaseInitializer {
 
         // Initialise WingitUsers
         UserRepository userRepository = context.getBean(UserRepository.class);
-        List<WingitUser> wingitUserList = new ArrayList<>();
-        initialiseSampleUsers(wingitUserList, userRepository, encoder);
+        initialiseSampleUsers(userRepository, encoder);
 //        for (WingitUser wingitUser : wingitUserList) { Log("[Add WingitUser]: " + wingitUser); }
         Log("[Added sample WingitUsers]");
     }
