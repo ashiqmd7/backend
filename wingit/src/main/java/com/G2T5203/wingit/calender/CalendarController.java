@@ -2,6 +2,7 @@ package com.G2T5203.wingit.calender;
 
 import java.io.IOException;
 import java.time.*;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
@@ -12,6 +13,7 @@ import com.G2T5203.wingit.booking.BookingController;
 import com.G2T5203.wingit.booking.BookingService;
 import com.G2T5203.wingit.routeListing.RouteListing;
 import com.G2T5203.wingit.user.*;
+import net.fortuna.ical4j.model.property.*;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -27,11 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.Attendee;
-import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.Organizer;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
 import org.slf4j.Logger;
@@ -92,7 +89,7 @@ public class CalendarController {
             Calendar icsCalendar = new Calendar();
             icsCalendar.add(new ProdId("-//WingIt//iCal4j 1.0//EN"));
 
-            String eventSummary = "Flight Booking";
+            String eventSummary = "WingIt Flight Booking";
 
             String userEmail = getUserEmail(bookingUsername);
 
@@ -179,6 +176,10 @@ public class CalendarController {
                             routeListing.getRouteListingPk().getRoute().getArrivalDest()
             );
             event.add(location);
+
+            Description description = new Description();
+            description.setValue(routeListing.getRouteListingPk().getPlane().getPlaneId());
+            event.add(description);
 
             return event;
         } else {
