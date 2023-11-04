@@ -56,7 +56,7 @@ public class BookingService {
         if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
         Booking retrievedBooking = optionalRetrievedBooking.get();
         if (isBookingExpired(retrievedBooking)) {
-            forceDeleteBooking(retrievedBooking);
+            deleteExpiredBooking(retrievedBooking);
             throw new BookingExpiredException();
         }
 
@@ -68,7 +68,7 @@ public class BookingService {
         if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);
         Booking retrievedBooking = optionalRetrievedBooking.get();
         if (isBookingExpired(retrievedBooking)) {
-            forceDeleteBooking(retrievedBooking);
+            deleteExpiredBooking(retrievedBooking);
             throw new BookingExpiredException();
         }
 
@@ -82,7 +82,7 @@ public class BookingService {
         boolean hasDeletedSomeExpiredBookings = false;
         for (Booking booking : bookings) {
             if (isBookingExpired(booking)) {
-                forceDeleteBooking(booking);
+                deleteExpiredBooking(booking);
                 hasDeletedSomeExpiredBookings = true;
             }
         }
@@ -220,20 +220,20 @@ public class BookingService {
     }
 
     @Transactional
-    private void forceDeleteBookingById(int bookingId) {
+    private void deleteExpiredBookingById(int bookingId) {
         Optional<Booking> booking = repo.findById(bookingId);
         if (booking.isPresent()) {
-            forceDeleteBooking(booking.get());
+            deleteExpiredBooking(booking.get());
         } else {
             throw new BookingNotFoundException(bookingId);
         }
     }
 
     @Transactional
-    private void forceDeleteBooking(Booking booking) {
+    private void deleteExpiredBooking(Booking booking) {
         try {
             for (SeatListing seatListing : booking.getSeatListing()) {
-                // Delete all seatListings if any.
+                // Cancel all seatListings if any.
                 RouteListingPk routeListingPk = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk();
                 seatListingService.cancelSeatListingBooking(
                         routeListingPk.getPlane().getPlaneId(),
@@ -242,6 +242,23 @@ public class BookingService {
                         seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
             }
             repo.deleteById((booking.getBookingId()));
+        } catch (Exception e) {
+            throw new BookingBadRequestException(e);
+        }
+    }
+
+    @Transactional
+    public void forceDeleteBooking(Booking booking) {
+        try {
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                RouteListingPk routeListingPk = seatListing.getSeatListingPk().getRouteListing().getRouteListingPk();
+                seatListingService.forceCancelSeatListingBooking(
+                        routeListingPk.getPlane().getPlaneId(),
+                        routeListingPk.getRoute().getRouteId(),
+                        routeListingPk.getDepartureDatetime(),
+                        seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
+            }
+            repo.deleteById(booking.getBookingId());
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
         }
@@ -260,7 +277,7 @@ public class BookingService {
 
         for (Booking booking : matchingBookings) {
             if (isBookingExpired(booking)) {
-                forceDeleteBooking(booking);
+                deleteExpiredBooking(booking);
             } else {
                 activeUnfinishedBookings.add(booking);
             }
@@ -314,7 +331,7 @@ public class BookingService {
         if (bookingOptional.isPresent()) {
             Booking booking = bookingOptional.get();
             if (isBookingExpired(booking)) {
-                forceDeleteBooking(booking);
+                deleteExpiredBooking(booking);
                 throw new BookingExpiredException();
             }
             // TODO: Should we be checking if chargedPrice < 0? Or do we allow multiple recalculations.
@@ -348,7 +365,7 @@ public class BookingService {
         if (bookingOptional.isEmpty()) throw new BookingNotFoundException(bookingId);
         Booking booking = bookingOptional.get();
         if (isBookingExpired(booking)) {
-            forceDeleteBooking(booking);
+            deleteExpiredBooking(booking);
             throw new BookingExpiredException();
         }
         throwIfSeatBookingsIncomplete(booking);

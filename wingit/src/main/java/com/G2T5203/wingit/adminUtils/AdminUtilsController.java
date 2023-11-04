@@ -1,7 +1,10 @@
 package com.G2T5203.wingit.adminUtils;
 
 import com.G2T5203.wingit.WingitApplication;
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingRepository;
+import com.G2T5203.wingit.booking.BookingService;
+import com.G2T5203.wingit.booking.BookingSimpleJson;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
@@ -40,8 +43,9 @@ public class AdminUtilsController {
     private final SeatRepository seatRepository;
     private final PlaneRepository planeRepository;
     private final RouteRepository routeRepository;
+    private final BookingService bookingService;
 
-    public AdminUtilsController(ApplicationContext context, UserRepository userRepository, SeatListingRepository seatListingRepository, RouteListingRepository routeListingRepository, BookingRepository bookingRepository, SeatRepository seatRepository, PlaneRepository planeRepository, RouteRepository routeRepository) {
+    public AdminUtilsController(ApplicationContext context, UserRepository userRepository, SeatListingRepository seatListingRepository, RouteListingRepository routeListingRepository, BookingRepository bookingRepository, SeatRepository seatRepository, PlaneRepository planeRepository, RouteRepository routeRepository, BookingService bookingService) {
         this.context = context;
         this.userRepository = userRepository;
         this.seatListingRepository = seatListingRepository;
@@ -50,6 +54,7 @@ public class AdminUtilsController {
         this.seatRepository = seatRepository;
         this.planeRepository = planeRepository;
         this.routeRepository = routeRepository;
+        this.bookingService = bookingService;
     }
 
     private void deleteAllPlanesAndRoutes() {
@@ -62,6 +67,14 @@ public class AdminUtilsController {
     }
 
     private boolean isProduction() { return activeProfile.equals("prod"); }
+
+    @PutMapping(path = "/adminUtils/forceCancelNonInitBookings")
+    public void forceCancelNonInitBookings() {
+        List<Booking> bookingsToBeDeleted = bookingRepository.findAllByWingitUserUsernameNot("richman");
+        for (Booking bookingToBeDeleted : bookingsToBeDeleted) {
+            bookingService.forceDeleteBooking(bookingToBeDeleted);
+        }
+    }
 
     @PutMapping(path = "/adminUtils/resetPlanesAndRoutesDB")
     public void resetPlanesAndRoutesDB() {

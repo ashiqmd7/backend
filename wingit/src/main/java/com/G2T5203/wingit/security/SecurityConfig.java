@@ -65,6 +65,7 @@ public class SecurityConfig {
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/adminUtils/resetPlanesAndRoutesDB")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/adminUtils/restartSpringBoot")).hasRole("ADMIN")
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/adminUtils/forceCancelNonInitBookings")).hasRole("ADMIN")
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/routes/new")).hasRole("ADMIN")
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/seats/*")).hasRole("ADMIN")
