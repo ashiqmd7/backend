@@ -65,17 +65,19 @@ public class AdminUtilsController {
 
     @PutMapping(path = "/adminUtils/resetPlanesAndRoutesDB")
     public void resetPlanesAndRoutesDB() {
-        deleteAllPlanesAndRoutes();
-        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
+        // Commenting out as this is not working
+//        deleteAllPlanesAndRoutes();
+//        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
     }
 
     @PutMapping(path = "/adminUtils/resetUsersAndDB")
     public void resetUsersAndPlanesAndRoutesDB() {
-        deleteAllPlanesAndRoutes();
-        List<WingitUser> nonAdminUsers = userRepository.findAllByAuthorityRole("ROLE_USER");
-        userRepository.deleteAll(nonAdminUsers);
-
-        DatabaseInitializer.initNonAdminUsersData(context);
-        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
+        // Commenting out as this is not working.
+//        deleteAllPlanesAndRoutes();
+//        List<WingitUser> nonAdminUsers = userRepository.findAllByAuthorityRole("ROLE_USER");
+//        userRepository.deleteAll(nonAdminUsers);
+//
+//        DatabaseInitializer.initNonAdminUsersData(context);
+//        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
     }
 }
