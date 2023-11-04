@@ -10,7 +10,8 @@ import java.util.TimeZone;
 import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingController;
 import com.G2T5203.wingit.booking.BookingService;
-import com.G2T5203.wingit.user.UserBadRequestException;
+import com.G2T5203.wingit.routeListing.RouteListing;
+import com.G2T5203.wingit.user.*;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -41,10 +42,12 @@ import org.slf4j.LoggerFactory;
 public class CalendarController {
     private final BookingService bookingService;
     private static final Logger logger = LoggerFactory.getLogger(CalendarController.class);
+    private final UserService userService;
 
 
-    public CalendarController(BookingService bookingService) {
+    public CalendarController(BookingService bookingService, UserService userService) {
         this.bookingService = bookingService;
+        this.userService = userService;
     }
 
     private boolean isAdmin(UserDetails userDetails) { return userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")); }
@@ -72,9 +75,9 @@ public class CalendarController {
     }
 
     @GetMapping(path = "/generate-calendar/{bookingId}")
-    public ResponseEntity<Resource> generateCalendarFile(@PathVariable int bookingId,
-                                                         @AuthenticationPrincipal UserDetails userDetails,
-                                                         @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Resource> generateCalendarFile(@PathVariable int bookingId) {
+//                                                         @AuthenticationPrincipal UserDetails userDetails,
+//                                                         @AuthenticationPrincipal Jwt jwt) {
         try {
             logger.info("Entering generateCalendarFile");
 
@@ -83,51 +86,44 @@ public class CalendarController {
 
             Booking booking = bookingService.getBookingById(bookingId);
 
-            checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
+//            checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
 
-            // Check if inboundRouteListing is not null
+            // create a new iCalendar
+            Calendar icsCalendar = new Calendar();
+            icsCalendar.add(new ProdId("-//WingIt//iCal4j 1.0//EN"));
+
+            String eventSummary = "Flight Booking";
+
+            String userEmail = getUserEmail(bookingUsername);
+
+            // create the Outbound Flight event
+            VEvent outboundEvent = createICalEvent(booking.getOutboundRouteListing(), eventSummary, userEmail);
+            icsCalendar.add(outboundEvent);
+
+            // if there is a inbound flight event, create it
             if (booking.getInboundRouteListing() != null) {
-                try {
-                    String eventSummary = "Flight Booking";
-                    VEvent event = createICalEvent(booking, eventSummary);
-
-                    if (event == null) {
-                        logger.error("Failed to create iCalendar event.");
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(new ByteArrayResource("Failed to create iCalendar event".getBytes()));
-                    }
-
-                    // Convert the iCalendar event to a byte array
-                    Calendar icsCalendar = new Calendar();
-                    icsCalendar.getProperties().add(new ProdId("-//WingIt//iCal4j 1.0//EN"));
-                    icsCalendar.getComponents().add(event);
-                    byte[] calendarBytes = icsCalendar.toString().getBytes();
-
-                    // Create a Resource from the byte array
-                    Resource resource = new ByteArrayResource(calendarBytes);
-
-                    // Set response headers for the calendar file download
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=mycalendar.ics");
-                    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-                    headers.add("Pragma", "no-cache");
-                    headers.add("Expires", "0");
-
-                    // Return the calendar file as a response
-                    return ResponseEntity.ok()
-                            .headers(headers)
-                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                            .body(resource);
-                } catch (Exception e) {
-                    logger.error("Exception occurred: {}", e.getMessage(), e);
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(new ByteArrayResource(("Error: " + e.getMessage()).getBytes()));
-                }
-            } else {
-                // Handle the case when inboundRouteListing is null
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ByteArrayResource("InboundRouteListing is null".getBytes()));
+                VEvent inboundEvent = createICalEvent(booking.getInboundRouteListing(), eventSummary, userEmail);
+                icsCalendar.add(inboundEvent);
             }
+
+            // convert the iCalendar to a byte array
+            byte[] calendarBytes = icsCalendar.toString().getBytes();
+
+            // create a Resource from the byte array
+            Resource resource = new ByteArrayResource(calendarBytes);
+
+            // eet response headers for the calendar file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=mycalendar.ics");
+            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+            headers.add("Pragma", "no-cache");
+            headers.add("Expires", "0");
+
+            // return the calendar file as a response
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
         } catch (Exception e) {
             logger.error("Exception occurred: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -138,40 +134,68 @@ public class CalendarController {
         }
     }
 
-    private VEvent createICalEvent(Booking booking, String eventSummary) {
-        if (booking.getInboundRouteListing() != null) {
-            LocalDateTime departureDatetime = booking.getOutboundRouteListing().getRouteListingPk().getDepartureDatetime();
-            long flightDurationMinutes = booking.getInboundRouteListing().getRouteListingPk().getRoute().getFlightDuration().toMinutes();
+    private VEvent createICalEvent(RouteListing routeListing, String eventSummary, String userEmail) {
+        if (routeListing != null) {
+            LocalDateTime departureDatetime = routeListing.getRouteListingPk().getDepartureDatetime();
+            long flightDurationMinutes = routeListing.getRouteListingPk().getRoute().getFlightDuration().toMinutes();
             LocalDateTime arrivalDatetime = departureDatetime.plusMinutes(flightDurationMinutes);
 
-            // Convert LocalDateTime to ZonedDateTime in the default system time zone
+            // convert LocalDateTime to ZonedDateTime in the default system time zone
             ZoneId systemDefaultZone = ZoneId.systemDefault();
             ZonedDateTime zonedDateTime = arrivalDatetime.atZone(systemDefaultZone);
 
-            // Convert ZonedDateTime to milliseconds
+            // convert ZonedDateTime to milliseconds
             Long startDateTimeInMillis = zonedDateTime.toInstant().toEpochMilli();
             Long endDateTimeInMillis = zonedDateTime.plusHours(1).toInstant().toEpochMilli(); // Assuming the event duration is 1 hour
 
             java.util.Calendar calendarStartTime = new GregorianCalendar();
             calendarStartTime.setTimeInMillis(startDateTimeInMillis);
 
-            // Time zone info
+            // time zone info
             TimeZone tz = calendarStartTime.getTimeZone();
             ZoneId zid = tz.toZoneId();
 
-            /* Generate unique identifier */
+            /* generate unique identifier */
             UidGenerator ug = new RandomUidGenerator();
             Uid uid = ug.generateUid();
 
             LocalDateTime start = LocalDateTime.ofInstant(calendarStartTime.toInstant(), zid);
             LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(endDateTimeInMillis), zid);
             VEvent event = new VEvent(start, end, eventSummary);
-            event.getProperties().add(uid);
+            event.add(uid);
+
+            Attendee attendee = new Attendee(userEmail);
+            event.add(attendee);
+
+            Organizer organizer = new Organizer();
+            organizer.setValue("MAILTO:WingIt@world.com");
+            event.add(organizer);
+
+            Location location = new Location(
+                    routeListing.getRouteListingPk().getRoute().getDepartureDest() +
+                            " to " +
+                            routeListing.getRouteListingPk().getRoute().getArrivalDest()
+            );
+            event.add(location);
 
             return event;
         } else {
-            // Handle the case when there is no inboundRouteListing
+            // case when there is no routeListing
             return null;
         }
     }
+
+    private String getUserEmail(String username) {
+        WingitUser user = userService.getById(username);
+
+        if (user != null) {
+            // Create a WingitUserSimpleJson instance and retrieve the email
+            WingitUserSimpleJson userJson = new WingitUserSimpleJson(user);
+            return userJson.getEmail();
+        } else {
+            throw new UserNotFoundException(username);
+        }
+    }
 }
+
+
