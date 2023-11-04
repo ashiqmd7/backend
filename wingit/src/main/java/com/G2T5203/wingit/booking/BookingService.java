@@ -258,6 +258,12 @@ public class BookingService {
                         routeListingPk.getDepartureDatetime(),
                         seatListing.getSeatListingPk().getSeat().getSeatPk().getSeatNumber());
             }
+            // NOTE: Safety clearing. Cause this cached version of booking still has the seats.
+            // If we delete it without first clearing, it might also cause the seats to be resetted.
+            // Effectively undoing the forced Cancel.
+            List<SeatListing> bookingSeatListing = booking.getSeatListing();
+            bookingSeatListing.clear();
+            booking.setSeatListing(bookingSeatListing);
             repo.deleteById(booking.getBookingId());
         } catch (Exception e) {
             throw new BookingBadRequestException(e);
