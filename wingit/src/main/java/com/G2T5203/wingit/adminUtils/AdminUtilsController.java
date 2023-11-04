@@ -1,7 +1,10 @@
 package com.G2T5203.wingit.adminUtils;
 
 import com.G2T5203.wingit.WingitApplication;
+import com.G2T5203.wingit.booking.Booking;
 import com.G2T5203.wingit.booking.BookingRepository;
+import com.G2T5203.wingit.booking.BookingService;
+import com.G2T5203.wingit.booking.BookingSimpleJson;
 import com.G2T5203.wingit.plane.PlaneRepository;
 import com.G2T5203.wingit.route.RouteRepository;
 import com.G2T5203.wingit.routeListing.RouteListingRepository;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -29,55 +33,41 @@ import java.util.Properties;
 @RestController
 public class AdminUtilsController {
 
-    @Value("${spring.profiles.active:}")
-    private String activeProfile;
-
-    private final ApplicationContext context;
     private final UserRepository userRepository;
-    private final SeatListingRepository seatListingRepository;
-    private final RouteListingRepository routeListingRepository;
     private final BookingRepository bookingRepository;
-    private final SeatRepository seatRepository;
-    private final PlaneRepository planeRepository;
-    private final RouteRepository routeRepository;
+    private final BookingService bookingService;
 
-    public AdminUtilsController(ApplicationContext context, UserRepository userRepository, SeatListingRepository seatListingRepository, RouteListingRepository routeListingRepository, BookingRepository bookingRepository, SeatRepository seatRepository, PlaneRepository planeRepository, RouteRepository routeRepository) {
-        this.context = context;
+    public AdminUtilsController(UserRepository userRepository, BookingRepository bookingRepository, BookingService bookingService) {
         this.userRepository = userRepository;
-        this.seatListingRepository = seatListingRepository;
-        this.routeListingRepository = routeListingRepository;
         this.bookingRepository = bookingRepository;
-        this.seatRepository = seatRepository;
-        this.planeRepository = planeRepository;
-        this.routeRepository = routeRepository;
+        this.bookingService = bookingService;
     }
 
-    private void deleteAllPlanesAndRoutes() {
-        seatListingRepository.deleteAll();
-        routeListingRepository.deleteAll();
-        bookingRepository.deleteAll();
-        seatRepository.deleteAll();
-        planeRepository.deleteAll();
-        routeRepository.deleteAll();
+    @PutMapping(path = "/adminUtils/forceCancelNonInitBookings")
+    public void forceCancelNonInitBookings() {
+        List<Booking> bookingsToBeDeleted = bookingRepository.findAllByWingitUserUsernameNot("richman");
+        for (Booking bookingToBeDeleted : bookingsToBeDeleted) {
+            bookingService.forceDeleteBooking(bookingToBeDeleted);
+        }
     }
 
-    private boolean isProduction() { return activeProfile.equals("prod"); }
+    @PutMapping(path = "/adminUtils/resetBookingsAndUsers")
+    public void resetBookingsAndUsers() {
+        forceCancelNonInitBookings();
+        List<WingitUser> sampleUsers = DatabaseInitializer.getSampleUserList();
+        List<WingitUser> nonAdminUsers = userRepository.findAllByAuthorityRole("ROLE_USER");
+        for (WingitUser nonAdminUser : nonAdminUsers) {
+            boolean isSampleUser = false;
+            for (WingitUser sampleUser : sampleUsers) {
+                if (nonAdminUser.getUsername().equals(sampleUser.getUsername())) {
+                    isSampleUser = true;
+                    break;
+                }
+            }
 
-    @PutMapping(path = "/adminUtils/resetPlanesAndRoutesDB")
-    public void resetPlanesAndRoutesDB() {
-        // Commenting out as this is not working
-//        deleteAllPlanesAndRoutes();
-//        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
+            if (isSampleUser) continue;
+            userRepository.deleteById(nonAdminUser.getUsername());
+        }
     }
 
-    @PutMapping(path = "/adminUtils/resetUsersAndDB")
-    public void resetUsersAndPlanesAndRoutesDB() {
-        // Commenting out as this is not working.
-//        deleteAllPlanesAndRoutes();
-//        List<WingitUser> nonAdminUsers = userRepository.findAllByAuthorityRole("ROLE_USER");
-//        userRepository.deleteAll(nonAdminUsers);
-//
-//        DatabaseInitializer.initNonAdminUsersData(context);
-//        DatabaseInitializer.initPlanesAndRoutesData(context, isProduction());
-    }
 }
