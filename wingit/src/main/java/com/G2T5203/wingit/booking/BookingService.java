@@ -63,6 +63,15 @@ public class BookingService {
         return retrievedBooking.getWingitUser().getUsername();
     }
 
+    public Booking getBookingById(int bookingId) {
+        Optional<Booking> optionalBooking = repo.findById(bookingId);
+        if (optionalBooking.isEmpty()) {
+            throw new BookingNotFoundException(bookingId);
+        }
+        Booking booking = optionalBooking.get();
+        return booking;
+    }
+
     public boolean checkIsBookingFinalized(int bookingId) {
         Optional<Booking> optionalRetrievedBooking = repo.findById(bookingId);
         if (optionalRetrievedBooking.isEmpty()) throw new BookingNotFoundException(bookingId);

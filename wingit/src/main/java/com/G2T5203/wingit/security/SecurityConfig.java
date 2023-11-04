@@ -110,6 +110,9 @@ public class SecurityConfig {
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/seatListings/**")).authenticated()
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/rest/api/generate-calendar")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/rest/api/generate-calendar/*")).permitAll()
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/rest/api/generate-calendar/**")).permitAll()
+
 
                             .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/*")).permitAll()
 

@@ -38,7 +38,7 @@ public class BookingController {
 
         return (!isUser && !isAdmin);
     }
-    private void checkIfNotUserNorAdmin(String username, UserDetails userDetails, Jwt jwt) {
+    public void checkIfNotUserNorAdmin(String username, UserDetails userDetails, Jwt jwt) {
         if (jwt != null) {
             if (isNeitherUserNorAdmin(username, jwt)) throw new UserBadRequestException("Not the same user.");
         } else if (userDetails != null) {
