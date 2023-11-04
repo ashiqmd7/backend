@@ -40,13 +40,35 @@ import org.slf4j.LoggerFactory;
 @RequestMapping(path = "/rest/api")
 public class CalendarController {
     private final BookingService bookingService;
-    private final BookingController bookingController;
     private static final Logger logger = LoggerFactory.getLogger(CalendarController.class);
 
 
-    public CalendarController(BookingService bookingService, BookingController bookingController) {
+    public CalendarController(BookingService bookingService) {
         this.bookingService = bookingService;
-        this.bookingController = bookingController;
+    }
+
+    private boolean isAdmin(UserDetails userDetails) { return userDetails.getAuthorities().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")); }
+    private boolean isAdmin(Jwt jwt) { return jwt.getClaim("role").equals("ROLE_ADMIN"); }
+    private boolean isNeitherUserNorAdmin(String username, UserDetails userDetails) {
+        boolean isUser = username.equals(userDetails.getUsername());
+        boolean isAdmin = isAdmin(userDetails);
+
+        return (!isUser && !isAdmin);
+    }
+    private boolean isNeitherUserNorAdmin(String username, Jwt jwt) {
+        boolean isUser = username.equals(jwt.getClaim("sub"));
+        boolean isAdmin = isAdmin(jwt);
+
+        return (!isUser && !isAdmin);
+    }
+    public void checkIfNotUserNorAdmin(String username, UserDetails userDetails, Jwt jwt) {
+        if (jwt != null) {
+            if (isNeitherUserNorAdmin(username, jwt)) throw new UserBadRequestException("Not the same user.");
+        } else if (userDetails != null) {
+            if (isNeitherUserNorAdmin(username, userDetails)) throw new UserBadRequestException("Not the same user.");
+        } else {
+            throw new UserBadRequestException("No AuthenticationPrincipal provided for check.");
+        }
     }
 
     @GetMapping(path = "/generate-calendar/{bookingId}")
@@ -61,43 +83,51 @@ public class CalendarController {
 
             Booking booking = bookingService.getBookingById(bookingId);
 
-            bookingController.checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
+            checkIfNotUserNorAdmin(bookingUsername, userDetails, jwt);
 
-            if (booking == null || booking.getInboundRouteListing() == null) {
-                logger.warn("Booking or inboundRouteListing is null.");
-                return ResponseEntity.notFound().build();
+            // Check if inboundRouteListing is not null
+            if (booking.getInboundRouteListing() != null) {
+                try {
+                    String eventSummary = "Flight Booking";
+                    VEvent event = createICalEvent(booking, eventSummary);
+
+                    if (event == null) {
+                        logger.error("Failed to create iCalendar event.");
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(new ByteArrayResource("Failed to create iCalendar event".getBytes()));
+                    }
+
+                    // Convert the iCalendar event to a byte array
+                    Calendar icsCalendar = new Calendar();
+                    icsCalendar.getProperties().add(new ProdId("-//WingIt//iCal4j 1.0//EN"));
+                    icsCalendar.getComponents().add(event);
+                    byte[] calendarBytes = icsCalendar.toString().getBytes();
+
+                    // Create a Resource from the byte array
+                    Resource resource = new ByteArrayResource(calendarBytes);
+
+                    // Set response headers for the calendar file download
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=mycalendar.ics");
+                    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+                    headers.add("Pragma", "no-cache");
+                    headers.add("Expires", "0");
+
+                    // Return the calendar file as a response
+                    return ResponseEntity.ok()
+                            .headers(headers)
+                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                            .body(resource);
+                } catch (Exception e) {
+                    logger.error("Exception occurred: {}", e.getMessage(), e);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(new ByteArrayResource(("Error: " + e.getMessage()).getBytes()));
+                }
+            } else {
+                // Handle the case when inboundRouteListing is null
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ByteArrayResource("InboundRouteListing is null".getBytes()));
             }
-
-            String eventSummary = "Flight Booking";
-            VEvent event = createICalEvent(booking, eventSummary);
-
-            if (event == null) {
-                logger.error("Failed to create iCalendar event.");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ByteArrayResource("Failed to create iCalendar event".getBytes()));
-            }
-
-            // Convert the iCalendar event to a byte array
-            Calendar icsCalendar = new Calendar();
-            icsCalendar.getProperties().add(new ProdId("-//WingIt//iCal4j 1.0//EN"));
-            icsCalendar.getComponents().add(event);
-            byte[] calendarBytes = icsCalendar.toString().getBytes();
-
-            // Create a Resource from the byte array
-            Resource resource = new ByteArrayResource(calendarBytes);
-
-            // Set response headers for the calendar file download
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=mycalendar.ics");
-            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-            headers.add("Pragma", "no-cache");
-            headers.add("Expires", "0");
-
-            // Return the calendar file as a response
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resource);
         } catch (Exception e) {
             logger.error("Exception occurred: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
