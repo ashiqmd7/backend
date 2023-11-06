@@ -115,8 +115,13 @@ public class BookingService {
         for (Booking booking : activeBookingsForRouteListing) {
             numRemainingSeats -= booking.getPartySize(); // Remove reserved number of seats for active booking
             // must do below because if unfinished booking reserves a seat, numRemainingSeats will be one less and double counted by party pax.
-            numRemainingSeats += booking.getSeatListing().size(); // Add back to tally those they already booked to undo doublecount.
-
+            int numSeatsMatchingRouteListing = 0;
+            for (SeatListing seatListing : booking.getSeatListing()) {
+                if (seatListing.getSeatListingPk().getRouteListing().getRouteListingPk().equals(routeListingPk)) {
+                    numSeatsMatchingRouteListing++;
+                }
+            }
+            numRemainingSeats += numSeatsMatchingRouteListing; // Add back to tally those they already booked to undo doublecount.
         }
 
         return numRemainingSeats;
